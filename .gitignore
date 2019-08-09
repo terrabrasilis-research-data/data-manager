@@ -1,47 +1,48 @@
-# See http://help.github.com/ignore-files/ for more about ignoring files.
-/db
-
-# compiled output
-/dist
-/tmp
-/out-tsc
-# Only exists if Bazel was run
-/bazel-out
-
-# dependencies
-/node_modules
-
-# profiling files
-chrome-profiler-events.json
-speed-measure-plugin.json
-
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-.history/*
-
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-/typings
-
-# System Files
+syntax: glob
+# generic
+*.pyc
+*.swp
+*.swo
 .DS_Store
-Thumbs.db
+ckan.egg-info/*
+sandbox/*
+dist
+
+# pylons
+development.ini*
+sstore/*
+data/*
+pylons_data/*
+#ckan/i18n/*/*/*.mo
+
+# other
+pip-requirements-local.txt
+migrate/*
+build/*
+tmp/*
+solr_runtime/*
+fl_notes.txt
+*.ini
+.noseids
+*~
+.idea
+.vscode
+
+# custom style
+ckan/public/base/less/custom.less
+
+# nosetest coverage output
+.coverage
+htmlcov/*
+
+# CKAN
+ckan.log
+ckan_deb/DEBIAN/control
+ckan_deb/DEBIAN/prerm
+
+# node.js
+node_modules/
+
+# docker
+contrib/docker/.env
+terrabrasilis-research-data-api/flask
