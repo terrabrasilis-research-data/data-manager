@@ -14,7 +14,6 @@ Installation
 7. `cd terrabrasilis-research-data-api`
 8. run the following command: `virtualenv flask` 
 9. run the following command: `flask/bin/pip install flask` 
-10. run the following command: `flask/bin/pip install flask` 
-11.  run the following command: `flask/bin/pip install flask-httpauth` 
-12.  run the following command: `chmod a+x app.py`
-13.  run the following command: `./app.py`
+10.  run the following command: `flask/bin/pip install flask-httpauth` 
+11.  run the following command: `chmod a+x app.py`
+12.  run the following command: `./app.py`
