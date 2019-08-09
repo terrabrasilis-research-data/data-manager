@@ -3,15 +3,33 @@ The Data Manager component is responsible for the management of Research Data Re
 
 CKAN Installation
 ------------
-1. cd terrabrasilis-research-data-ckan/contrib/docker
-2. sudo docker-compose up -d --build
-3. sudo docker exec -it ckan /usr/local/bin/ckan-paster --plugin=ckan sysadmin -c /etc/ckan/production.ini add ckanadmin
+```sh
+cd terrabrasilis-research-data-ckan/contrib/docker
+```
+```sh
+sudo docker-compose up -d --build
+```
+```sh
+sudo docker exec -it ckan /usr/local/bin/ckan-paster --plugin=ckan sysadmin -c /etc/ckan/production.ini add ckanadmin
+```
 
 TBRD Installation
 ------------
-1. cd terrabrasilis-research-data-api
-2. virtualenv flask
-3. flask/bin/pip install flask
-4. flask/bin/pip install flask-httpauth
-5. chmod a+x app.py
-6. ./app.py
+```sh
+cd terrabrasilis-research-data-api
+```
+```sh
+virtualenv flask
+```
+```sh
+flask/bin/pip install flask
+```
+```sh
+flask/bin/pip install flask-httpauth
+```
+```sh
+chmod a+x app.py
+```
+```sh
+./app.py
+```
