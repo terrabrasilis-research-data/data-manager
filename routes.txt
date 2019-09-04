@@ -1,0 +1,16 @@
+GET ALL
+curl -i http://localhost:5000/api/v1.0/repositories
+
+GET ONE
+curl -i http://localhost:5000/api/v1.0/repositories/1
+
+CREATE
+curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"name":"Teste", "users":"[]", "abstract":""}' http://localhost:5000/api/v1.0/repositories
+
+UPDATE
+curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X PUT -d '{"name":"AAA", "users":"[]", "abstract":"AAA"}' http://localhost:5000/api/v1.0/repositories/3
+
+DELETE
+curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X DELETE -d '{"id":3}' http://localhost:5000/api/v1.0/repositories/3
+
+
