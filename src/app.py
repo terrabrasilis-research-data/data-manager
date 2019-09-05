@@ -153,8 +153,7 @@ def make_public_repositorie(repositorie):
         else:
             new_repositorie[field] = repositorie[field]
     data = new_repositorie
-	repo_users = [user for user in users if user in data["users"]]
-    return {"name": data['name'], "users": repo_users, "abstract":data["abstract"], "categories": data["categories"], "keywords": data["keywords"], "uri": data["uri"]}
+    return {"name": data['name'], "users": {}, "abstract":data["abstract"], "categories": data["categories"], "keywords": data["keywords"], "uri": data["uri"]}
 
 def make_public_user(user):
     new_user = {}
@@ -178,7 +177,16 @@ def get_user(user_id):
 
 @app.route('/api/v1.0/repositories', methods=['GET'])
 def get_repositories():
-    return jsonify({'repositories': [make_public_repositorie(repositorie) for repositorie in repositories] })
+    data = {'repositories': [make_public_repositorie(repositorie) for repositorie in repositories] }
+    new_user = {}
+    for field in users:
+        if field == 'id':
+            new_user['uri'] = url_for('get_user', user_id=user['id'], _external=True)
+        else:
+            new_user[field] = user[field]
+    users_repo = [user for user in new_user if new_user['id'] in data["users"]]
+    data["users"] = users_repo
+    return jsonify(data)
 
 @app.route('/api/v1.0/repositories/<int:repositorie_id>', methods=['GET'])
 def get_repositorie(repositorie_id):
@@ -193,10 +201,10 @@ def create_repositorie():
     if not request.json or not 'name' and 'users' and 'abstract' in request.json:
         abort(400)
     repositorie = {
-		"id": repositories[-1]['id'] + 1,
-		"name": request.json['name'],
-		"users": request.json['users'],
-		"abstract": request.json['abstract']
+        "id": repositories[-1]['id'] + 1,
+        "name": request.json['name'],
+        "users": request.json['users'],
+        "abstract": request.json['abstract']
     }
     repositories.append(repositorie)
     return jsonify({'repositorie': repositorie}), 201
@@ -231,6 +239,3 @@ def delete_repositorie(repositorie_id):
 
 if __name__ == '__main__':
     app.run('0.0.0.0')
-
-
-    
