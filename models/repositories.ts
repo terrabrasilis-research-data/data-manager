@@ -5,31 +5,13 @@ declare module repositories {
         image: string;
     }
 
-    export interface Service {
-        id: number;
-        name: string;
-        host: string;
-        ports: number[];
-        created_on: Date;
-    }
-
-    export interface CustomField {
-    }
-
-    export interface Repositorie {
-        id: number;
+    export interface Repository {
+        categories: string[];
+        keywords: string[];
+        users: User[];
         name: string;
         abstract: string;
-        maintainer: string;
-        created_on: Date;
-        language: string;
-        email: string;
-        bbox: number[];
-        keywords: string[];
-        categories: string[];
-        users: User[];
-        services: Service[];
-        custom_fields: CustomField[];
+        uri: string;
     }
 
 }

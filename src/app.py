@@ -25,6 +25,18 @@ def unauthorized():
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
+users = [
+	{
+			"id": 1,
+			"name": "username_1",
+			"image": "assets/images/img_avatar.png"
+		}, {
+			"id": 2,
+			"name": "username_2",
+			"image": "assets/images/img_avatar2.png"
+		}
+]
+
 repositories = [
     {
 
@@ -47,9 +59,11 @@ repositories = [
 		"keywords": ["Sistemas Socioambientais", "Atividade Antrópicas", "Uso e Cobertura da Terra"],
 		"categories": ["Uso e Cobertura da Terra"],
 		"users": [{
+			"id": 1,
 			"name": "username_1",
 			"image": "assets/images/img_avatar2.png"
 		}, {
+			"id": 2,
 			"name": "username_2",
 			"image": "assets/images/img_avatar.png"
 		}],
@@ -97,9 +111,11 @@ repositories = [
 		"keywords": ["Sensoriamento Remoto", "Sistemas Aquáticos", "Águas Continentais"],
 		"categories": ["Sensoriamento Remoto"],
 		"users": [{
+			"id": 1,
 			"name": "username_1",
 			"image": "assets/images/img_avatar.png"
 		}, {
+			"id": 2,
 			"name": "username_2",
 			"image": "assets/images/img_avatar2.png"
 		}],
@@ -137,7 +153,28 @@ def make_public_repositorie(repositorie):
         else:
             new_repositorie[field] = repositorie[field]
     data = new_repositorie
-    return data['name'], data["users"], data["abstract"]
+	repo_users = [user for user in users if user in data["users"]]
+    return {"name": data['name'], "users": repo_users, "abstract":data["abstract"], "categories": data["categories"], "keywords": data["keywords"], "uri": data["uri"]}
+
+def make_public_user(user):
+    new_user = {}
+    for field in user:
+        if field == 'id':
+            new_user['uri'] = url_for('get_user', user_id=user['id'], _external=True)
+        else:
+            new_user[field] = user[field]
+    return new_user
+
+@app.route('/api/v1.0/users', methods=['GET'])
+def get_users():
+    return jsonify({'users': [make_public_user(user) for user in users] })
+
+@app.route('/api/v1.0/users/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    user = [user for user in users if user['id'] == user_id]
+    if len(user) == 0:
+        abort(404)
+    return jsonify({'user': user[0]})
 
 @app.route('/api/v1.0/repositories', methods=['GET'])
 def get_repositories():
