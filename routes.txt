@@ -1,8 +1,10 @@
 GET ALL
 curl -i http://localhost:5000/api/v1.0/repositories
+curl -i http://localhost:5000/api/v1.0/users
 
 GET ONE
 curl -i http://localhost:5000/api/v1.0/repositories/1
+curl -i http://localhost:5000/api/v1.0/users/1
 
 CREATE
 curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"name":"Teste", "users":"[]", "abstract":""}' http://localhost:5000/api/v1.0/repositories
