@@ -27,11 +27,11 @@ def not_found(error):
 
 users = [
 	{
-			"id": 1,
+			"user_id": 1,
 			"name": "username_1",
 			"image": "assets/images/img_avatar.png"
 		}, {
-			"id": 2,
+			"user_id": 2,
 			"name": "username_2",
 			"image": "assets/images/img_avatar2.png"
 		}
@@ -59,30 +59,30 @@ repositories = [
 		"keywords": ["Sistemas Socioambientais", "Atividade Antrópicas", "Uso e Cobertura da Terra"],
 		"categories": ["Uso e Cobertura da Terra"],
 		"users": [{
-			"id": 1,
+			"user_id": 1,
 			"name": "username_1",
 			"image": "assets/images/img_avatar2.png"
 		}, {
-			"id": 2,
+			"user_id": 2,
 			"name": "username_2",
 			"image": "assets/images/img_avatar.png"
 		}],
 		"services": [{
-				"id": 1,
+				"service_id": 1,
 				"name": "PostgreSQL",
 				"host": "137.012.125.01",
 				"ports": [5432],
 				"created_on": "2019-09-04T14:48:54+00:00"
 			},
 			{
-				"id": 2,
+				"service_id": 2,
 				"name": "GeoServer",
 				"host": "137.012.125.02",
 				"ports": [5555, 5050],
 				"created_on": "2019-09-04T14:48:54+00:00"
 			},
 			{
-				"id": 3,
+				"service_id": 3,
 				"name": "GeoNetwork",
 				"host": "137.012.125.03",
 				"ports": [5000],
@@ -111,30 +111,30 @@ repositories = [
 		"keywords": ["Sensoriamento Remoto", "Sistemas Aquáticos", "Águas Continentais"],
 		"categories": ["Sensoriamento Remoto"],
 		"users": [{
-			"id": 1,
+			"user_id": 1,
 			"name": "username_1",
 			"image": "assets/images/img_avatar.png"
 		}, {
-			"id": 2,
+			"user_id": 2,
 			"name": "username_2",
 			"image": "assets/images/img_avatar2.png"
 		}],
 		"services": [{
-				"id": 1,
+				"service_id": 1,
 				"name": "PostgreSQL",
 				"host": "137.012.125.01",
 				"ports": [5432],
 				"created_on": "2019-09-04T14:48:54+00:00"
 			},
 			{
-				"id": 2,
+				"service_id": 2,
 				"name": "GeoServer",
 				"host": "137.012.125.02",
 				"ports": [5555, 5050],
 				"created_on": "2019-09-04T14:48:54+00:00"
 			},
 			{
-				"id": 3,
+				"service_id": 3,
 				"name": "GeoNetwork",
 				"host": "137.012.125.03",
 				"ports": [5000],
@@ -145,7 +145,7 @@ repositories = [
 	}
 ]
 
-def make_public_repositorie(repositorie):
+def make_public_repositorie(repositorie, multiple):
     new_repositorie = {}
     for field in repositorie:
         if field == 'id':
@@ -153,13 +153,16 @@ def make_public_repositorie(repositorie):
         else:
             new_repositorie[field] = repositorie[field]
     data = new_repositorie
-    return {"name": data['name'], "users": {}, "abstract":data["abstract"], "categories": data["categories"], "keywords": data["keywords"], "uri": data["uri"]}
+    if multiple == True:
+        return {"name": data['name'], "users": [make_public_user(user) for user in data["users"]], "abstract":data["abstract"], "categories": data["categories"], "keywords": data["keywords"], "uri": data["uri"]}
+    else:
+        return {"name": data['name'], "users": [make_public_user(user) for user in data["users"]], "abstract":data["abstract"], "categories": data["categories"], "keywords": data["keywords"], "uri": data["uri"], "maintainer": data['maintainer'], "created_on": data['created_on'], "language": data['language'], "email": data['email'], "bbox": data['bbox'], "keywords": data['keywords'], "categories": data['categories'], "services": data['services'], "custom_fields": data['custom_fields']}
 
 def make_public_user(user):
     new_user = {}
     for field in user:
-        if field == 'id':
-            new_user['uri'] = url_for('get_user', user_id=user['id'], _external=True)
+        if field == 'user_id':
+            new_user['uri'] = url_for('get_user', user_id=user['user_id'], _external=True)
         else:
             new_user[field] = user[field]
     return new_user
@@ -170,22 +173,14 @@ def get_users():
 
 @app.route('/api/v1.0/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
-    user = [user for user in users if user['id'] == user_id]
+    user = [user for user in users if user['user_id'] == user_id]
     if len(user) == 0:
         abort(404)
     return jsonify({'user': user[0]})
 
 @app.route('/api/v1.0/repositories', methods=['GET'])
 def get_repositories():
-    data = {'repositories': [make_public_repositorie(repositorie) for repositorie in repositories] }
-    new_user = {}
-    for field in users:
-        if field == 'id':
-            new_user['uri'] = url_for('get_user', user_id=user['id'], _external=True)
-        else:
-            new_user[field] = user[field]
-    users_repo = [user for user in new_user if new_user['id'] in data["users"]]
-    data["users"] = users_repo
+    data = {'repositories': [make_public_repositorie(repositorie, True) for repositorie in repositories] }
     return jsonify(data)
 
 @app.route('/api/v1.0/repositories/<int:repositorie_id>', methods=['GET'])
@@ -193,7 +188,7 @@ def get_repositorie(repositorie_id):
     repositorie = [repositorie for repositorie in repositories if repositorie['id'] == repositorie_id]
     if len(repositorie) == 0:
         abort(404)
-    return jsonify({'repositorie': repositorie[0]})
+    return jsonify({'repositorie': make_public_repositorie(repositorie[0], False)})
 
 @app.route('/api/v1.0/repositories', methods=['POST'])
 @auth.login_required
@@ -238,4 +233,4 @@ def delete_repositorie(repositorie_id):
     return jsonify({'result': True})
 
 if __name__ == '__main__':
-    app.run('0.0.0.0')
+    app.run('0.0.0.0',debug=True)
