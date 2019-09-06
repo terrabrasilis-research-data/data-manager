@@ -11,20 +11,24 @@ auth = HTTPBasicAuth()
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
+#oath
 @auth.get_password
 def get_password(username):
     if username == 'gabriel':
         return 'gabriel'
     return None
 
+#oath
 @auth.error_handler
 def unauthorized():
     return make_response(jsonify({'error': 'Unauthorized access'}), 403)
 
+#errorhandler
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
-
+	
+#data
 users = [
 	{
 			"user_id": 1,
@@ -37,6 +41,7 @@ users = [
 		}
 ]
 
+#data
 repositories = [
     {
 
@@ -145,7 +150,8 @@ repositories = [
 	}
 ]
 
-def make_public_repositorie(repositorie, multiple):
+#uri repositories
+def make_public_repositorie(repositorie):
     new_repositorie = {}
     for field in repositorie:
         if field == 'id':
@@ -153,11 +159,9 @@ def make_public_repositorie(repositorie, multiple):
         else:
             new_repositorie[field] = repositorie[field]
     data = new_repositorie
-    if multiple == True:
-        return {"name": data['name'], "users": [make_public_user(user) for user in data["users"]], "abstract":data["abstract"], "categories": data["categories"], "keywords": data["keywords"], "uri": data["uri"]}
-    else:
-        return {"name": data['name'], "users": [make_public_user(user) for user in data["users"]], "abstract":data["abstract"], "categories": data["categories"], "keywords": data["keywords"], "uri": data["uri"], "maintainer": data['maintainer'], "created_on": data['created_on'], "language": data['language'], "email": data['email'], "bbox": data['bbox'], "keywords": data['keywords'], "categories": data['categories'], "services": data['services'], "custom_fields": data['custom_fields']}
+    return {"name": data['name'], "users": [make_public_user(user) for user in data["users"]], "abstract":data["abstract"], "categories": data["categories"], "keywords": data["keywords"], "uri": data["uri"], "maintainer": data['maintainer'], "created_on": data['created_on'], "language": data['language'], "email": data['email'], "bbox": data['bbox'], "keywords": data['keywords'], "categories": data['categories'], "services": data['services'], "custom_fields": data['custom_fields']}
 
+#uri users
 def make_public_user(user):
     new_user = {}
     for field in user:
@@ -167,10 +171,12 @@ def make_public_user(user):
             new_user[field] = user[field]
     return new_user
 
+#get_users()
 @app.route('/api/v1.0/users', methods=['GET'])
 def get_users():
     return jsonify({'users': [make_public_user(user) for user in users] })
 
+#get_user(user_id)
 @app.route('/api/v1.0/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
     user = [user for user in users if user['user_id'] == user_id]
@@ -178,18 +184,21 @@ def get_user(user_id):
         abort(404)
     return jsonify({'user': user[0]})
 
+#get_repositories()
 @app.route('/api/v1.0/repositories', methods=['GET'])
 def get_repositories():
-    data = {'repositories': [make_public_repositorie(repositorie, True) for repositorie in repositories] }
+    data = {'repositories': [make_public_repositorie(repositorie) for repositorie in repositories] }
     return jsonify(data)
 
+#get_repositorie(repositorie_id)
 @app.route('/api/v1.0/repositories/<int:repositorie_id>', methods=['GET'])
 def get_repositorie(repositorie_id):
     repositorie = [repositorie for repositorie in repositories if repositorie['id'] == repositorie_id]
     if len(repositorie) == 0:
         abort(404)
-    return jsonify({'repositorie': make_public_repositorie(repositorie[0], False)})
+    return jsonify({'repositorie': make_public_repositorie(repositorie[0])})
 
+#create_repositorie()
 @app.route('/api/v1.0/repositories', methods=['POST'])
 @auth.login_required
 def create_repositorie():
@@ -204,6 +213,7 @@ def create_repositorie():
     repositories.append(repositorie)
     return jsonify({'repositorie': repositorie}), 201
 
+#update_repositorie(repositorie_id)
 @app.route('/api/v1.0/repositories/<int:repositorie_id>', methods=['PUT'])
 @auth.login_required
 def update_repositorie(repositorie_id):
@@ -222,7 +232,8 @@ def update_repositorie(repositorie_id):
     repositorie[0]['users'] = request.json.get('users', repositorie[0]['users'])
     repositorie[0]['abstract'] = request.json.get('abstract', repositorie[0]['abstract'])
     return jsonify({'repositorie': repositorie[0]})
-    
+
+#delete_repositorie(repositorie_id)    
 @app.route('/api/v1.0/repositories/<int:repositorie_id>', methods=['DELETE'])
 @auth.login_required
 def delete_repositorie(repositorie_id):
@@ -232,5 +243,6 @@ def delete_repositorie(repositorie_id):
     repositories.remove(repositorie[0])
     return jsonify({'result': True})
 
+#app
 if __name__ == '__main__':
     app.run('0.0.0.0',debug=True)
