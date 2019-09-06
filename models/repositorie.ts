@@ -1,36 +1,36 @@
 declare module repositories {
 
     export interface User {
+        id: number;
         name: string;
         image: string;
-        id: number;
     }
 
     export interface CustomField {
     }
 
     export interface Service {
-        name: string;
         id: number;
+        name: string;
         host: string;
         ports: number[];
         created_on: Date;
     }
 
     export interface Repositorie {
-        language: string;
-        users: User[];
-        name: string;
         id: number;
-        keywords: string[];
-        created_on: Date;
-        maintainer: string;
-        categories: string[];
-        custom_fields: CustomField[];
+        name: string;
+        users: User[];
         abstract: string;
+        categories: string[];
+        keywords: string[];
+        maintainer: string;
+        language: string;
+        created_on: Date;
+        services: Service[];
         email: string;
         bbox: number[];
-        services: Service[];
+        custom_fields: CustomField[];
     }
 
 }

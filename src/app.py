@@ -159,7 +159,7 @@ def make_public_repositorie(repositorie):
         else:
             new_repositorie[field] = repositorie[field]
     data = new_repositorie
-    return {"name": data['name'], "users": [make_public_user(user) for user in data["users"]], "abstract":data["abstract"], "categories": data["categories"], "keywords": data["keywords"], "uri": data["uri"], "maintainer": data['maintainer'], "created_on": data['created_on'], "language": data['language'], "email": data['email'], "bbox": data['bbox'], "keywords": data['keywords'], "categories": data['categories'], "services": data['services'], "custom_fields": data['custom_fields']}
+    return {"name": data['name'], "users": [make_public_user(user) for user in data['users']], "abstract":data['abstract'], "categories": data['categories'], "uri": data['uri'], "maintainer": data['maintainer'], "created_on": data['created_on'], "language": data['language'], "email": data['email'], "bbox": data['bbox'], "keywords": data['keywords'], "services": data['services'], "custom_fields": data['custom_fields']}
 
 #uri users
 def make_public_user(user):
@@ -206,9 +206,18 @@ def create_repositorie():
         abort(400)
     repositorie = {
         "id": repositories[-1]['id'] + 1,
-        "name": request.json['name'],
-        "users": request.json['users'],
-        "abstract": request.json['abstract']
+		"name": request.json['name'],
+		"users": request.json['users'],
+		"abstract": request.json['abstract'],
+		"categories": request.json['categories'],
+		"maintainer": request.json['maintainer'],
+		"created_on": request.json['created_on'],
+		"language": request.json['language'],
+		"email":request.json['email'],
+		"bbox": request.json['bbox'],
+		"keywords": request.json['keywords'],
+		"services": request.json['services'],
+		"custom_fields": request.json['custom_fields']
     }
     repositories.append(repositorie)
     return jsonify({'repositorie': repositorie}), 201
