@@ -4,11 +4,6 @@ The Data Manager component is responsible for the management of Research Data Re
 
 How to use
 ------------
-#### get_repositories()
-```sh
-curl -i http://localhost:5000/api/v1.0/repositories
-```
-
 #### get_users()
 ```sh
 curl -i http://localhost:5000/api/v1.0/users
@@ -17,6 +12,11 @@ curl -i http://localhost:5000/api/v1.0/users
 #### get_user(user_id)
 ```sh
 curl -i http://localhost:5000/api/v1.0/users/1
+```
+
+#### get_repositories()
+```sh
+curl -i http://localhost:5000/api/v1.0/repositories
 ```
 
 #### get_repositorie(repositorie_id)
