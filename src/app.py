@@ -75,34 +75,6 @@ def make_public_user(user):
             new_user[field] = user[field]
     return new_user
 
-#create_user()
-@app.route('/api/v1.0/users', methods=['POST'])
-def create_user():
-    if not request.json or not 'username' and 'password' and 'image' in request.json:
-        abort(400)
-    username=request.args.get('username')
-    full_name=request.args.get('full_name')
-    password=request.args.get('password')
-    email=request.args.get('email')
-    image=request.args.get('image')
-    created_on=request.args.get('created_on')
-    last_login=request.args.get('last_login')
-    try:
-        user=User(
-            username = username,
-            full_name = full_name,
-            password = password,
-            email = email,
-            image = image,
-            created_on = created_on,
-            last_login = last_login
-        )
-        db.session.add(user)
-        db.session.commit()
-        return "User added. user id={}".format(user.user_id)
-    except Exception as e:
-        return(str(e))
-
 #get_users()
 @app.route("/api/v1.0/users")
 def get_users():
@@ -122,7 +94,34 @@ def get_user(user_id):
     except Exception as e:
 	    return(str(e))
 
-
+#create_user()
+@app.route('/api/v1.0/users', methods=['POST'])
+@auth.login_required
+def create_user():
+    if not request.json or not 'username' and 'password' and 'image' in request.json:
+        abort(400)
+    username=request.json['username']
+    full_name=request.json['full_name']
+    password=request.json['password']
+    email=request.json['email']
+    image=request.json['image']
+    created_on=request.json['created_on']
+    last_login=request.json['last_login']
+    try:
+        user=User(
+            username = username,
+            full_name = full_name,
+            password = password,
+            email = email,
+            image = image,
+            created_on = created_on,
+            last_login = last_login
+        )
+        db.session.add(user)
+        db.session.commit()
+        return "User added. user id={}".format(user.user_id)
+    except Exception as e:
+        return(str(e))
 
 
 
