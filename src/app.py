@@ -1,15 +1,41 @@
 #!flask/bin/python
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate, MigrateCommand
 from flask_httpauth import HTTPBasicAuth
 from flask import Flask, jsonify
 from flask import make_response
 from flask import request
 from flask import url_for
 from flask import abort
+from models import *
+import os
+
+#auth
 auth = HTTPBasicAuth()
+
+#env
+def get_env_variable(name):
+    try:
+        return os.environ[name]
+    except KeyError:
+        message = "Expected environment variable '{}' not set.".format(name)
+        raise Exception(message)
+
+#values
+POSTGRES_URL = get_env_variable("POSTGRES_URL")
+POSTGRES_USER = get_env_variable("POSTGRES_USER")
+POSTGRES_PW = get_env_variable("POSTGRES_PW")
+POSTGRES_DB = get_env_variable("POSTGRES_DB")
 
 #app
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
+
+#db
+DB_URL = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=POSTGRES_USER,pw=POSTGRES_PW,url=POSTGRES_URL,db=POSTGRES_DB)
+app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # silence the deprecation warning
+db = SQLAlchemy(app)
 
 #oath
 @auth.get_password
@@ -28,128 +54,6 @@ def unauthorized():
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
-#data
-users = [
-	{
-			"user_id": 1,
-			"name": "username_1",
-			"image": "assets/images/img_avatar.png"
-		}, {
-			"user_id": 2,
-			"name": "username_2",
-			"image": "assets/images/img_avatar2.png"
-		}
-]
-
-#data
-repositories = [
-    {
-
-		"id": 1,
-		"name": "LiSS",
-		"abstract": "O Laboratório de Investigação Sistemas Socioambientais (LiSS) é um dos laboratórios que compõe a Coordenação-Geral de Observação da Terra OBT-INPE. Ele tem como objeto estudar a influencia das atividade antrópicas nas mudanças de uso e cobertura da Terra. A principal área de estudo do LiSS é a Amazônia Legal, porém pesquisas também vem sendo feitas na região do Vale Paraibano (SP) e no bioma do Pantanal.",
-		"maintainer": "username",
-		"created_on": "2019-09-04T14:48:54+00:00",
-		"language": "Português",
-		"email": "email@email.com",
-		"bbox": [
-			[
-				[-70.0588433406, -33.3848757513],
-				[-35.2541558406, -33.3848757513],
-				[-35.2541558406, 0.2315631899],
-				[-70.0588433406, 0.2315631899],
-				[-70.0588433406, -33.3848757513]
-			]
-		],
-		"keywords": ["Sistemas Socioambientais", "Atividade Antrópicas", "Uso e Cobertura da Terra"],
-		"categories": ["Uso e Cobertura da Terra"],
-		"users": [{
-			"user_id": 1,
-			"name": "username_1",
-			"image": "assets/images/img_avatar2.png"
-		}, {
-			"user_id": 2,
-			"name": "username_2",
-			"image": "assets/images/img_avatar.png"
-		}],
-		"services": [{
-				"service_id": 1,
-				"name": "PostgreSQL",
-				"host": "137.012.125.01",
-				"ports": [5432],
-				"created_on": "2019-09-04T14:48:54+00:00"
-			},
-			{
-				"service_id": 2,
-				"name": "GeoServer",
-				"host": "137.012.125.02",
-				"ports": [5555, 5050],
-				"created_on": "2019-09-04T14:48:54+00:00"
-			},
-			{
-				"service_id": 3,
-				"name": "GeoNetwork",
-				"host": "137.012.125.03",
-				"ports": [5000],
-				"created_on": "2019-09-04T14:48:54+00:00"
-			}
-		],
-		"custom_fields": [{}]
-	},
-	{
-		"id": 2,
-		"name": "LabISA",
-		"abstract": "O Laboratório de Instrumentação de Sistemas Aquáticos (LabISA) é um dos laboratórios que compõe a Coordenação-Geral de Observação da Terra OBT-INPE. O laboratório foi motivado pelo aumento no número de estudos voltados à aplicações de sensoriamento remoto para estimativa de propriedades físicas, biológicas e químicas de águas continentais. A principal atividade do laboratório é coleta de dados sobre propriedades óticas e limnológicas de águas interiores e costeiras. A principal área de estudo do LabISA são sistemas de águas interiores de diferentes biomas do Brasil.",
-		"maintainer": "username",
-		"created_on": "2019-09-04T14:48:54+00:00",
-		"language": "Português",
-		"email": "email@email.com",
-		"bbox": [
-			[
-				[-70.0588433406, -33.3848757513],
-				[-35.2541558406, -33.3848757513],
-				[-35.2541558406, 0.2315631899],
-				[-70.0588433406, 0.2315631899],
-				[-70.0588433406, -33.3848757513]
-			]
-		],
-		"keywords": ["Sensoriamento Remoto", "Sistemas Aquáticos", "Águas Continentais"],
-		"categories": ["Sensoriamento Remoto"],
-		"users": [{
-			"user_id": 1,
-			"name": "username_1",
-			"image": "assets/images/img_avatar.png"
-		}, {
-			"user_id": 2,
-			"name": "username_2",
-			"image": "assets/images/img_avatar2.png"
-		}],
-		"services": [{
-				"service_id": 1,
-				"name": "PostgreSQL",
-				"host": "137.012.125.01",
-				"ports": [5432],
-				"created_on": "2019-09-04T14:48:54+00:00"
-			},
-			{
-				"service_id": 2,
-				"name": "GeoServer",
-				"host": "137.012.125.02",
-				"ports": [5555, 5050],
-				"created_on": "2019-09-04T14:48:54+00:00"
-			},
-			{
-				"service_id": 3,
-				"name": "GeoNetwork",
-				"host": "137.012.125.03",
-				"ports": [5000],
-				"created_on": "2019-09-04T14:48:54+00:00"
-			}
-		],
-		"custom_fields": [{}]
-	}
-]
-
 #uri repositories
 def make_public_repositorie(repositorie):
     new_repositorie = {}
@@ -159,7 +63,7 @@ def make_public_repositorie(repositorie):
         else:
             new_repositorie[field] = repositorie[field]
     data = new_repositorie
-    return {"name": data['name'], "users": [make_public_user(user) for user in data['users']], "abstract":data['abstract'], "categories": data['categories'], "uri": data['uri'], "maintainer": data['maintainer'], "created_on": data['created_on'], "language": data['language'], "email": data['email'], "bbox": data['bbox'], "keywords": data['keywords'], "services": data['services'], "custom_fields": data['custom_fields']}
+    return {"name": data['name'], "users": [make_public_user(user) for user in data['users']], "abstract":data['abstract'], "categories": data['categories'], "uri": data['uri'], "maintainer": data['maintainer'], "created_on": data['created_on'], "language": data['language'], "email": data['email'], "bbox": data['bbox'], "start_date": data['start_date'], "end_data": data['end_data'], "keywords": data['keywords'], "services": data['services'], "custom_fields": data['custom_fields']}
 
 #uri users
 def make_public_user(user):
@@ -171,18 +75,62 @@ def make_public_user(user):
             new_user[field] = user[field]
     return new_user
 
-#get_users()
-@app.route('/api/v1.0/users', methods=['GET'])
-def get_users():
-    return jsonify({'users': [make_public_user(user) for user in users] })
+#create_user()
+@app.route('/api/v1.0/users', methods=['POST'])
+def create_user():
+    if not request.json or not 'username' and 'password' and 'image' in request.json:
+        abort(400)
+    username=request.args.get('username')
+    full_name=request.args.get('full_name')
+    password=request.args.get('password')
+    email=request.args.get('email')
+    image=request.args.get('image')
+    created_on=request.args.get('created_on')
+    last_login=request.args.get('last_login')
+    try:
+        user=User(
+            username = username,
+            full_name = full_name,
+            password = password,
+            email = email,
+            image = image,
+            created_on = created_on,
+            last_login = last_login
+        )
+        db.session.add(user)
+        db.session.commit()
+        return "User added. user id={}".format(user.user_id)
+    except Exception as e:
+        return(str(e))
 
+#get_users()
+@app.route("/api/v1.0/users")
+def get_users():
+    try:
+        users=User.query.all()
+        return jsonify([make_public_user(e.serialize()) for e in users])
+
+    except Exception as e:
+	    return(str(e))
+		
 #get_user(user_id)
-@app.route('/api/v1.0/users/<int:user_id>', methods=['GET'])
+@app.route("/api/v1.0/users/<int:user_id>")
 def get_user(user_id):
-    user = [user for user in users if user['user_id'] == user_id]
-    if len(user) == 0:
-        abort(404)
-    return jsonify({'user': user[0]})
+    try:
+        user=User.query.filter_by(user_id=user_id).first()
+        return jsonify(user.serialize())
+    except Exception as e:
+	    return(str(e))
+
+
+
+
+
+
+
+
+
+
 
 #get_repositories()
 @app.route('/api/v1.0/repositories', methods=['GET'])

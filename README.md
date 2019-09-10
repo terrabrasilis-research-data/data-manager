@@ -12,5 +12,7 @@ flask/bin/pip install -r requirements.txt
 
 chmod a+x app.py
 
+source .env
+
 ./app.py
 ```

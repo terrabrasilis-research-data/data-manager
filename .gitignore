@@ -1,4 +1,5 @@
 src/flask
+src/migrations
 
 syntax: glob
 # generic
