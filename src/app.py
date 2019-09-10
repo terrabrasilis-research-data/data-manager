@@ -75,6 +75,16 @@ def make_public_user(user):
             new_user[field] = user[field]
     return new_user
 
+#uri service
+def make_public_service(service):
+    new_service = {}
+    for field in service:
+        if field == 'service_id':
+            new_service['uri'] = url_for('get_service', service_id=service['service_id'], _external=True)
+        else:
+            new_service[field] = service[field]
+    return new_service
+
 #get_users()
 @app.route("/api/v1.0/users")
 def get_users():
@@ -119,12 +129,28 @@ def create_user():
         )
         db.session.add(user)
         db.session.commit()
-        return "User added. user id={}".format(user.user_id)
+        return jsonify({'result': True})
     except Exception as e:
         return(str(e))
 
+#get_services()
+@app.route("/api/v1.0/services")
+def get_services():
+    try:
+        services=Service.query.all()
+        return jsonify([make_public_service(e.serialize()) for e in services])
 
+    except Exception as e:
+	    return(str(e))	
 
+#get_service(service_id)
+@app.route("/api/v1.0/services/<int:service_id>")
+def get_service(service_id):
+    try:
+        service=Service.query.filter_by(service_id=service_id).first()
+        return jsonify(service.serialize())
+    except Exception as e:
+	    return(str(e))
 
 
 

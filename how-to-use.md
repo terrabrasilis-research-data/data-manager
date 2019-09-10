@@ -19,6 +19,17 @@ curl -i http://localhost:5000/api/v1.0/users/1
 curl -i curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"username": "gabriel", "full_name": "Gabriel Sansigolo", "password":"gabriel", "email":"gabrielsansigolo@gmail.com", "image":"assets/images/img_avatar2.png", "created_on":"2019-09-04T14:48:54+00:00", "last_login":"2019-09-04T14:48:54+00:00"}' http://localhost:5000/api/v1.0/users
 ```
 
+#### get_services()
+```sh
+curl -i http://localhost:5000/api/v1.0/services
+```
+
+#### get_service(service_id)
+```sh
+curl -i http://localhost:5000/api/v1.0/services/1
+```
+
+<!---
 #### get_repositories()
 ```sh
 curl -i http://localhost:5000/api/v1.0/repositories
@@ -43,4 +54,4 @@ curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X PUT -d '{"name
 ```sh
 curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X DELETE -d '{"id":3}' http://localhost:5000/api/v1.0/repositories/3
 ```
-
+-->

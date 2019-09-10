@@ -35,3 +35,40 @@ class User(db.Model):
             'created_on':self.created_on,
             'last_login':self.last_login
         }
+
+class Service(db.Model):
+
+    __tablename__ = 'services'
+
+    service_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=False, nullable=False)
+    machine = db.Column(db.Integer, unique=False, nullable=False)
+    host_id = db.Column(db.Integer, db.ForeignKey('hosts.host_id'),nullable=False)
+    created_on = db.Column(db.TIMESTAMP, unique=False, nullable=False)
+
+    def __init__(self, name, machine, host_id, created_on):
+        self.name = name
+        self.machine = machine
+        self.host_id = host_id
+        self.created_on = created_on
+
+    def __repr__(self):
+        return '<id {}>'.format(self.id)
+    
+    def serialize(self):
+        return {
+            'service_id': self.service_id, 
+            'name': self.name,
+            'machine':self.machine,
+            'host_id':self.host_id,
+            'created_on':self.created_on,
+        }
+
+#class Categories(db.Model):
+#    __tablename__ = 'categories'
+
+#class Keywords(db.Model):
+#    __tablename__ = 'keywords'
+
+#class Repositorie(db.Model):
+#    __tablename__ = 'research_data_repositories'
