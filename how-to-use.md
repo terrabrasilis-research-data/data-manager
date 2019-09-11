@@ -44,7 +44,7 @@ curl -i http://localhost:5000/api/v1.0/keywords
 curl -i http://localhost:5000/api/v1.0/repositories
 ```
 
-#### get_repositorie(repositorie_id)
+#### get_repositorie(repo_id)
 ```sh
 curl -i http://localhost:5000/api/v1.0/repositories/1
 ```
