@@ -1,4 +1,5 @@
 from app import db
+from geoalchemy2 import Geometry
 
 class User(db.Model):
 
@@ -53,7 +54,7 @@ class Service(db.Model):
         self.created_on = created_on
 
     def __repr__(self):
-        return '<id {}>'.format(self.id)
+        return '<id {}>'.format(self.service_id)
     
     def serialize(self):
         return {
@@ -102,6 +103,49 @@ class Keywords(db.Model):
             'name': self.name
         }
 
+class Repositorie(db.Model):
 
-#class Repositorie(db.Model):
-#    __tablename__ = 'research_data_repositories'
+    __tablename__ = 'research_data_repositories'
+
+    repo_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=False, nullable=False)
+    abstract = db.Column(db.String(500), unique=False, nullable=False)
+    maintainer = db.Column(db.String(355), unique=False, nullable=False)
+    created_on = db.Column(db.TIMESTAMP, unique=False, nullable=False)
+    language = db.Column(db.String(50), unique=False, nullable=False)
+    bbox = db.Column(Geometry('POLYGON'), unique=False, nullable=False)
+    start_date = db.Column(db.TIMESTAMP, unique=False, nullable=False)
+    end_date = db.Column(db.TIMESTAMP, unique=False, nullable=False)
+    custom_fields = db.Column(db.String(500), unique=False, nullable=False)
+    
+    def __init__(self, name, abstract, maintainer, created_on, language, bbox, start_date, end_date, custom_fields):
+        self.name = name
+        self.abstract = abstract
+        self.maintainer = maintainer
+        self.created_on = created_on
+        self.language = language
+        self.bbox = bbox
+        self.start_date = start_date
+        self.end_date = end_date
+        self.custom_fields = custom_fields
+    
+    def __repr__(self):
+        return '<id {}>'.format(self.id)
+
+    def serialize(self):
+        return {
+            'repo_id': self.repo_id, 
+            'name': self.name,
+            'abstract':self.abstract,
+            'maintainer':self.maintainer,
+            'created_on':self.created_on,
+            'language':self.language,
+            #'bbox':self.bbox,
+            'start_date':self.start_date,
+            'end_date':self.end_date,
+            'custom_fields':self.custom_fields,
+        }
+
+    
+
+

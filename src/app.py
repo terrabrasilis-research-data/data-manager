@@ -58,12 +58,13 @@ def not_found(error):
 def make_public_repositorie(repositorie):
     new_repositorie = {}
     for field in repositorie:
-        if field == 'id':
-            new_repositorie['uri'] = url_for('get_repositorie', repositorie_id=repositorie['id'], _external=True)
+        if field == 'repo_id':
+            new_repositorie['uri'] = url_for('get_repositorie', repo_id=repositorie['repo_id'], _external=True)
         else:
             new_repositorie[field] = repositorie[field]
     data = new_repositorie
-    return {"name": data['name'], "users": [make_public_user(user) for user in data['users']], "abstract":data['abstract'], "categories": data['categories'], "uri": data['uri'], "maintainer": data['maintainer'], "created_on": data['created_on'], "language": data['language'], "email": data['email'], "bbox": data['bbox'], "start_date": data['start_date'], "end_data": data['end_data'], "keywords": data['keywords'], "services": data['services'], "custom_fields": data['custom_fields']}
+    #{"name": data['name'], "users": [make_public_user(user) for user in data['users']], "abstract":data['abstract'], "categories": data['categories'], "uri": data['uri'], "maintainer": data['maintainer'], "created_on": data['created_on'], "language": data['language'], "email": data['email'], "bbox": data['bbox'], "start_date": data['start_date'], "end_data": data['end_data'], "keywords": data['keywords'], "services": data['services'], "custom_fields": data['custom_fields']}
+    return new_repositorie
 
 #uri users
 def make_public_user(user):
@@ -91,12 +92,11 @@ def get_users():
     try:
         users=User.query.all()
         return jsonify([make_public_user(e.serialize()) for e in users])
-
     except Exception as e:
 	    return(str(e))
 		
 #get_user(user_id)
-@app.route("/api/v1.0/users/<int:user_id>")
+@app.route("/api/v1.0/users/<int:user_id>", methods=['GET'])
 def get_user(user_id):
     try:
         user=User.query.filter_by(user_id=user_id).first()
@@ -134,10 +134,11 @@ def create_user():
         return(str(e))
 
 #get_services()
-@app.route("/api/v1.0/services")
+@app.route("/api/v1.0/services", methods=['GET'])
 def get_services():
     try:
         services=Service.query.all()
+        print(Service.query.all())
         return jsonify([make_public_service(e.serialize()) for e in services])
 
     except Exception as e:
@@ -153,7 +154,7 @@ def get_service(service_id):
 	    return(str(e))
 
 #get_categories()
-@app.route("/api/v1.0/categories")
+@app.route("/api/v1.0/categories", methods=['GET'])
 def get_categories():
     try:
         categories=Categorie.query.all()
@@ -163,12 +164,33 @@ def get_categories():
 	    return(str(e))
 
 #get_keywords()
-@app.route("/api/v1.0/keywords")
+@app.route("/api/v1.0/keywords", methods=['GET'])
 def get_keywords():
     try:
         keywords=Keywords.query.all()
+        print([e.serialize() for e in keywords])
         return jsonify([e.serialize() for e in keywords])
 
+    except Exception as e:
+	    return(str(e))
+
+#get_repositories()
+@app.route("/api/v1.0/repositories", methods=['GET'])
+def get_repositories():
+    try:
+        repositories=Repositorie.query.all()
+        print([e.serialize() for e in repositories])
+        return jsonify([make_public_repositorie(e.serialize()) for e in repositories])
+
+    except Exception as e:
+	    return(str(e))
+		
+#get_repositories(repo_id)
+@app.route("/api/v1.0/repositories/<int:repo_id>", methods=['GET'])
+def get_repositorie(repo_id):
+    try:
+        repositories=Repositorie.query.filter_by(repo_id=repo_id).first()
+        return jsonify(repositories.serialize())
     except Exception as e:
 	    return(str(e))
 
@@ -176,19 +198,15 @@ def get_keywords():
 
 
 
-#get_repositories()
-@app.route('/api/v1.0/repositories', methods=['GET'])
-def get_repositories():
-    data = {'repositories': [make_public_repositorie(repositorie) for repositorie in repositories] }
-    return jsonify(data)
 
-#get_repositorie(repositorie_id)
-@app.route('/api/v1.0/repositories/<int:repositorie_id>', methods=['GET'])
-def get_repositorie(repositorie_id):
-    repositorie = [repositorie for repositorie in repositories if repositorie['id'] == repositorie_id]
-    if len(repositorie) == 0:
-        abort(404)
-    return jsonify({'repositorie': make_public_repositorie(repositorie[0])})
+
+
+
+
+
+
+
+
 
 #create_repositorie()
 @app.route('/api/v1.0/repositories', methods=['POST'])

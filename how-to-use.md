@@ -37,9 +37,8 @@ curl -i http://localhost:5000/api/v1.0/categories
 #### get_keywords()
 ```sh
 curl -i http://localhost:5000/api/v1.0/keywords
-```
 
-<!---
+```
 #### get_repositories()
 ```sh
 curl -i http://localhost:5000/api/v1.0/repositories
@@ -49,6 +48,8 @@ curl -i http://localhost:5000/api/v1.0/repositories
 ```sh
 curl -i http://localhost:5000/api/v1.0/repositories/1
 ```
+
+<!---
 
 #### create_repositorie()
 ```sh
