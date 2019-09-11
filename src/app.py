@@ -194,43 +194,39 @@ def get_repositorie(repo_id):
     except Exception as e:
 	    return(str(e))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #create_repositorie()
 @app.route('/api/v1.0/repositories', methods=['POST'])
 @auth.login_required
 def create_repositorie():
-    if not request.json or not 'name' and 'users' and 'abstract' in request.json:
+    if not request.json or not 'name' and 'abstract' and 'maintainer' in request.json:
         abort(400)
-    repositorie = {
-        "id": repositories[-1]['id'] + 1,
-		"name": request.json['name'],
-		"users": request.json['users'],
-		"abstract": request.json['abstract'],
-		"categories": request.json['categories'],
-		"maintainer": request.json['maintainer'],
-		"created_on": request.json['created_on'],
-		"language": request.json['language'],
-		"email":request.json['email'],
-		"bbox": request.json['bbox'],
-		"keywords": request.json['keywords'],
-		"services": request.json['services'],
-		"custom_fields": request.json['custom_fields']
-    }
-    repositories.append(repositorie)
-    return jsonify({'repositorie': repositorie}), 201
+
+    name = request.json['name']
+    abstract = request.json['abstract']
+    maintainer = request.json['maintainer']
+    created_on = request.json['created_on']
+    language = request.json['language']
+    bbox = request.json['bbox']
+    start_date = request.json['start_date']
+    end_date = request.json['end_date']
+    custom_fields = request.json['custom_fields']
+    try:
+        repositorie=Repositorie(
+            name = name,
+            abstract = abstract,
+            maintainer = maintainer,
+            created_on = created_on,
+            language = language,
+            bbox = bbox,
+            start_date = start_date,
+            end_date = end_date,
+            custom_fields = custom_fields
+        )
+        db.session.add(repositorie)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+        return(str(e))
 
 #update_repositorie(repositorie_id)
 @app.route('/api/v1.0/repositories/<int:repositorie_id>', methods=['PUT'])

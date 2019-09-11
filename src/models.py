@@ -1,5 +1,9 @@
+import json
 from app import db
 from geoalchemy2 import Geometry
+from geoalchemy2 import functions
+from flask.json import jsonify
+from sqlalchemy.dialects.postgresql import JSONB
 
 class User(db.Model):
 
@@ -11,8 +15,8 @@ class User(db.Model):
     password = db.Column(db.String(50), unique=False, nullable=False)
     email = db.Column(db.String(355), unique=False, nullable=False)
     image = db.Column(db.String(355), unique=False, nullable=False)
-    created_on = db.Column(db.TIMESTAMP, unique=False, nullable=False)
-    last_login = db.Column(db.TIMESTAMP, unique=False, nullable=False)
+    created_on = db.Column(db.DateTime(), unique=False, nullable=False)
+    last_login = db.Column(db.DateTime(), unique=False, nullable=False)
 
     def __init__(self, username, full_name, password, email, image, created_on, last_login):
         self.username = username
@@ -45,7 +49,7 @@ class Service(db.Model):
     name = db.Column(db.String(50), unique=False, nullable=False)
     machine = db.Column(db.Integer, unique=False, nullable=False)
     host_id = db.Column(db.Integer, db.ForeignKey('hosts.host_id'),nullable=False)
-    created_on = db.Column(db.TIMESTAMP, unique=False, nullable=False)
+    created_on = db.Column(db.DateTime(), unique=False, nullable=False)
 
     def __init__(self, name, machine, host_id, created_on):
         self.name = name
@@ -111,12 +115,12 @@ class Repositorie(db.Model):
     name = db.Column(db.String(50), unique=False, nullable=False)
     abstract = db.Column(db.String(500), unique=False, nullable=False)
     maintainer = db.Column(db.String(355), unique=False, nullable=False)
-    created_on = db.Column(db.TIMESTAMP, unique=False, nullable=False)
+    created_on = db.Column(db.DateTime(), unique=False, nullable=False)
     language = db.Column(db.String(50), unique=False, nullable=False)
-    bbox = db.Column(Geometry('POLYGON'), unique=False, nullable=False)
-    start_date = db.Column(db.TIMESTAMP, unique=False, nullable=False)
-    end_date = db.Column(db.TIMESTAMP, unique=False, nullable=False)
-    custom_fields = db.Column(db.String(500), unique=False, nullable=False)
+    bbox = db.Column(Geometry(geometry_type='POLYGON'), unique=False, nullable=False)
+    start_date = db.Column(db.DateTime(), unique=False, nullable=False)
+    end_date = db.Column(db.DateTime(), unique=False, nullable=False)
+    custom_fields = db.Column(JSONB, unique=False, nullable=False)
     
     def __init__(self, name, abstract, maintainer, created_on, language, bbox, start_date, end_date, custom_fields):
         self.name = name
@@ -128,7 +132,7 @@ class Repositorie(db.Model):
         self.start_date = start_date
         self.end_date = end_date
         self.custom_fields = custom_fields
-    
+   
     def __repr__(self):
         return '<id {}>'.format(self.id)
 
@@ -140,12 +144,8 @@ class Repositorie(db.Model):
             'maintainer':self.maintainer,
             'created_on':self.created_on,
             'language':self.language,
-            #'bbox':self.bbox,
+            #'bbox': self.bbox, #db.session.query(functions.ST_AsGeoJSON(self.bbox)),
             'start_date':self.start_date,
             'end_date':self.end_date,
-            'custom_fields':self.custom_fields,
+            'custom_fields':self.custom_fields
         }
-
-    
-
-
