@@ -29,6 +29,16 @@ curl -i http://localhost:5000/api/v1.0/services
 curl -i http://localhost:5000/api/v1.0/services/1
 ```
 
+#### get_categories()
+```sh
+curl -i http://localhost:5000/api/v1.0/categories
+```
+
+#### get_keywords()
+```sh
+curl -i http://localhost:5000/api/v1.0/keywords
+```
+
 <!---
 #### get_repositories()
 ```sh

@@ -64,11 +64,44 @@ class Service(db.Model):
             'created_on':self.created_on,
         }
 
-#class Categories(db.Model):
-#    __tablename__ = 'categories'
+class Categorie(db.Model):
 
-#class Keywords(db.Model):
-#    __tablename__ = 'keywords'
+    __tablename__ = 'categories'
+
+    categorie_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=False, nullable=False)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return '<id {}>'.format(self.id)
+
+    def serialize(self):
+        return {
+            'id': self.categorie_id, 
+            'name': self.name
+        }
+
+class Keywords(db.Model):
+
+    __tablename__ = 'keywords'
+
+    keyword_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=False, nullable=False)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return '<id {}>'.format(self.id)
+
+    def serialize(self):
+        return {
+            'id': self.keyword_id, 
+            'name': self.name
+        }
+
 
 #class Repositorie(db.Model):
 #    __tablename__ = 'research_data_repositories'

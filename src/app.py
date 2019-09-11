@@ -152,6 +152,25 @@ def get_service(service_id):
     except Exception as e:
 	    return(str(e))
 
+#get_categories()
+@app.route("/api/v1.0/categories")
+def get_categories():
+    try:
+        categories=Categorie.query.all()
+        return jsonify([e.serialize() for e in categories])
+
+    except Exception as e:
+	    return(str(e))
+
+#get_keywords()
+@app.route("/api/v1.0/keywords")
+def get_keywords():
+    try:
+        keywords=Keywords.query.all()
+        return jsonify([e.serialize() for e in keywords])
+
+    except Exception as e:
+	    return(str(e))
 
 
 
