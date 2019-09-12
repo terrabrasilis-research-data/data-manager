@@ -8,6 +8,7 @@ from flask import request
 from flask import url_for
 from flask import abort
 from models import *
+import json
 import os
 
 #auth
@@ -62,8 +63,15 @@ def make_public_repositorie(repositorie):
             new_repositorie['uri'] = url_for('get_repositorie', repo_id=repositorie['repo_id'], _external=True)
         else:
             new_repositorie[field] = repositorie[field]
-    data = new_repositorie
-    #{"name": data['name'], "users": [make_public_user(user) for user in data['users']], "abstract":data['abstract'], "categories": data['categories'], "uri": data['uri'], "maintainer": data['maintainer'], "created_on": data['created_on'], "language": data['language'], "email": data['email'], "bbox": data['bbox'], "start_date": data['start_date'], "end_data": data['end_data'], "keywords": data['keywords'], "services": data['services'], "custom_fields": data['custom_fields']}
+    #new_repositorie['BBox'] = json.dumps(new_repositorie['BBox'])
+    return new_repositorie
+
+#bbox
+def bbox(repositorie):
+    new_repositorie = {}
+    for field in repositorie:
+        new_repositorie[field] = repositorie[field]
+    #new_repositorie['BBox'] = json.dumps(new_repositorie['BBox'])
     return new_repositorie
 
 #uri users
@@ -179,9 +187,7 @@ def get_keywords():
 def get_repositories():
     try:
         repositories=Repositorie.query.all()
-        print([e.serialize() for e in repositories])
         return jsonify([make_public_repositorie(e.serialize()) for e in repositories])
-
     except Exception as e:
 	    return(str(e))
 		
@@ -190,7 +196,7 @@ def get_repositories():
 def get_repositorie(repo_id):
     try:
         repositories=Repositorie.query.filter_by(repo_id=repo_id).first()
-        return jsonify(repositories.serialize())
+        return jsonify(bbox(repositories.serialize()))
     except Exception as e:
 	    return(str(e))
 
@@ -227,36 +233,6 @@ def create_repositorie():
         return jsonify({'result': True})
     except Exception as e:
         return(str(e))
-
-#update_repositorie(repositorie_id)
-@app.route('/api/v1.0/repositories/<int:repositorie_id>', methods=['PUT'])
-@auth.login_required
-def update_repositorie(repositorie_id):
-    repositorie = [repositorie for repositorie in repositories if repositorie['id'] == repositorie_id]
-    if len(repositorie) == 0:
-        abort(404)
-    if not request.json:
-        abort(400)
-    #if 'name' in request.json and type(request.json['name']) != unicode:
-    #    abort(400)
-    #if 'users' in request.json and type(request.json['users']) != unicode:
-    #    abort(400)
-    #if 'abstract' in request.json and type(request.json['abstract']) != unicode:
-    #    abort(400)
-    repositorie[0]['name'] = request.json.get('name', repositorie[0]['name'])
-    repositorie[0]['users'] = request.json.get('users', repositorie[0]['users'])
-    repositorie[0]['abstract'] = request.json.get('abstract', repositorie[0]['abstract'])
-    return jsonify({'repositorie': repositorie[0]})
-
-#delete_repositorie(repositorie_id)    
-@app.route('/api/v1.0/repositories/<int:repositorie_id>', methods=['DELETE'])
-@auth.login_required
-def delete_repositorie(repositorie_id):
-    repositorie = [repositorie for repositorie in repositories if repositorie['id'] == repositorie_id]
-    if len(repositorie) == 0:
-        abort(404)
-    repositories.remove(repositorie[0])
-    return jsonify({'result': True})
 
 #app
 if __name__ == '__main__':

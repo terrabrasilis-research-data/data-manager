@@ -137,14 +137,15 @@ class Repositorie(db.Model):
         return '<id {}>'.format(self.id)
 
     def serialize(self):
-        return {
+
+        return {            
             'repo_id': self.repo_id, 
             'name': self.name,
             'abstract':self.abstract,
             'maintainer':self.maintainer,
             'created_on':self.created_on,
             'language':self.language,
-            #'bbox': self.bbox, #db.session.query(functions.ST_AsGeoJSON(self.bbox)),
+            'bbox': db.session.scalar(functions.ST_AsGeoJSON(self.bbox)),
             'start_date':self.start_date,
             'end_date':self.end_date,
             'custom_fields':self.custom_fields
