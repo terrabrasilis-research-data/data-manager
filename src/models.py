@@ -15,8 +15,8 @@ class User(db.Model):
     password = db.Column(db.String(50), unique=False, nullable=False)
     email = db.Column(db.String(355), unique=False, nullable=False)
     image = db.Column(db.String(355), unique=False, nullable=False)
-    created_on = db.Column(db.DateTime(), unique=False, nullable=False)
-    last_login = db.Column(db.DateTime(), unique=False, nullable=False)
+    created_on = db.Column(db.DateTime, unique=False, nullable=False)
+    last_login = db.Column(db.DateTime, unique=False, nullable=False)
 
     def __init__(self, username, full_name, password, email, image, created_on, last_login):
         self.username = username
@@ -49,7 +49,7 @@ class Service(db.Model):
     name = db.Column(db.String(50), unique=False, nullable=False)
     machine = db.Column(db.Integer, unique=False, nullable=False)
     host_id = db.Column(db.Integer, db.ForeignKey('hosts.host_id'),nullable=False)
-    created_on = db.Column(db.DateTime(), unique=False, nullable=False)
+    created_on = db.Column(db.DateTime, unique=False, nullable=False)
 
     def __init__(self, name, machine, host_id, created_on):
         self.name = name
@@ -115,11 +115,11 @@ class Repositorie(db.Model):
     name = db.Column(db.String(50), unique=False, nullable=False)
     abstract = db.Column(db.String(500), unique=False, nullable=False)
     maintainer = db.Column(db.String(355), unique=False, nullable=False)
-    created_on = db.Column(db.DateTime(), unique=False, nullable=False)
+    created_on = db.Column(db.DateTime, unique=False, nullable=False)
     language = db.Column(db.String(50), unique=False, nullable=False)
     bbox = db.Column(Geometry(geometry_type='POLYGON'), unique=False, nullable=False)
-    start_date = db.Column(db.DateTime(), unique=False, nullable=False)
-    end_date = db.Column(db.DateTime(), unique=False, nullable=False)
+    start_date = db.Column(db.DateTime, unique=False, nullable=False)
+    end_date = db.Column(db.DateTime, unique=False, nullable=False)
     custom_fields = db.Column(JSONB, unique=False, nullable=False)
     
     def __init__(self, name, abstract, maintainer, created_on, language, bbox, start_date, end_date, custom_fields):
