@@ -55,7 +55,23 @@ def unauthorized():
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
+       
+#new_bbox
+def new_bbox(repositories):
+    new_repositorie = {}
+    for field in repositories:
+        if field == 'bbox':
+            new_repositorie[field] = repositories[field]
+    return new_repositorie
 
+#remove_bbox
+def remove_bbox(repositories):
+    new_repositorie = {}
+    for field in repositories:
+        if field != 'bbox':
+            new_repositorie[field] = repositories[field]
+    return new_repositorie
+        
 #uri repositories
 def make_public_repositorie(repositorie):
     new_repositorie = {}
@@ -179,17 +195,12 @@ def get_keywords():
 def get_repositories():
     try:
         repositories=Repositorie.query.all()
-        data = ([make_public_repositorie(e.serialize()) for e in repositories]) # <- list
-        json_data = {}
-        for val in data: 
-            json_data.setdefault('repositories', []).append(val)  #<- dict
-
-        #bbox
-
-        return jsonify({'a': str(type(data))})
+        data = ([remove_bbox(make_public_repositorie(e.serialize())) for e in repositories])
+        bbox = ([new_bbox(e.serialize()) for e in repositories])
+        return jsonify(bbox)
     except Exception as e:
 	    return(str(e))
-		
+
 #get_repositories(repo_id)
 @app.route("/api/v1.0/repositories/<int:repo_id>", methods=['GET'])
 def get_repositorie(repo_id):
