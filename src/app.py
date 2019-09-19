@@ -92,6 +92,11 @@ def make_public_user(user):
             new_user[field] = user[field]
     return new_user
 
+def merge_two_dicts(x, y):
+    z = x.copy()   # start with x's keys and values
+    z.update(y)    # modifies z with y's keys and values & returns None
+    return z
+
 #uri service
 def make_public_service(service):
     new_service = {}
@@ -184,7 +189,6 @@ def get_categories():
 def get_keywords():
     try:
         keywords=Keywords.query.all()
-        print([e.serialize() for e in keywords])
         return jsonify([e.serialize() for e in keywords])
 
     except Exception as e:
@@ -195,9 +199,23 @@ def get_keywords():
 def get_repositories():
     try:
         repositories=Repositorie.query.all()
+
         data = ([remove_bbox(make_public_repositorie(e.serialize())) for e in repositories])
         bbox = ([new_bbox(e.serialize()) for e in repositories])
-        return jsonify(bbox)
+
+        json_data = {}
+        for val in data: 
+            json_data.setdefault('repositorie', []).append(val)
+        
+        json_bbox = {}
+        for val in bbox: 
+            json_bbox.setdefault('bbox', []).append(val)
+
+        a = json_data['repositorie']
+        b = json_bbox['bbox']
+
+        return jsonify({'a': str(type(a))})
+
     except Exception as e:
 	    return(str(e))
 
