@@ -92,11 +92,6 @@ def make_public_user(user):
             new_user[field] = user[field]
     return new_user
 
-def merge_two_dicts(x, y):
-    z = x.copy()   # start with x's keys and values
-    z.update(y)    # modifies z with y's keys and values & returns None
-    return z
-
 #uri service
 def make_public_service(service):
     new_service = {}
@@ -198,23 +193,30 @@ def get_keywords():
 @app.route("/api/v1.0/repositories", methods=['GET'])
 def get_repositories():
     try:
+        #query all
         repositories=Repositorie.query.all()
-
+        
+        #get lists
         data = ([remove_bbox(make_public_repositorie(e.serialize())) for e in repositories])
         bbox = ([new_bbox(e.serialize()) for e in repositories])
 
+        #create data dict
         json_data = {}
         for val in data: 
             json_data.setdefault('repositorie', []).append(val)
         
+        #create bboxs dict
         json_bbox = {}
         for val in bbox: 
             json_bbox.setdefault('bbox', []).append(val)
+        
+        #create response dict
+        json_response = {}
+        for i in range(len(data)):
+            json_data['repositorie'][i].update(json_bbox["bbox"][i])
+            json_response.setdefault("repositorie", []).append(json_data['repositorie'][i])
 
-        a = json_data['repositorie']
-        b = json_bbox['bbox']
-
-        return jsonify({'a': str(type(a))})
+        return jsonify(json_response)
 
     except Exception as e:
 	    return(str(e))
@@ -223,8 +225,23 @@ def get_repositories():
 @app.route("/api/v1.0/repositories/<int:repo_id>", methods=['GET'])
 def get_repositorie(repo_id):
     try:
+        
+        #query single id
         repositories=Repositorie.query.filter_by(repo_id=repo_id).first()
-        return jsonify(bbox(repositories.serialize()))
+
+        #create data dict
+        json_data = remove_bbox(repositories.serialize())
+
+        #create bbox dict
+        json_bbox = new_bbox(repositories.serialize())
+        
+        #create response dict
+        json_response = {}
+        json_data.update(json_bbox)
+        json_response.setdefault("repositorie", []).append(json_data)
+
+        return jsonify(json_response)
+
     except Exception as e:
 	    return(str(e))
 
