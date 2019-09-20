@@ -154,7 +154,6 @@ def create_user():
 def get_services():
     try:
         services=Service.query.all()
-        print(Service.query.all())
         return jsonify([make_public_service(e.serialize()) for e in services])
 
     except Exception as e:
@@ -195,11 +194,11 @@ def get_repositories():
     try:
         #query all
         repositories=Repositorie.query.all()
-        
+       
         #get lists
         data = ([remove_bbox(make_public_repositorie(e.serialize())) for e in repositories])
         bbox = ([new_bbox(e.serialize()) for e in repositories])
-
+        
         #create data dict
         json_data = {}
         for val in data: 
@@ -213,7 +212,24 @@ def get_repositories():
         #create response dict
         json_response = {}
         for i in range(len(data)):
-            json_data['repositorie'][i].update(json_bbox["bbox"][i])
+
+            #create users dict
+            users=User.query.all() #filter for each line
+            members = ([make_public_user(e.serialize()) for e in users])
+            json_users = {}
+            for val in members: 
+                json_users.setdefault('users', []).append(val)
+            
+            #create services dict
+            services = Service.query.all() #filter for each line
+            ser = ([make_public_service(e.serialize()) for e in services])
+            json_ser = {}
+            for val in ser: 
+                json_ser.setdefault('services', []).append(val)
+            
+            json_data['repositorie'][i].update(json_bbox['bbox'][i])
+            json_data['repositorie'][i].update({"services": [json_ser['services']]})
+            json_data['repositorie'][i].update({"users": [json_users['users']]})
             json_response.setdefault("repositorie", []).append(json_data['repositorie'][i])
 
         return jsonify(json_response)
@@ -234,10 +250,26 @@ def get_repositorie(repo_id):
 
         #create bbox dict
         json_bbox = new_bbox(repositories.serialize())
+
+        #create users dict
+        users=User.query.all() #filter for each line
+        members = ([make_public_user(e.serialize()) for e in users])
+        json_users = {}
+        for val in members: 
+            json_users.setdefault('users', []).append(val)
         
+        #create services dict    
+        services = Service.query.all() #filter for each line
+        ser = ([make_public_service(e.serialize()) for e in services])
+        json_ser = {}
+        for val in ser: 
+            json_ser.setdefault('services', []).append(val)
+
         #create response dict
         json_response = {}
         json_data.update(json_bbox)
+        json_data.update(json_ser)
+        json_data.update(json_users)
         json_response.setdefault("repositorie", []).append(json_data)
 
         return jsonify(json_response)
