@@ -71,6 +71,14 @@ def remove_bbox(repositories):
         if field != 'bbox':
             new_repositorie[field] = repositories[field]
     return new_repositorie
+
+#remove_id
+def remove_id(categories):
+    new_categories = {}
+    for field in categories:
+        if field != 'id':
+            new_categories[field] = categories[field]
+    return new_categories
         
 #uri repositories
 def make_public_repositorie(repositorie):
@@ -212,24 +220,33 @@ def get_repositories():
         #create response dict
         json_response = {}
         for i in range(len(data)):
+            
+            #create categories dict
+            categories=Categorie.query.all() #filter for each in FK table
+            cate = ([remove_id(e.serialize()) for e in categories])
+            json_cate = {}
+            for val in cate: 
+                json_cate.setdefault('categories', []).append(val)
 
             #create users dict
-            users=User.query.all() #filter for each line
+            users=User.query.all() #filter for each in FK table
             members = ([make_public_user(e.serialize()) for e in users])
             json_users = {}
             for val in members: 
                 json_users.setdefault('users', []).append(val)
             
             #create services dict
-            services = Service.query.all() #filter for each line
+            services = Service.query.all() #filter for each in FK table
             ser = ([make_public_service(e.serialize()) for e in services])
             json_ser = {}
             for val in ser: 
                 json_ser.setdefault('services', []).append(val)
             
+            #compose
             json_data['repositorie'][i].update(json_bbox['bbox'][i])
             json_data['repositorie'][i].update({"services": [json_ser['services']]})
             json_data['repositorie'][i].update({"users": [json_users['users']]})
+            json_data['repositorie'][i].update({"categories": [json_cate['categories']]})
             json_response.setdefault("repositorie", []).append(json_data['repositorie'][i])
 
         return jsonify(json_response)
@@ -247,29 +264,37 @@ def get_repositorie(repo_id):
 
         #create data dict
         json_data = remove_bbox(repositories.serialize())
-
+        
         #create bbox dict
         json_bbox = new_bbox(repositories.serialize())
 
         #create users dict
-        users=User.query.all() #filter for each line
+        users=User.query.all()#filter for each in FK table
         members = ([make_public_user(e.serialize()) for e in users])
         json_users = {}
         for val in members: 
             json_users.setdefault('users', []).append(val)
         
         #create services dict    
-        services = Service.query.all() #filter for each line
+        services = Service.query.all() #filter for each in FK table
         ser = ([make_public_service(e.serialize()) for e in services])
         json_ser = {}
         for val in ser: 
             json_ser.setdefault('services', []).append(val)
+
+        #create categories dict
+        categories=Categorie.query.all() #filter for each in FK table
+        cate = ([remove_id(e.serialize()) for e in categories])
+        json_cate = {}
+        for val in cate: 
+            json_cate.setdefault('categories', []).append(val)
 
         #create response dict
         json_response = {}
         json_data.update(json_bbox)
         json_data.update(json_ser)
         json_data.update(json_users)
+        json_data.update(json_cate)
         json_response.setdefault("repositorie", []).append(json_data)
 
         return jsonify(json_response)
