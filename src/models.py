@@ -3,6 +3,7 @@ from app import db
 from geoalchemy2 import Geometry
 from geoalchemy2 import functions
 from flask.json import jsonify
+from sqlalchemy import PrimaryKeyConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 
 class User(db.Model):
@@ -150,3 +151,60 @@ class Repositorie(db.Model):
             'end_date':self.end_date,
             'custom_fields':self.custom_fields
         }
+
+class Repositorie_Service(db.Model):
+
+    __tablename__ = 'research_data_repositories_services'
+    __table_args__ = (
+        PrimaryKeyConstraint('repo_id', 'service_id'),
+    )
+
+    repo_id = db.Column(db.Integer, db.ForeignKey('research_data_repositories.repo_id'),nullable=False)
+    service_id = db.Column(db.Integer, db.ForeignKey('services.service_id'),nullable=False)
+
+    def __init__(self, repo_id, service_id):
+        self.repo_id = repo_id
+        self.service_id = service_id
+     
+class Repositorie_User(db.Model):
+
+    __tablename__ = 'research_data_repositories_users'
+    __table_args__ = (
+        PrimaryKeyConstraint('repo_id', 'user_id'),
+    )
+
+    repo_id = db.Column(db.Integer, db.ForeignKey('research_data_repositories.repo_id'),nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),nullable=False)
+
+    def __init__(self, repo_id, user_id):
+        self.repo_id = repo_id
+        self.user_id = user_id
+
+class Repositorie_Categorie(db.Model):
+
+    __tablename__ = 'research_data_repositories_categories'
+    __table_args__ = (
+        PrimaryKeyConstraint('repo_id', 'categorie_id'),
+    )
+
+    repo_id = db.Column(db.Integer, db.ForeignKey('research_data_repositories.repo_id'),nullable=False)
+    categorie_id = db.Column(db.Integer, db.ForeignKey('categories.categorie_id'),nullable=False)
+
+    def __init__(self, repo_id, categorie_id):
+        self.repo_id = repo_id
+        self.categorie_id = categorie_id
+     
+class Repositorie_Keyword(db.Model):
+
+    __tablename__ = 'research_data_repositories_keywords'
+    __table_args__ = (
+        PrimaryKeyConstraint('repo_id', 'keyword_id'),
+    )
+
+    repo_id = db.Column(db.Integer, db.ForeignKey('research_data_repositories.repo_id'),nullable=False)
+    keyword_id = db.Column(db.Integer, db.ForeignKey('keywords.keyword_id'),nullable=False)
+
+    def __init__(self, repo_id, keyword_id):
+        self.repo_id = repo_id
+        self.keyword_id = keyword_id
+       

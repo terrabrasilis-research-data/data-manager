@@ -220,30 +220,33 @@ def get_repositories():
         #create response dict
         json_response = {}
         for i in range(len(data)):
-            
+
+            #create data list
+            data = ([e.serialize() for e in repositories])
+
             #create keywords dict
-            keywords=Keywords.query.all() #filter for each in FK table
+            keywords=Keywords.query.filter(Keywords.keyword_id.in_([1,2]))
             keyw = ([remove_id(e.serialize()) for e in keywords])
             json_keyword = {}
             for val in keyw: 
                 json_keyword.setdefault('keywords', []).append(val)
   
             #create categories dict
-            categories=Categorie.query.all() #filter for each in FK table
+            categories=Categorie.query.filter(Categorie.categorie_id.in_([1,2]))
             cate = ([remove_id(e.serialize()) for e in categories])
             json_cate = {}
             for val in cate: 
                 json_cate.setdefault('categories', []).append(val)
 
             #create users dict
-            users=User.query.all() #filter for each in FK table
+            users=User.query.filter(User.user_id.in_([1,2]))
             members = ([make_public_user(e.serialize()) for e in users])
             json_users = {}
             for val in members: 
                 json_users.setdefault('users', []).append(val)
             
             #create services dict
-            services = Service.query.all() #filter for each in FK table
+            services = Service.query.filter(Service.service_id.in_([1,2]))
             ser = ([make_public_service(e.serialize()) for e in services])
             json_ser = {}
             for val in ser: 
