@@ -221,6 +221,13 @@ def get_repositories():
         json_response = {}
         for i in range(len(data)):
             
+            #create keywords dict
+            keywords=Keywords.query.all() #filter for each in FK table
+            keyw = ([remove_id(e.serialize()) for e in keywords])
+            json_keyword = {}
+            for val in keyw: 
+                json_keyword.setdefault('keywords', []).append(val)
+  
             #create categories dict
             categories=Categorie.query.all() #filter for each in FK table
             cate = ([remove_id(e.serialize()) for e in categories])
@@ -247,6 +254,7 @@ def get_repositories():
             json_data['repositorie'][i].update({"services": [json_ser['services']]})
             json_data['repositorie'][i].update({"users": [json_users['users']]})
             json_data['repositorie'][i].update({"categories": [json_cate['categories']]})
+            json_data['repositorie'][i].update({"keywords": [json_keyword['keywords']]})
             json_response.setdefault("repositorie", []).append(json_data['repositorie'][i])
 
         return jsonify(json_response)
@@ -289,12 +297,20 @@ def get_repositorie(repo_id):
         for val in cate: 
             json_cate.setdefault('categories', []).append(val)
 
+        #create keywords dict
+        keywords=Keywords.query.all() #filter for each in FK table
+        keyw = ([remove_id(e.serialize()) for e in keywords])
+        json_keyword = {}
+        for val in keyw: 
+            json_keyword.setdefault('keywords', []).append(val)
+
         #create response dict
         json_response = {}
         json_data.update(json_bbox)
         json_data.update(json_ser)
         json_data.update(json_users)
         json_data.update(json_cate)
+        json_data.update(json_keyword)
         json_response.setdefault("repositorie", []).append(json_data)
 
         return jsonify(json_response)
