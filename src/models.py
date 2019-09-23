@@ -85,7 +85,7 @@ class Categorie(db.Model):
 
     def serialize(self):
         return {
-            'id': self.categorie_id, 
+            'categorie_id': self.categorie_id, 
             'name': self.name
         }
 
@@ -104,7 +104,7 @@ class Keywords(db.Model):
 
     def serialize(self):
         return {
-            'id': self.keyword_id, 
+            'keyword_id': self.keyword_id, 
             'name': self.name
         }
 
@@ -165,7 +165,14 @@ class Repositorie_Service(db.Model):
     def __init__(self, repo_id, service_id):
         self.repo_id = repo_id
         self.service_id = service_id
-     
+
+    def serialize(self):
+
+        return {            
+            'repo_id': self.repo_id, 
+            'service_id': self.service_id
+        }
+
 class Repositorie_User(db.Model):
 
     __tablename__ = 'research_data_repositories_users'
@@ -180,6 +187,13 @@ class Repositorie_User(db.Model):
         self.repo_id = repo_id
         self.user_id = user_id
 
+    def serialize(self):
+
+        return {            
+            'repo_id': self.repo_id, 
+            'user_id': self.user_id
+        }
+
 class Repositorie_Categorie(db.Model):
 
     __tablename__ = 'research_data_repositories_categories'
@@ -193,6 +207,13 @@ class Repositorie_Categorie(db.Model):
     def __init__(self, repo_id, categorie_id):
         self.repo_id = repo_id
         self.categorie_id = categorie_id
+
+    def serialize(self):
+
+        return {            
+            'repo_id': self.repo_id, 
+            'categorie_id': self.categorie_id
+        }
      
 class Repositorie_Keyword(db.Model):
 
@@ -207,4 +228,11 @@ class Repositorie_Keyword(db.Model):
     def __init__(self, repo_id, keyword_id):
         self.repo_id = repo_id
         self.keyword_id = keyword_id
+
+    def serialize(self):
+
+        return {            
+            'repo_id': self.repo_id, 
+            'keyword_id': self.keyword_id
+        }
        

@@ -76,7 +76,7 @@ def remove_bbox(repositories):
 def remove_id(categories):
     new_categories = {}
     for field in categories:
-        if field != 'id':
+        if field != 'keyword_id' or field != 'categorie_id':
             new_categories[field] = categories[field]
     return new_categories
         
@@ -216,13 +216,29 @@ def get_repositories():
         json_bbox = {}
         for val in bbox: 
             json_bbox.setdefault('bbox', []).append(val)
-        
+
+        #create data list 
+        data = ([e.serialize() for e in repositories])
+           
         #create response dict
         json_response = {}
         for i in range(len(data)):
 
-            #create data list
-            data = ([e.serialize() for e in repositories])
+            #create repositorie_repo_id
+            repositories_repo_id = data[i]['repo_id']
+
+            #create repo_ser list 
+            repo_ser = Repositorie_Service.query.filter(Repositorie_Service.repo_id.in_([1]))
+            r_ser = ([e.serialize() for e in repo_ser])
+
+            repo_usr = Repositorie_User.query.filter(Repositorie_Service.repo_id.in_([1]))
+            r_user = ([e.serialize() for e in repo_usr])
+
+            repo_cat = Repositorie_Categorie.query.filter(Repositorie_Service.repo_id.in_([1]))
+            r_cat = ([e.serialize() for e in repo_cat])
+
+            repo_key = Repositorie_Keyword.query.filter(Repositorie_Service.repo_id.in_([1]))
+            r_key = ([e.serialize() for e in repo_key])
 
             #create keywords dict
             keywords=Keywords.query.filter(Keywords.keyword_id.in_([1,2]))
