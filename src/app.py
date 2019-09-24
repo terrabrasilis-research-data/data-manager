@@ -205,6 +205,7 @@ def get_repositories():
        
         #get lists
         data = ([remove_bbox(make_public_repositorie(e.serialize())) for e in repositories])
+        id_data = ([e.serialize() for e in repositories])
         bbox = ([new_bbox(e.serialize()) for e in repositories])
         
         #create data dict
@@ -216,53 +217,67 @@ def get_repositories():
         json_bbox = {}
         for val in bbox: 
             json_bbox.setdefault('bbox', []).append(val)
+        
+        lista = []
 
-        #create data list 
-        data = ([e.serialize() for e in repositories])
-           
         #create response dict
         json_response = {}
-        for i in range(len(data)):
+        for i in range(len(data) - 1):
 
-            #create repositorie_repo_id
-            repositories_repo_id = data[i]['repo_id']
+            #create lists
+            list_ser = []
+            list_user = []
+            list_cat = []
+            list_key = []
 
-            #create repo_ser list 
-            repo_ser = Repositorie_Service.query.filter(Repositorie_Service.repo_id.in_([1]))
+            #create lists
+            repo_ser = Repositorie_Service.query.filter(Repositorie_Service.repo_id.in_([id_data[i]['repo_id']]))
             r_ser = ([e.serialize() for e in repo_ser])
-
-            repo_usr = Repositorie_User.query.filter(Repositorie_Service.repo_id.in_([1]))
+          
+            repo_usr = Repositorie_User.query.filter(Repositorie_User.repo_id.in_([id_data[i]['repo_id']]))
             r_user = ([e.serialize() for e in repo_usr])
 
-            repo_cat = Repositorie_Categorie.query.filter(Repositorie_Service.repo_id.in_([1]))
+            repo_cat = Repositorie_Categorie.query.filter(Repositorie_Categorie.repo_id.in_([id_data[i]['repo_id']]))
             r_cat = ([e.serialize() for e in repo_cat])
 
-            repo_key = Repositorie_Keyword.query.filter(Repositorie_Service.repo_id.in_([1]))
+            repo_key = Repositorie_Keyword.query.filter(Repositorie_Keyword.repo_id.in_([id_data[i]['repo_id']]))
             r_key = ([e.serialize() for e in repo_key])
 
+            for j in range(len(r_ser)):
+                list_ser.append(r_ser[j]['service_id'])
+
+            for k in range(len(r_user)):
+                list_user.append(r_user[k]['user_id'])
+
+            for l in range(len(r_cat)):
+                list_cat.append(r_cat[l]['categorie_id'])
+
+            for m in range(len(r_key)):
+                list_key.append(r_key[m]['keyword_id'])
+  
             #create keywords dict
-            keywords=Keywords.query.filter(Keywords.keyword_id.in_([1,2]))
+            keywords=Keywords.query.filter(Keywords.keyword_id.in_(list_key))
             keyw = ([remove_id(e.serialize()) for e in keywords])
             json_keyword = {}
             for val in keyw: 
                 json_keyword.setdefault('keywords', []).append(val)
   
             #create categories dict
-            categories=Categorie.query.filter(Categorie.categorie_id.in_([1,2]))
+            categories=Categorie.query.filter(Categorie.categorie_id.in_(list_cat))
             cate = ([remove_id(e.serialize()) for e in categories])
             json_cate = {}
             for val in cate: 
                 json_cate.setdefault('categories', []).append(val)
 
             #create users dict
-            users=User.query.filter(User.user_id.in_([1,2]))
+            users=User.query.filter(User.user_id.in_(list_user))
             members = ([make_public_user(e.serialize()) for e in users])
             json_users = {}
             for val in members: 
                 json_users.setdefault('users', []).append(val)
             
             #create services dict
-            services = Service.query.filter(Service.service_id.in_([1,2]))
+            services = Service.query.filter(Service.service_id.in_(list_ser))
             ser = ([make_public_service(e.serialize()) for e in services])
             json_ser = {}
             for val in ser: 
@@ -270,10 +285,10 @@ def get_repositories():
             
             #compose
             json_data['repositorie'][i].update(json_bbox['bbox'][i])
-            json_data['repositorie'][i].update({"services": [json_ser['services']]})
-            json_data['repositorie'][i].update({"users": [json_users['users']]})
-            json_data['repositorie'][i].update({"categories": [json_cate['categories']]})
-            json_data['repositorie'][i].update({"keywords": [json_keyword['keywords']]})
+            json_data['repositorie'][i].update({"services": json_ser['services']})
+            json_data['repositorie'][i].update({"users": json_users['users']})
+            json_data['repositorie'][i].update({"categories": json_cate['categories']})
+            json_data['repositorie'][i].update({"keywords": json_keyword['keywords']})
             json_response.setdefault("repositorie", []).append(json_data['repositorie'][i])
 
         return jsonify(json_response)
@@ -295,33 +310,64 @@ def get_repositorie(repo_id):
         #create bbox dict
         json_bbox = new_bbox(repositories.serialize())
 
-        #create users dict
-        users=User.query.all()#filter for each in FK table
-        members = ([make_public_user(e.serialize()) for e in users])
-        json_users = {}
-        for val in members: 
-            json_users.setdefault('users', []).append(val)
+        #create lists
+        list_ser = []
+        list_user = []
+        list_cat = []
+        list_key = []
+
+        #create lists 
+        repo_ser = Repositorie_Service.query.filter(Repositorie_Service.repo_id.in_([repo_id]))
+        r_ser = ([e.serialize() for e in repo_ser])
         
-        #create services dict    
-        services = Service.query.all() #filter for each in FK table
-        ser = ([make_public_service(e.serialize()) for e in services])
-        json_ser = {}
-        for val in ser: 
-            json_ser.setdefault('services', []).append(val)
+        repo_usr = Repositorie_User.query.filter(Repositorie_User.repo_id.in_([repo_id]))
+        r_user = ([e.serialize() for e in repo_usr])
+
+        repo_cat = Repositorie_Categorie.query.filter(Repositorie_Categorie.repo_id.in_([repo_id]))
+        r_cat = ([e.serialize() for e in repo_cat])
+
+        repo_key = Repositorie_Keyword.query.filter(Repositorie_Keyword.repo_id.in_([repo_id]))
+        r_key = ([e.serialize() for e in repo_key])
+
+        for j in range(len(r_ser)):
+            list_ser.append(r_ser[j]['service_id'])
+
+        for k in range(len(r_user)):
+            list_user.append(r_user[k]['user_id'])
+
+        for l in range(len(r_cat)):
+            list_cat.append(r_cat[l]['categorie_id'])
+
+        for m in range(len(r_key)):
+            list_key.append(r_key[m]['keyword_id'])
+
+        #create keywords dict
+        keywords=Keywords.query.filter(Keywords.keyword_id.in_(list_key))
+        keyw = ([remove_id(e.serialize()) for e in keywords])
+        json_keyword = {}
+        for val in keyw: 
+            json_keyword.setdefault('keywords', []).append(val)
 
         #create categories dict
-        categories=Categorie.query.all() #filter for each in FK table
+        categories=Categorie.query.filter(Categorie.categorie_id.in_(list_cat))
         cate = ([remove_id(e.serialize()) for e in categories])
         json_cate = {}
         for val in cate: 
             json_cate.setdefault('categories', []).append(val)
 
-        #create keywords dict
-        keywords=Keywords.query.all() #filter for each in FK table
-        keyw = ([remove_id(e.serialize()) for e in keywords])
-        json_keyword = {}
-        for val in keyw: 
-            json_keyword.setdefault('keywords', []).append(val)
+        #create users dict
+        users=User.query.filter(User.user_id.in_(list_user))
+        members = ([make_public_user(e.serialize()) for e in users])
+        json_users = {}
+        for val in members: 
+            json_users.setdefault('users', []).append(val)
+        
+        #create services dict
+        services = Service.query.filter(Service.service_id.in_(list_ser))
+        ser = ([make_public_service(e.serialize()) for e in services])
+        json_ser = {}
+        for val in ser: 
+            json_ser.setdefault('services', []).append(val)
 
         #create response dict
         json_response = {}
