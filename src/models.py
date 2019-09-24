@@ -89,6 +89,29 @@ class Categorie(db.Model):
             'name': self.name
         }
 
+class Host(db.Model):
+
+    __tablename__ = 'hosts'
+
+    host_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=False, nullable=False)
+    address = db.Column(db.String(15), unique=False, nullable=False)
+    created_on = db.Column(db.DateTime, unique=False, nullable=False)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return '<id {}>'.format(self.id)
+
+    def serialize(self):
+        return {
+            'host_id': self.host_id, 
+            'name': self.name, 
+            'address': self.address,
+            'created_on': self.created_on
+        }
+
 class Keywords(db.Model):
 
     __tablename__ = 'keywords'

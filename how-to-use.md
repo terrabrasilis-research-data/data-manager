@@ -39,6 +39,13 @@ curl -i http://localhost:5000/api/v1.0/categories
 curl -i http://localhost:5000/api/v1.0/keywords
 
 ```
+
+#### get_hosts()
+```sh
+curl -i http://localhost:5000/api/v1.0/hosts
+
+```
+
 #### get_repositories()
 ```sh
 curl -i http://localhost:5000/api/v1.0/repositories

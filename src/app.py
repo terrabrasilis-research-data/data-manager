@@ -196,6 +196,16 @@ def get_keywords():
     except Exception as e:
 	    return(str(e))
 
+#get_hosts()
+@app.route("/api/v1.0/hosts", methods=['GET'])
+def get_hosts():
+    try:
+        hosts=Host.query.all()
+        return jsonify([e.serialize() for e in hosts])
+
+    except Exception as e:
+	    return(str(e))
+
 #get_repositories()
 @app.route("/api/v1.0/repositories", methods=['GET'])
 def get_repositories():
