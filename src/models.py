@@ -112,6 +112,25 @@ class Host(db.Model):
             'created_on': self.created_on
         }
 
+class Port(db.Model):
+
+    __tablename__ = 'ports'
+
+    port_id = db.Column(db.Integer, primary_key=True)
+    port = db.Column(db.String(10), unique=False, nullable=False)
+    
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return '<id {}>'.format(self.id)
+
+    def serialize(self):
+        return {
+            'port_id': self.port_id, 
+            'port': self.port
+        }
+
 class Keywords(db.Model):
 
     __tablename__ = 'keywords'
@@ -257,5 +276,26 @@ class Repositorie_Keyword(db.Model):
         return {            
             'repo_id': self.repo_id, 
             'keyword_id': self.keyword_id
+        }
+
+class Service_Port(db.Model):
+
+    __tablename__ = 'services_ports'
+    __table_args__ = (
+        PrimaryKeyConstraint('port_id', 'service_id'),
+    )
+
+    port_id = db.Column(db.Integer, db.ForeignKey('ports.port_id'),nullable=False)
+    service_id = db.Column(db.Integer, db.ForeignKey('services.service_id'),nullable=False)
+
+    def __init__(self, port_id, service_id):
+        self.port_id = port_id
+        self.service_id = service_id
+
+    def serialize(self):
+
+        return {            
+            'port_id': self.port_id, 
+            'service_id': self.service_id
         }
        

@@ -46,6 +46,12 @@ curl -i http://localhost:5000/api/v1.0/hosts
 
 ```
 
+#### get_ports(repo_id)
+```sh
+curl -i http://localhost:5000/api/v1.0/ports/1
+
+```
+
 #### get_repositories()
 ```sh
 curl -i http://localhost:5000/api/v1.0/repositories

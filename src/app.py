@@ -206,6 +206,35 @@ def get_hosts():
     except Exception as e:
 	    return(str(e))
 
+#get_ports()
+@app.route("/api/v1.0/ports/<int:repo_id>", methods=['GET'])
+def get_ports(repo_id):
+    try:
+        
+        #create lists
+        list_ser = []
+        list_por = []
+
+        repo_ser = Repositorie_Service.query.filter(Repositorie_Service.repo_id.in_([repo_id]))
+        r_ser = ([e.serialize() for e in repo_ser])
+
+        for j in range(len(r_ser)):
+            list_ser.append(r_ser[j]['service_id'])
+
+        ser_port = Service_Port.query.filter(Service_Port.service_id.in_(list_ser))
+        s_port = ([e.serialize() for e in ser_port])
+
+        for k in range(len(s_port)):
+            list_por.append(s_port[k]['port_id'])
+
+        #create port dict
+        ports = Port.query.filter(Port.port_id.in_(list_por))
+
+        return jsonify([e.serialize() for e in ports])
+
+    except Exception as e:
+	    return(str(e))
+
 #get_repositories()
 @app.route("/api/v1.0/repositories", methods=['GET'])
 def get_repositories():
