@@ -126,7 +126,6 @@ class Port(db.Model):
 
     def serialize(self):
         return {
-            'port_id': self.port_id, 
             'port': self.port
         }
 

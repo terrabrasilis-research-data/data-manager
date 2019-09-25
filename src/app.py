@@ -72,14 +72,6 @@ def remove_bbox(repositories):
             new_repositorie[field] = repositories[field]
     return new_repositorie
 
-#remove_id
-def remove_id(categories):
-    new_categories = {}
-    for field in categories:
-        if field != 'keyword_id' or field != 'categorie_id':
-            new_categories[field] = categories[field]
-    return new_categories
-        
 #uri repositories
 def make_public_repositorie(repositorie):
     new_repositorie = {}
@@ -105,6 +97,7 @@ def make_public_service(service):
     new_service = {}
     for field in service:
         if field == 'service_id':
+            new_service[field] = service[field]
             new_service['uri'] = url_for('get_service', service_id=service['service_id'], _external=True)
         else:
             new_service[field] = service[field]
@@ -296,17 +289,17 @@ def get_repositories():
   
             #create keywords dict
             keywords=Keywords.query.filter(Keywords.keyword_id.in_(list_key))
-            keyw = ([remove_id(e.serialize()) for e in keywords])
+            keyw = ([e.serialize() for e in keywords])
             json_keyword = {}
             for val in keyw: 
-                json_keyword.setdefault('keywords', []).append(val)
+                json_keyword.setdefault('keywords', []).append(val['name'])
   
             #create categories dict
             categories=Categorie.query.filter(Categorie.categorie_id.in_(list_cat))
-            cate = ([remove_id(e.serialize()) for e in categories])
+            cate = ([e.serialize() for e in categories])
             json_cate = {}
             for val in cate: 
-                json_cate.setdefault('categories', []).append(val)
+                json_cate.setdefault('categories', []).append(val['name'])
 
             #create users dict
             users=User.query.filter(User.user_id.in_(list_user))
@@ -325,8 +318,27 @@ def get_repositories():
             for n in range(len(ser)):
                 hosts = Host.query.filter(Host.host_id.in_([json_ser['services'][n]['host_id']]))
                 hos = ([e.serialize() for e in hosts])
-                json_ser['services'][n].update({"host": hos[0]['address']})
-            
+                
+                ser_port = Service_Port.query.filter(Service_Port.service_id.in_( [json_ser['services'][n]['service_id']] ))
+                s_port = ([e.serialize() for e in ser_port])
+
+                list_por = []
+                for k in range(len(s_port)):
+                    list_por.append(s_port[k]['port_id'])
+
+                ports = Port.query.filter(Port.port_id.in_(list_por))
+                por = ([e.serialize() for e in ports])
+
+                json_ports = {}
+                for val in por: 
+                    json_ports.setdefault('ports', []).append(val['port'])
+
+                json_ser['services'][n].update({ "ports" : json_ports['ports'] })
+
+                json_ser['services'][n].update({ "address" : str(hos[0]['address']) + str(json_ser['services'][n]['machine']) })
+                del json_ser['services'][n]['host_id']
+                del json_ser['services'][n]['machine']
+
             #compose
             json_data['repositorie'][i].update(json_bbox['bbox'][i])
             json_data['repositorie'][i].update({"services": json_ser['services']})
@@ -387,17 +399,17 @@ def get_repositorie(repo_id):
 
         #create keywords dict
         keywords=Keywords.query.filter(Keywords.keyword_id.in_(list_key))
-        keyw = ([remove_id(e.serialize()) for e in keywords])
+        keyw = ([e.serialize() for e in keywords])
         json_keyword = {}
         for val in keyw: 
-            json_keyword.setdefault('keywords', []).append(val)
+            json_keyword.setdefault('keywords', []).append(val['name'])
 
         #create categories dict
         categories=Categorie.query.filter(Categorie.categorie_id.in_(list_cat))
-        cate = ([remove_id(e.serialize()) for e in categories])
+        cate = ([e.serialize() for e in categories])
         json_cate = {}
         for val in cate: 
-            json_cate.setdefault('categories', []).append(val)
+            json_cate.setdefault('categories', []).append(val['name'])
 
         #create users dict
         users=User.query.filter(User.user_id.in_(list_user))
@@ -413,6 +425,30 @@ def get_repositorie(repo_id):
         for val in ser: 
             json_ser.setdefault('services', []).append(val)
 
+        for n in range(len(ser)):
+            hosts = Host.query.filter(Host.host_id.in_([json_ser['services'][n]['host_id']]))
+            hos = ([e.serialize() for e in hosts])
+
+            ser_port = Service_Port.query.filter(Service_Port.service_id.in_( [json_ser['services'][n]['service_id']] ))
+            s_port = ([e.serialize() for e in ser_port])
+
+            list_por = []
+            for k in range(len(s_port)):
+                list_por.append(s_port[k]['port_id'])
+
+            ports = Port.query.filter(Port.port_id.in_(list_por))
+            por = ([e.serialize() for e in ports])
+            
+            json_ports = {}
+            for val in por: 
+                json_ports.setdefault('ports', []).append(val['port'])
+
+            json_ser['services'][n].update({ "ports" : json_ports['ports'] })
+            json_ser['services'][n].update({ "address" : str(hos[0]['address']) + str(json_ser['services'][n]['machine']) })
+
+            del json_ser['services'][n]['host_id']
+            del json_ser['services'][n]['machine']
+            
         #create response dict
         json_response = {}
         json_data.update(json_bbox)
