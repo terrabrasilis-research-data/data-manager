@@ -206,7 +206,7 @@ def get_hosts():
     except Exception as e:
 	    return(str(e))
 
-#get_ports()
+#get_ports(repo_id)
 @app.route("/api/v1.0/ports/<int:repo_id>", methods=['GET'])
 def get_ports(repo_id):
     try:
@@ -261,7 +261,7 @@ def get_repositories():
 
         #create response dict
         json_response = {}
-        for i in range(len(data) - 1):
+        for i in range(len(data)):
 
             #create lists
             list_ser = []
@@ -321,6 +321,11 @@ def get_repositories():
             json_ser = {}
             for val in ser: 
                 json_ser.setdefault('services', []).append(val)
+            
+            for n in range(len(ser)):
+                hosts = Host.query.filter(Host.host_id.in_([json_ser['services'][n]['host_id']]))
+                hos = ([e.serialize() for e in hosts])
+                json_ser['services'][n].update({"host": hos[0]['address']})
             
             #compose
             json_data['repositorie'][i].update(json_bbox['bbox'][i])

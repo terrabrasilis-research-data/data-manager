@@ -85,7 +85,6 @@ class Categorie(db.Model):
 
     def serialize(self):
         return {
-            'categorie_id': self.categorie_id, 
             'name': self.name
         }
 
@@ -146,7 +145,6 @@ class Keywords(db.Model):
 
     def serialize(self):
         return {
-            'keyword_id': self.keyword_id, 
             'name': self.name
         }
 
