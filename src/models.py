@@ -97,9 +97,11 @@ class Host(db.Model):
     address = db.Column(db.String(15), unique=False, nullable=False)
     created_on = db.Column(db.DateTime, unique=False, nullable=False)
 
-    def __init__(self, name):
+    def __init__(self, name, address, created_on):
         self.name = name
-
+        self.address = address
+        self.created_on = created_on
+        
     def __repr__(self):
         return '<id {}>'.format(self.id)
 
@@ -158,19 +160,15 @@ class Repositorie(db.Model):
     created_on = db.Column(db.DateTime, unique=False, nullable=False)
     language = db.Column(db.String(50), unique=False, nullable=False)
     bbox = db.Column(Geometry(geometry_type='POLYGON'), unique=False, nullable=False)
-    start_date = db.Column(db.DateTime, unique=False, nullable=False)
-    end_date = db.Column(db.DateTime, unique=False, nullable=False)
     custom_fields = db.Column(JSONB, unique=False, nullable=False)
     
-    def __init__(self, name, abstract, maintainer, created_on, language, bbox, start_date, end_date, custom_fields):
+    def __init__(self, name, abstract, maintainer, created_on, language, bbox, custom_fields):
         self.name = name
         self.abstract = abstract
         self.maintainer = maintainer
         self.created_on = created_on
         self.language = language
         self.bbox = bbox
-        self.start_date = start_date
-        self.end_date = end_date
         self.custom_fields = custom_fields
    
     def __repr__(self):

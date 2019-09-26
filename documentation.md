@@ -4,37 +4,47 @@ The Data Manager component is responsible for the management of Research Data Re
 
 Documentation
 ------------
-#### get_users()
+#### create_user()
+```sh
+curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"username": "gabriel", "full_name": "Gabriel Sansigolo", "password":"gabriel", "email":"gabrielsansigolo@gmail.com", "image":"assets/images/img_avatar2.png", "created_on":"2019-09-04T14:48:54+00:00", "last_login":"2019-09-04T14:48:54+00:00"}' http://localhost:5000/api/v1.0/users
+```
+
+#### read_users()
 ```sh
 curl -i http://localhost:5000/api/v1.0/users
 ```
 
-#### get_user(user_id)
+#### read_user(user_id)
 ```sh
 curl -i http://localhost:5000/api/v1.0/users/1
 ```
- 
-#### create_user()
-```sh
-curl -i curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"username": "gabriel", "full_name": "Gabriel Sansigolo", "password":"gabriel", "email":"gabrielsansigolo@gmail.com", "image":"assets/images/img_avatar2.png", "created_on":"2019-09-04T14:48:54+00:00", "last_login":"2019-09-04T14:48:54+00:00"}' http://localhost:5000/api/v1.0/users
-```
 
+#### update_user(user_id)
+```sh
+curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X PUT -d '{"username": "gabriel", "full_name": "Gabriel Sansigolo", "password":"gabriel", "email":"gabrielsansigolo@gmail.com", "image":"assets/images/img_avatar2.png", "created_on":"2019-09-04T14:48:54+00:00", "last_login":"2019-09-04T14:48:54+00:00"}' http://localhost:5000/api/v1.0/users/1
+```
+ 
 #### create_user_repositorie_rel()
 ```sh
-curl -i curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"repo_id": 1, "user_id": 3}' http://localhost:5000/api/v1.0/user_repositorie_rel
+curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"repo_id": 1, "user_id": 3}' http://localhost:5000/api/v1.0/user_repositorie_rel
 ```
 
-#### get_services() 
+#### read_services() 
 ```sh
 curl -i http://localhost:5000/api/v1.0/services
 ```
 
 #### create_service_repositorie_rel()
 ```sh
-curl -i curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"repo_id": 1, "service_id": 4}' http://localhost:5000/api/v1.0/service_repositorie_rel
+curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"repo_id": 1, "service_id": 4}' http://localhost:5000/api/v1.0/service_repositorie_rel
 ```
 
-#### get_categories() 
+#### create_services() 
+```sh
+curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"name": "PostgreSQL", "machine": 1, "host_id": 3, "created_on": "2019-09-04T14:48:54+00:00"}' http://localhost:5000/api/v1.0/services
+```
+
+#### read_categories() 
 ```sh
 curl -i http://localhost:5000/api/v1.0/categories
 
@@ -42,15 +52,15 @@ curl -i http://localhost:5000/api/v1.0/categories
 
 #### create_categorie()
 ```sh
-curl -i curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"name": "Observação da Terra"}' http://localhost:5000/api/v1.0/categories
+curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"name": "Observação da Terra"}' http://localhost:5000/api/v1.0/categories
 ```
 
 #### create_categorie_repositorie_rel()
 ```sh
-curl -i curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"repo_id": 1, "categorie_id": 3}' http://localhost:5000/api/v1.0/categorie_repositorie_rel
+curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"repo_id": 1, "categorie_id": 3}' http://localhost:5000/api/v1.0/categorie_repositorie_rel
 ```
 
-#### get_keywords()
+#### read_keywords()
 ```sh
 curl -i http://localhost:5000/api/v1.0/keywords
 
@@ -63,32 +73,42 @@ curl -i curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -
 
 #### create_keyword_repositorie_rel()
 ```sh
-curl -i curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"repo_id": 1, "keyword_id": 7}' http://localhost:5000/api/v1.0/keyword_repositorie_rel
+curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"repo_id": 1, "keyword_id": 7}' http://localhost:5000/api/v1.0/keyword_repositorie_rel
 ```
 
-#### get_hosts()
+#### read_hosts()
 ```sh
 curl -i http://localhost:5000/api/v1.0/hosts
 
 ```
 
-#### get_ports(repo_id)
+#### create_hosts()
+```sh
+curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"name": "Servidor_3","address": "172.19.0","created_on":"2019-09-04T14:48:54+00:00" }' http://localhost:5000/api/v1.0/hosts
+```
+
+#### read_ports(repo_id)
 ```sh
 curl -i http://localhost:5000/api/v1.0/ports/1
 
 ```
+#### create_repositorie()
+```sh
+curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"name": "Teste","abstract": "Teste","maintainer": "username","created_on": "2019-09-04T14:48:54+00:00","language": "Português","email": "email@email.com","bbox": "POLYGON((-70.0588433406 -33.3848757513,-35.2541558406 -33.3848757513, -35.2541558406 0.2315631899,-70.0588433406 0.2315631899,-70.0588433406 -33.3848757513))","custom_fields": []}' http://localhost:5000/api/v1.0/repositories
+```
 
-#### get_repositories()
+#### read_repositories()
 ```sh
 curl -i http://localhost:5000/api/v1.0/repositories
 ```
 
-#### get_repositorie(repo_id)
+#### read_repositorie(repo_id)
 ```sh
 curl -i http://localhost:5000/api/v1.0/repositories/1
 
 ```
-#### create_repositorie()
+
+#### update_repositorie()
 ```sh
-curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"name": "AAA","abstract": "AAA","maintainer": "username","created_on": "2019-09-04T14:48:54+00:00","language": "Português","email": "email@email.com","bbox": "POLYGON((-70.0588433406 -33.3848757513,-35.2541558406 -33.3848757513, -35.2541558406 0.2315631899,-70.0588433406 0.2315631899,-70.0588433406 -33.3848757513))","custom_fields": [], "start_date": "2019-09-04T14:48:54+00:00", "end_date": "2019-09-04T14:48:54+00:00"}' http://localhost:5000/api/v1.0/repositories
+curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X PUT -d '{"name": "Teste","abstract": "Teste","maintainer": "username","created_on": "2019-09-04T14:48:54+00:00","language": "Português","email": "email@email.com","bbox": "POLYGON((-70.0588433406 -33.3848757513,-35.2541558406 -33.3848757513, -35.2541558406 0.2315631899,-70.0588433406 0.2315631899,-70.0588433406 -33.3848757513))","custom_fields": []}' http://localhost:5000/api/v1.0/repositories/3
 ```

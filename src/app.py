@@ -77,7 +77,7 @@ def make_public_repositorie(repositorie):
     new_repositorie = {}
     for field in repositorie:
         if field == 'repo_id':
-            new_repositorie['uri'] = url_for('get_repositorie', repo_id=repositorie['repo_id'], _external=True)
+            new_repositorie['uri'] = url_for('read_repositorie', repo_id=repositorie['repo_id'], _external=True)
         else:
             new_repositorie[field] = repositorie[field]
     return new_repositorie
@@ -87,7 +87,7 @@ def make_public_user(user):
     new_user = {}
     for field in user:
         if field == 'user_id':
-            new_user['uri'] = url_for('get_user', user_id=user['user_id'], _external=True)
+            new_user['uri'] = url_for('read_user', user_id=user['user_id'], _external=True)
         else:
             new_user[field] = user[field]
     return new_user
@@ -103,29 +103,11 @@ def make_public_service(service):
             new_service[field] = service[field]
     return new_service
 
-#get_users()
-@app.route("/api/v1.0/users")
-def get_users():
-    try:
-        users=User.query.all()
-        return jsonify([make_public_user(e.serialize()) for e in users])
-    except Exception as e:
-	    return(str(e))
-		
-#get_user(user_id)
-@app.route("/api/v1.0/users/<int:user_id>", methods=['GET'])
-def get_user(user_id):
-    try:
-        user=User.query.filter_by(user_id=user_id).first()
-        return jsonify(user.serialize())
-    except Exception as e:
-	    return(str(e))
-
 #create_user()
 @app.route('/api/v1.0/users', methods=['POST'])
 @auth.login_required
 def create_user():
-    if not request.json or not 'username' and 'password' and 'image' in request.json:
+    if not request.json or not 'username' and 'password' and 'image' and "full_name" and "email" and "created_on" and "last_login" in request.json:
         abort(400)
     username=request.json['username']
     full_name=request.json['full_name']
@@ -150,6 +132,55 @@ def create_user():
     except Exception as e:
         return(str(e))
 
+#read_users()
+@app.route("/api/v1.0/users")
+def read_users():
+    try:
+        users=User.query.all()
+        return jsonify([make_public_user(e.serialize()) for e in users])
+    except Exception as e:
+	    return(str(e))
+		
+#read_user(user_id)
+@app.route("/api/v1.0/users/<int:user_id>", methods=['GET'])
+def read_user(user_id):
+    try:
+        user=User.query.filter_by(user_id=user_id).first()
+        return jsonify(user.serialize())
+    except Exception as e:
+	    return(str(e))
+
+#update_user()
+@app.route("/api/v1.0/users/<int:user_id>", methods=['PUT'])
+def update_user(user_id):
+    if not request.json or not 'username' and 'password' and 'image' and "full_name" and "email" and "created_on" and "last_login" in request.json:
+        abort(400)
+    username=request.json['username']
+    full_name=request.json['full_name']
+    password=request.json['password']
+    email=request.json['email']
+    image=request.json['image']
+    created_on=request.json['created_on']
+    last_login=request.json['last_login']
+    try:
+        q = User.query.filter_by(user_id=user_id)
+        user = q.first()
+        q.update(dict(
+            user_id = user_id,
+            username = username,
+            full_name = full_name,
+            password = password,
+            email = email,
+            image = image,
+            created_on = created_on,
+            last_login = last_login
+        ))
+        #db.session.add(user)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+	    return(str(e))
+
 #create_user_repositorie_rel()
 @app.route('/api/v1.0/user_repositorie_rel', methods=['POST'])
 @auth.login_required
@@ -169,9 +200,9 @@ def create_user_repositorie_rel():
     except Exception as e:
         return(str(e))
 
-#get_services()
+#read_services()
 @app.route("/api/v1.0/services", methods=['GET'])
-def get_services():
+def read_services():
     try:
         services=Service.query.all()
         return jsonify([make_public_service(e.serialize()) for e in services])
@@ -179,14 +210,38 @@ def get_services():
     except Exception as e:
 	    return(str(e))	
 
-#get_service(service_id)
+#read_service(service_id)
 @app.route("/api/v1.0/services/<int:service_id>")
-def get_service(service_id):
+def read_service(service_id):
     try:
         service=Service.query.filter_by(service_id=service_id).first()
         return jsonify(service.serialize())
     except Exception as e:
 	    return(str(e))
+
+#create_service()
+@app.route('/api/v1.0/services', methods=['POST'])
+@auth.login_required
+def create_service():
+    if not request.json or not 'name' and 'machine' and 'host_id' and 'created_on' in request.json:
+        abort(400)
+    name=request.json['name']
+    machine=request.json['machine']
+    host_id=request.json['host_id']
+    created_on=request.json['created_on']
+    
+    try:
+        service=Service(
+            name=name,
+            machine=machine,
+            host_id=host_id,
+            created_on=created_on
+        )
+        db.session.add(service)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+        return(str(e))
 
 #create_service_repositorie_rel()
 @app.route('/api/v1.0/service_repositorie_rel', methods=['POST'])
@@ -207,9 +262,9 @@ def create_service_repositorie_rel():
     except Exception as e:
         return(str(e))
 
-#get_categories()
+#read_categories()
 @app.route("/api/v1.0/categories", methods=['GET'])
-def get_categories():
+def read_categories():
     try:
         categories=Categorie.query.all()
         return jsonify([e.serialize() for e in categories])
@@ -253,9 +308,9 @@ def create_categorie_repositorie_rel():
     except Exception as e:
         return(str(e))
 
-#get_keywords()
+#read_keywords()
 @app.route("/api/v1.0/keywords", methods=['GET'])
-def get_keywords():
+def read_keywords():
     try:
         keywords=Keywords.query.all()
         return jsonify([e.serialize() for e in keywords])
@@ -299,9 +354,9 @@ def create_keyword_repositorie_rel():
     except Exception as e:
         return(str(e))
 
-#get_hosts()
+#read_hosts()
 @app.route("/api/v1.0/hosts", methods=['GET'])
-def get_hosts():
+def read_hosts():
     try:
         hosts=Host.query.all()
         return jsonify([e.serialize() for e in hosts])
@@ -309,9 +364,31 @@ def get_hosts():
     except Exception as e:
 	    return(str(e))
 
-#get_ports(repo_id)
+#create_host()
+@app.route('/api/v1.0/hosts', methods=['POST'])
+@auth.login_required
+def create_host():
+    if not request.json or not 'name' and 'address' and 'created_on' in request.json:
+        abort(400)
+
+    name = request.json['name']
+    address = request.json['address']
+    created_on = request.json['created_on']
+    try:
+        host=Host(
+            name = name,
+            address = address,
+            created_on = created_on
+        )
+        db.session.add(host)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+        return(str(e))
+
+#read_ports(repo_id)
 @app.route("/api/v1.0/ports/<int:repo_id>", methods=['GET'])
-def get_ports(repo_id):
+def read_ports(repo_id):
     try:
         
         #create lists
@@ -338,9 +415,39 @@ def get_ports(repo_id):
     except Exception as e:
 	    return(str(e))
 
-#get_repositories()
+#create_repositorie()
+@app.route('/api/v1.0/repositories', methods=['POST'])
+@auth.login_required
+def create_repositorie():
+    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'bbox' in request.json:
+        abort(400)
+
+    name = request.json['name']
+    abstract = request.json['abstract']
+    maintainer = request.json['maintainer']
+    created_on = request.json['created_on']
+    language = request.json['language']
+    bbox = request.json['bbox']
+    custom_fields = request.json['custom_fields']
+    try:
+        repositorie=Repositorie(
+            name = name,
+            abstract = abstract,
+            maintainer = maintainer,
+            created_on = created_on,
+            language = language,
+            bbox = bbox,
+            custom_fields = custom_fields
+        )
+        db.session.add(repositorie)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+        return(str(e))
+
+#read_repositories()
 @app.route("/api/v1.0/repositories", methods=['GET'])
-def get_repositories():
+def read_repositories():
     try:
         #query all
         repositories=Repositorie.query.all()
@@ -463,9 +570,9 @@ def get_repositories():
     except Exception as e:
 	    return(str(e))
 
-#get_repositories(repo_id)
+#read_repositories(repo_id)
 @app.route("/api/v1.0/repositories/<int:repo_id>", methods=['GET'])
-def get_repositorie(repo_id):
+def read_repositorie(repo_id):
     try:
         
         #query single id
@@ -575,11 +682,11 @@ def get_repositorie(repo_id):
     except Exception as e:
 	    return(str(e))
 
-#create_repositorie()
-@app.route('/api/v1.0/repositories', methods=['POST'])
+#update_repositorie()
+@app.route('/api/v1.0/repositories/<int:repo_id>', methods=['PUT'])
 @auth.login_required
-def create_repositorie():
-    if not request.json or not 'name' and 'abstract' and 'maintainer' in request.json:
+def update_repositorie(repo_id):
+    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'bbox' in request.json:
         abort(400)
 
     name = request.json['name']
@@ -588,22 +695,20 @@ def create_repositorie():
     created_on = request.json['created_on']
     language = request.json['language']
     bbox = request.json['bbox']
-    start_date = request.json['start_date']
-    end_date = request.json['end_date']
     custom_fields = request.json['custom_fields']
     try:
-        repositorie=Repositorie(
+        q = Repositorie.query.filter_by(repo_id=repo_id)
+        repositorie = q.first()
+        q.update(dict(
             name = name,
             abstract = abstract,
             maintainer = maintainer,
             created_on = created_on,
             language = language,
             bbox = bbox,
-            start_date = start_date,
-            end_date = end_date,
             custom_fields = custom_fields
-        )
-        db.session.add(repositorie)
+        ))
+        #db.session.add(repositorie)
         db.session.commit()
         return jsonify({'result': True})
     except Exception as e:
