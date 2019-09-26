@@ -98,7 +98,7 @@ def make_public_service(service):
     for field in service:
         if field == 'service_id':
             new_service[field] = service[field]
-            new_service['uri'] = url_for('get_service', service_id=service['service_id'], _external=True)
+            #new_service['uri'] = url_for('get_service', service_id=service['service_id'], _external=True)
         else:
             new_service[field] = service[field]
     return new_service
@@ -179,6 +179,23 @@ def get_categories():
     except Exception as e:
 	    return(str(e))
 
+#create_categories()
+@app.route('/api/v1.0/categories', methods=['POST'])
+@auth.login_required
+def create_categories():
+    if not request.json or not 'name' in request.json:
+        abort(400)
+    name=request.json['name']
+    try:
+        categorie=Categorie(
+            name = name
+        )
+        db.session.add(categorie)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+        return(str(e))
+
 #get_keywords()
 @app.route("/api/v1.0/keywords", methods=['GET'])
 def get_keywords():
@@ -188,6 +205,23 @@ def get_keywords():
 
     except Exception as e:
 	    return(str(e))
+
+#create_keywords()
+@app.route('/api/v1.0/keywords', methods=['POST'])
+@auth.login_required
+def create_keywords():
+    if not request.json or not 'name' in request.json:
+        abort(400)
+    name=request.json['name']
+    try:
+        keyword=Keywords(
+            name = name
+        )
+        db.session.add(keyword)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+        return(str(e))
 
 #get_hosts()
 @app.route("/api/v1.0/hosts", methods=['GET'])
@@ -338,6 +372,7 @@ def get_repositories():
                 json_ser['services'][n].update({ "address" : str(hos[0]['address']) + str(json_ser['services'][n]['machine']) })
                 del json_ser['services'][n]['host_id']
                 del json_ser['services'][n]['machine']
+                del json_ser['services'][n]['service_id']
 
             #compose
             json_data['repositorie'][i].update(json_bbox['bbox'][i])
@@ -448,6 +483,7 @@ def get_repositorie(repo_id):
 
             del json_ser['services'][n]['host_id']
             del json_ser['services'][n]['machine']
+            del json_ser['services'][n]['service_id']
             
         #create response dict
         json_response = {}

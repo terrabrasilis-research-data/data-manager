@@ -186,8 +186,6 @@ class Repositorie(db.Model):
             'created_on':self.created_on,
             'language':self.language,
             'bbox': db.session.scalar(functions.ST_AsGeoJSON(self.bbox)),
-            'start_date':self.start_date,
-            'end_date':self.end_date,
             'custom_fields':self.custom_fields
         }
 
