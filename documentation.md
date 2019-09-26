@@ -19,9 +19,19 @@ curl -i http://localhost:5000/api/v1.0/users/1
 curl -i curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"username": "gabriel", "full_name": "Gabriel Sansigolo", "password":"gabriel", "email":"gabrielsansigolo@gmail.com", "image":"assets/images/img_avatar2.png", "created_on":"2019-09-04T14:48:54+00:00", "last_login":"2019-09-04T14:48:54+00:00"}' http://localhost:5000/api/v1.0/users
 ```
 
+#### create_user_repositorie_rel()
+```sh
+curl -i curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"repo_id": 1, "user_id": 3}' http://localhost:5000/api/v1.0/user_repositorie_rel
+```
+
 #### get_services() 
 ```sh
 curl -i http://localhost:5000/api/v1.0/services
+```
+
+#### create_service_repositorie_rel()
+```sh
+curl -i curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"repo_id": 1, "service_id": 4}' http://localhost:5000/api/v1.0/service_repositorie_rel
 ```
 
 #### get_categories() 
@@ -30,9 +40,14 @@ curl -i http://localhost:5000/api/v1.0/categories
 
 ```
 
-#### create_categories()
+#### create_categorie()
 ```sh
 curl -i curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"name": "Observação da Terra"}' http://localhost:5000/api/v1.0/categories
+```
+
+#### create_categorie_repositorie_rel()
+```sh
+curl -i curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"repo_id": 1, "categorie_id": 3}' http://localhost:5000/api/v1.0/categorie_repositorie_rel
 ```
 
 #### get_keywords()
@@ -44,6 +59,11 @@ curl -i http://localhost:5000/api/v1.0/keywords
 #### create_keywords()
 ```sh
 curl -i curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"name": "Processamento de Imagens"}' http://localhost:5000/api/v1.0/keywords
+```
+
+#### create_keyword_repositorie_rel()
+```sh
+curl -i curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"repo_id": 1, "keyword_id": 7}' http://localhost:5000/api/v1.0/keyword_repositorie_rel
 ```
 
 #### get_hosts()

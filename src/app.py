@@ -150,6 +150,25 @@ def create_user():
     except Exception as e:
         return(str(e))
 
+#create_user_repositorie_rel()
+@app.route('/api/v1.0/user_repositorie_rel', methods=['POST'])
+@auth.login_required
+def create_user_repositorie_rel():
+    if not request.json or not 'user_id' and 'repo_id' in request.json:
+        abort(400)
+    user_id=request.json['user_id']
+    repo_id=request.json['repo_id']
+    try:
+        user_repositorie=Repositorie_User(
+            repo_id = repo_id,
+            user_id = user_id
+        )
+        db.session.add(user_repositorie)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+        return(str(e))
+
 #get_services()
 @app.route("/api/v1.0/services", methods=['GET'])
 def get_services():
@@ -169,6 +188,25 @@ def get_service(service_id):
     except Exception as e:
 	    return(str(e))
 
+#create_service_repositorie_rel()
+@app.route('/api/v1.0/service_repositorie_rel', methods=['POST'])
+@auth.login_required
+def create_service_repositorie_rel():
+    if not request.json or not 'service_id' and 'repo_id' in request.json:
+        abort(400)
+    service_id=request.json['service_id']
+    repo_id=request.json['repo_id']
+    try:
+        service_repositorie=Repositorie_Service(
+            repo_id = repo_id,
+            service_id = service_id
+        )
+        db.session.add(service_repositorie)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+        return(str(e))
+
 #get_categories()
 @app.route("/api/v1.0/categories", methods=['GET'])
 def get_categories():
@@ -179,10 +217,10 @@ def get_categories():
     except Exception as e:
 	    return(str(e))
 
-#create_categories()
+#create_categorie()
 @app.route('/api/v1.0/categories', methods=['POST'])
 @auth.login_required
-def create_categories():
+def create_categorie():
     if not request.json or not 'name' in request.json:
         abort(400)
     name=request.json['name']
@@ -191,6 +229,25 @@ def create_categories():
             name = name
         )
         db.session.add(categorie)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+        return(str(e))
+
+#create_categorie_repositorie_rel()
+@app.route('/api/v1.0/categorie_repositorie_rel', methods=['POST'])
+@auth.login_required
+def create_categorie_repositorie_rel():
+    if not request.json or not 'repo_id' and 'categorie_id' in request.json:
+        abort(400)
+    repo_id=request.json['repo_id']
+    categorie_id=request.json['categorie_id']
+    try:
+        categorie_repositorie=Repositorie_Categorie(
+            repo_id = repo_id,
+            categorie_id = categorie_id,
+        )
+        db.session.add(categorie_repositorie)
         db.session.commit()
         return jsonify({'result': True})
     except Exception as e:
@@ -218,6 +275,25 @@ def create_keywords():
             name = name
         )
         db.session.add(keyword)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+        return(str(e))
+
+#create_keyword_repositorie_rel()
+@app.route('/api/v1.0/keyword_repositorie_rel', methods=['POST'])
+@auth.login_required
+def create_keyword_repositorie_rel():
+    if not request.json or not 'repo_id' and 'keyword_id' in request.json:
+        abort(400)
+    repo_id=request.json['repo_id']
+    keyword_id=request.json['keyword_id']
+    try:
+        keyword_repositorie=Repositorie_Keyword(
+            repo_id = repo_id,
+            keyword_id = keyword_id,
+        )
+        db.session.add(keyword_repositorie)
         db.session.commit()
         return jsonify({'result': True})
     except Exception as e:
