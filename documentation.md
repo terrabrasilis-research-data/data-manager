@@ -107,18 +107,39 @@ curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X PUT -d '{"name
 ```sh
 curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"repo_id": 1, "service_id": 4}' http://localhost:5000/api/v1.0/service_repositorie_rel
 ```
- 
+
+ #### delete_service_repositorie_rel(service_id,repo_id)
+```sh
+curl -u gabriel:gabriel -X DELETE http://localhost:5000/api/v1.0/service_repositorie_rel/1/3
+```
+
 #### create_user_repositorie_rel()
 ```sh
 curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"repo_id": 1, "user_id": 3}' http://localhost:5000/api/v1.0/user_repositorie_rel
 ```
 
+ #### delete_user_repositorie_rel(service_id,repo_id)
+```sh
+curl -u gabriel:gabriel -X DELETE http://localhost:5000/api/v1.0/user_repositorie_rel/4/1
+```
+
 #### create_categorie_repositorie_rel()
 ```sh
 curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"repo_id": 1, "categorie_id": 3}' http://localhost:5000/api/v1.0/categorie_repositorie_rel
+
+```
+
+#### delete_categorie_repositorie_rel(categorie_id,repo_id)
+```sh
+curl -u gabriel:gabriel -X DELETE http://localhost:5000/api/v1.0/categorie_repositorie_rel/1/3
 ```
 
 #### create_keyword_repositorie_rel()
 ```sh
 curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"repo_id": 1, "keyword_id": 7}' http://localhost:5000/api/v1.0/keyword_repositorie_rel
+```
+
+#### delete_keyword_repositorie_rel(categorie_id,repo_id)
+```sh
+curl -u gabriel:gabriel -X DELETE http://localhost:5000/api/v1.0/keyword_repositorie_rel/7/1
 ```

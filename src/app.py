@@ -151,7 +151,7 @@ def read_user(user_id):
     except Exception as e:
 	    return(str(e))
 
-#update_user()
+#update_user(user_id)
 @app.route("/api/v1.0/users/<int:user_id>", methods=['PUT'])
 def update_user(user_id):
     if not request.json or not 'username' and 'password' and 'image' and "full_name" and "email" and "created_on" and "last_login" in request.json:
@@ -200,6 +200,17 @@ def create_user_repositorie_rel():
     except Exception as e:
         return(str(e))
 
+#delete_user_repositorie_rel(user_id,repo_id)
+@app.route("/api/v1.0/user_repositorie_rel/<int:user_id>/<int:repo_id>", methods=['DELETE'])
+@auth.login_required
+def delete_user_repositorie_rel(user_id,repo_id):
+    try:
+        repo_users = db.session.query(Repositorie_User).filter_by(user_id=user_id, repo_id=repo_id).first()
+        db.session.delete(repo_users)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+	    return(str(e))
 
 #create_service()
 @app.route('/api/v1.0/services', methods=['POST'])
@@ -275,6 +286,18 @@ def create_service_repositorie_rel():
     except Exception as e:
         return(str(e))
 
+#delete_service_repositorie_rel(service_id,repo_id)
+@app.route("/api/v1.0/service_repositorie_rel/<int:service_id>/<int:repo_id>", methods=['DELETE'])
+@auth.login_required
+def delete_service_repositorie_rel(service_id,repo_id):
+    try:
+        repo_service = db.session.query(Repositorie_Service).filter_by(service_id=service_id, repo_id=repo_id).first()
+        db.session.delete(repo_service)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+	    return(str(e))
+
 #read_categories()
 @app.route("/api/v1.0/categories", methods=['GET'])
 def read_categories():
@@ -321,6 +344,18 @@ def create_categorie_repositorie_rel():
     except Exception as e:
         return(str(e))
 
+#delete_categorie_repositorie_rel(categorie_id,repo_id)
+@app.route("/api/v1.0/categorie_repositorie_rel/<int:categorie_id>/<int:repo_id>", methods=['DELETE'])
+@auth.login_required
+def delete_categorie_repositorie_rel(categorie_id,repo_id):
+    try:
+        repo_categorie = db.session.query(Repositorie_Categorie).filter_by(categorie_id=categorie_id, repo_id=repo_id).first()
+        db.session.delete(repo_categorie)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+	    return(str(e))
+
 #read_keywords()
 @app.route("/api/v1.0/keywords", methods=['GET'])
 def read_keywords():
@@ -366,6 +401,18 @@ def create_keyword_repositorie_rel():
         return jsonify({'result': True})
     except Exception as e:
         return(str(e))
+
+#delete_keyword_repositorie_rel(keyword_id,repo_id)
+@app.route("/api/v1.0/keyword_repositorie_rel/<int:keyword_id>/<int:repo_id>", methods=['DELETE'])
+@auth.login_required
+def delete_keyword_repositorie_rel(keyword_id,repo_id):
+    try:
+        repo_keywords = db.session.query(Repositorie_Keyword).filter_by(keyword_id=keyword_id, repo_id=repo_id).first()
+        db.session.delete(repo_keywords)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+	    return(str(e))
 
 #read_hosts()
 @app.route("/api/v1.0/hosts", methods=['GET'])
