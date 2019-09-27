@@ -181,6 +181,18 @@ def update_user(user_id):
     except Exception as e:
 	    return(str(e))
 
+#delete_user(service_id)
+@app.route("/api/v1.0/users/<int:user_id>", methods=['DELETE'])
+@auth.login_required
+def delete_user(user_id):
+    try:
+        user = db.session.query(User).filter_by(user_id=user_id).first()
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+	    return(str(e))
+
 #create_user_repositorie_rel()
 @app.route('/api/v1.0/user_repositorie_rel', methods=['POST'])
 @auth.login_required
@@ -773,6 +785,18 @@ def update_repositorie(repo_id):
         return jsonify({'result': True})
     except Exception as e:
         return(str(e))
+
+#delete_user(service_id)
+@app.route("/api/v1.0/repositories/<int:repo_id>", methods=['DELETE'])
+@auth.login_required
+def delete_repositorie(repo_id):
+    try:
+        repositorie = db.session.query(Repositorie).filter_by(repo_id=repo_id).first()
+        db.session.delete(repositorie)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+	    return(str(e))
 
 #app
 if __name__ == '__main__':

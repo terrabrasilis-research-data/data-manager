@@ -24,6 +24,11 @@ curl -i http://localhost:5000/api/v1.0/users/1
 curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X PUT -d '{"username": "gabriel", "full_name": "Gabriel Sansigolo", "password":"gabriel", "email":"gabrielsansigolo@gmail.com", "image":"assets/images/img_avatar2.png", "created_on":"2019-09-04T14:48:54+00:00", "last_login":"2019-09-04T14:48:54+00:00"}' http://localhost:5000/api/v1.0/users/1
 ```
 
+#### delete_user(user_id)
+```sh
+curl -u gabriel:gabriel -X DELETE http://localhost:5000/api/v1.0/users/3
+```
+
 #### create_services() 
 ```sh
 curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"name": "PostgreSQL", "machine": 1, "host_id": 3, "created_on": "2019-09-04T14:48:54+00:00"}' http://localhost:5000/api/v1.0/services
@@ -101,6 +106,11 @@ curl -i http://localhost:5000/api/v1.0/repositories/1
 #### update_repositorie(repo_id)
 ```sh
 curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X PUT -d '{"name": "Teste","abstract": "Teste","maintainer": "username","created_on": "2019-09-04T14:48:54+00:00","language": "Português","email": "email@email.com","bbox": "POLYGON((-70.0588433406 -33.3848757513,-35.2541558406 -33.3848757513, -35.2541558406 0.2315631899,-70.0588433406 0.2315631899,-70.0588433406 -33.3848757513))","custom_fields": []}' http://localhost:5000/api/v1.0/repositories/3
+```
+
+#### delete_repositorie(repo_id)
+```sh
+curl -u gabriel:gabriel -X DELETE http://localhost:5000/api/v1.0/repositories/3
 ```
 
 #### create_service_repositorie_rel()
