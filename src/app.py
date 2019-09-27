@@ -4,6 +4,7 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_httpauth import HTTPBasicAuth
 from flask import Flask, jsonify
 from flask import make_response
+from sqlalchemy import update
 from flask import request
 from flask import url_for
 from flask import abort
@@ -175,8 +176,7 @@ def update_user(user_id):
             created_on = created_on,
             last_login = last_login
         ))
-        #db.session.add(user)
-        db.session.commit()
+        db.session.execute(q)
         return jsonify({'result': True})
     except Exception as e:
 	    return(str(e))
@@ -200,24 +200,6 @@ def create_user_repositorie_rel():
     except Exception as e:
         return(str(e))
 
-#read_services()
-@app.route("/api/v1.0/services", methods=['GET'])
-def read_services():
-    try:
-        services=Service.query.all()
-        return jsonify([make_public_service(e.serialize()) for e in services])
-
-    except Exception as e:
-	    return(str(e))	
-
-#read_service(service_id)
-@app.route("/api/v1.0/services/<int:service_id>")
-def read_service(service_id):
-    try:
-        service=Service.query.filter_by(service_id=service_id).first()
-        return jsonify(service.serialize())
-    except Exception as e:
-	    return(str(e))
 
 #create_service()
 @app.route('/api/v1.0/services', methods=['POST'])
@@ -242,6 +224,37 @@ def create_service():
         return jsonify({'result': True})
     except Exception as e:
         return(str(e))
+
+#read_services()
+@app.route("/api/v1.0/services", methods=['GET'])
+def read_services():
+    try:
+        services=Service.query.all()
+        return jsonify([make_public_service(e.serialize()) for e in services])
+
+    except Exception as e:
+	    return(str(e))	
+
+#read_service(service_id)
+@app.route("/api/v1.0/services/<int:service_id>", methods=['GET'])
+def read_service(service_id):
+    try:
+        db.session.commit()
+        return jsonify(service.serialize())
+    except Exception as e:
+	    return(str(e))
+
+#delete_service(service_id)
+@app.route("/api/v1.0/services/<int:service_id>", methods=['DELETE'])
+@auth.login_required
+def delete_service(service_id):
+    try:
+        service = db.session.query(Service).filter_by(service_id=service_id).first()
+        db.session.delete(service)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+	    return(str(e))
 
 #create_service_repositorie_rel()
 @app.route('/api/v1.0/service_repositorie_rel', methods=['POST'])
@@ -682,7 +695,7 @@ def read_repositorie(repo_id):
     except Exception as e:
 	    return(str(e))
 
-#update_repositorie()
+#update_repositorie(repo_id)
 @app.route('/api/v1.0/repositories/<int:repo_id>', methods=['PUT'])
 @auth.login_required
 def update_repositorie(repo_id):
