@@ -1,6 +1,7 @@
 #!flask/bin/python
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
+from flask_swagger_ui import get_swaggerui_blueprint
 from flask_httpauth import HTTPBasicAuth
 from flask import Flask, jsonify
 from flask import make_response
@@ -33,6 +34,19 @@ POSTGRES_DB = get_env_variable("POSTGRES_DB")
 #app
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
+
+### swagger specific ###
+SWAGGER_URL = '/swagger'
+API_URL = 'http://127.0.0.1:5000/static/swagger.json'
+SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "TerraBrasilis Research Data"
+    }
+)
+app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
+### end swagger specific ###
 
 #db
 DB_URL = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=POSTGRES_USER,pw=POSTGRES_PW,url=POSTGRES_URL,db=POSTGRES_DB)
