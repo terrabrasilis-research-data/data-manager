@@ -167,6 +167,7 @@ def read_user(user_id):
 
 #update_user(user_id)
 @app.route("/api/v1.0/users/<int:user_id>", methods=['PUT'])
+@auth.login_required
 def update_user(user_id):
     if not request.json or not 'username' and 'password' and 'image' and "full_name" and "email" and "created_on" and "last_login" in request.json:
         abort(400)

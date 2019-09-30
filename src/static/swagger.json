@@ -10,80 +10,567 @@
       "license": {
         "name": "MIT",
         "url": "https://opensource.org/licenses/MIT"
-      }
+      },
+      "host":"127.0.0.1:5000"
     },
     "components": {
-      "schemas": {
-        "id": {
-          "properties": {
-            "uuid": {
-              "type": "string"
-            }
-          }
-        },
-        "bookRequestPostBody": {
-          "type": "object",
-          "properties": {
-            "title": {
-              "type": "string",
-              "format": "string"
-            },
-            "email": {
-              "type": "string",
-              "format": "email"
-            }
-          }
-        },
-        "bookRequest": {
-          "type": "object",
-          "properties": {
-            "title": {
-              "type": "string",
-              "format": "string"
-            },
-            "email": {
-              "type": "string",
-              "format": "email"
-            },
-            "timestamp": {
-              "type": "string",
-              "format": "number"
-            }
-          }
-        },
-        "bookRequests": {
-          "type": "object",
-          "properties": {
-            "bookRequest": {
-              "type": "object",
-              "additionalProperties": {
-                "$ref": "#/components/schemas/bookRequest"
-              }
-            }
-          }
+      "securitySchemes": {
+        "basicAuth": {
+          "type": "http",
+          "scheme": "basic"
         }
+      },
+      "schemas": {
+        "User": {
+          "type": "object",
+          "properties": {
+            "user_id": {
+              "type":"integer",
+              "format":"int64"
+            },
+            "username": {
+              "type": "string",
+              "format": "string"
+            },
+            "full_name": {
+              "type": "string",
+              "format": "string"
+            },
+            "password": {
+              "type": "string",
+              "format": "string"
+            },
+            "email": {
+              "type": "string",
+              "format": "string"
+            },
+            "image": {
+              "type": "string",
+              "format":  "string"
+            },
+            "created_on": {
+              "type": "string",
+              "format": "DateTime"
+            },
+            "last_login": {
+              "type": "string",
+              "format": "DateTime"
+            }
+          }
+
+        },
+        "Repositorie": {
+          "type": "object",
+          "properties": {
+            "repo_id": {
+              "type":"integer",
+              "format":"int64"
+            },
+            "name": {
+              "type": "string",
+              "format": "string"
+            },
+            "abstract": {
+              "type": "string",
+              "format": "string"
+            },
+            "maintainer": {
+              "type": "string",
+              "format": "string"
+            },
+            "language": {
+              "type": "string",
+              "format": "string"
+            },
+            "bbox": {
+              "type": "geom",
+              "format":  "Polygon"
+            },
+            "custom_fields": {
+              "type": "string",
+              "format": "JSON"
+            },
+            "created_on": {
+              "type": "string",
+              "format": "DateTime"
+            }
+          }
       }
+    }
     },
     "servers": [
       {
-        "url": "HTTP"
+        "url":"/api/v1.0/"
       }
     ],
     "tags": [
     ],
     "paths": {
-      "/request": {
+      "/users": {
         "get": {
           "tags": [
-            "Book Request"
+            "User Request"
           ],
-          "summary": "Returns bookRequests",
+          "summary": "Returns userRequests",
           "responses": {
             "200": {
               "description": "OK",
               "schema": {
-                "$ref": "#/components/schemas/bookRequests"
               }
+            }
+          }
+        },
+        "post": {
+          "security":{
+            "basicAuth": []
+          },
+          "tags": [
+            "User Request"
+          ],
+          "summary": "Create a new user request system",
+          "requestBody": {
+            "description": "User Request Post Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "201": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Bad post data."
+            }
+          }
+        }
+      },
+      "/users/{user_id}": {
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "description": "user_id of the user that we want to match",
+            "type": "string"
+          }
+        ],
+        "get": {
+          "tags": [
+            "User Request"
+          ],
+          "summary": "Get user request with given user_id",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "user_id",
+              "required": true,
+              "description": "User Request user_id",
+              "schema": {
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Misunderstood Request."
+            },
+            "404": {
+              "description": "Failed. User request not found."
+            }
+          }
+        },
+        "delete": {
+          "security":{
+            "basicAuth": []
+          },
+          "summary": "Delete User Request by user_id",
+          "tags": [
+            "User Request"
+          ],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "user_id",
+              "required": true,
+              "description": "User Request user_id",
+              "schema": {
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Misunderstood Request."
+            },
+            "404": {
+              "description": "Failed. User Request not found."
+            }
+          }
+        }
+      },
+      "/repositories": {
+        "get": {
+          "tags": [
+            "Repositorie Request"
+          ],
+          "summary": "Returns repositoriesRequests",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+              }
+            }
+          }
+        },
+        "post": {
+          "security":{
+            "basicAuth": []
+          },
+          "tags": [
+            "Repositorie Request"
+          ],
+          "summary": "Create a new repositorie request system",
+          "requestBody": {
+            "description": "Repositorie Request Post Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "201": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Bad post data."
+            }
+          }
+        }
+      },
+      "/repositories/{repo_id}": {
+        "parameters": [
+          {
+            "name": "repo_id",
+            "in": "path",
+            "required": true,
+            "description": "repo_id of the user that we want to match",
+            "type": "string"
+          }
+        ],
+        "get": {
+          "tags": [
+            "Repositorie Request"
+          ],
+          "summary": "Get repositorie request with given repo_id",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "repo_id",
+              "required": true,
+              "description": "Repositorie Request repo_id",
+              "schema": {
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Misunderstood Request."
+            },
+            "404": {
+              "description": "Failed. User request not found."
+            }
+          }
+        },
+        "delete": {
+          "security":{
+            "basicAuth": []
+          },
+          "summary": "Delete Repositorie Request by repo_id",
+          "tags": [
+            "Repositorie Request"
+          ],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "repo_id",
+              "required": true,
+              "description": "User Request repo_id",
+              "schema": {
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Misunderstood Request."
+            },
+            "404": {
+              "description": "Failed. User Request not found."
+            }
+          }
+        }
+      },
+      "/services": {
+        "get": {
+          "tags": [
+            "Service Request"
+          ],
+          "summary": "Returns servicesRequests",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+              }
+            }
+          }
+        },
+        "post": {
+          "security":{
+            "basicAuth": []
+          },
+          "tags": [
+            "Service Request"
+          ],
+          "summary": "Create a new service request system",
+          "requestBody": {
+            "description": "Repositorie Service Post Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "201": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Bad post data."
+            }
+          }
+        }
+      },
+      "/services/{service_id}": {
+        "parameters": [
+          {
+            "name": "service_id",
+            "in": "path",
+            "required": true,
+            "description": "service_id of the user that we want to match",
+            "type": "string"
+          }
+        ],
+        "delete": {
+          "security":{
+            "basicAuth": []
+          },
+          "summary": "Delete Service Request by service_id",
+          "tags": [
+            "Service Request"
+          ],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "service_id",
+              "required": true,
+              "description": "Service Request service_id",
+              "schema": {
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Misunderstood Request."
+            },
+            "404": {
+              "description": "Failed. User Request not found."
+            }
+          }
+        }
+      },
+      "/keywords": {
+        "get": {
+          "tags": [
+            "Keyword Request"
+          ],
+          "summary": "Returns keywordRequests",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+              }
+            }
+          }
+        },
+        "post": {
+          "security":{
+            "basicAuth": []
+          },
+          "tags": [
+            "Keyword Request"
+          ],
+          "summary": "Create a new keyword request system",
+          "requestBody": {
+            "description": "Keyword Request Post Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "201": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Bad post data."
+            }
+          }
+        }
+      },
+      "/categories": {
+        "get": {
+          "tags": [
+            "Categorie Request"
+          ],
+          "summary": "Returns categorieRequests",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+              }
+            }
+          }
+        },
+        "post": {
+          "security":{
+            "basicAuth": []
+          },
+          "tags": [
+            "Categorie Request"
+          ],
+          "summary": "Create a new categorie request system",
+          "requestBody": {
+            "description": "Categorie Request Post Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "201": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Bad post data."
+            }
+          }
+        }
+      },
+      "/hosts": {
+        "get": {
+          "tags": [
+            "Host Request"
+          ],
+          "summary": "Returns hostRequests",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+              }
+            }
+          }
+        },
+        "post": {
+          "security":{
+            "basicAuth": []
+          },
+          "tags": [
+            "Host Request"
+          ],
+          "summary": "Create a new host request system",
+          "requestBody": {
+            "description": "Host Request Post Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "201": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Bad post data."
             }
           }
         }
