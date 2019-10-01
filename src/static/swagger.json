@@ -307,7 +307,7 @@
               "description": "Failed. Misunderstood Request."
             },
             "404": {
-              "description": "Failed. User request not found."
+              "description": "Failed. Repositorie request not found."
             }
           }
         },
@@ -324,7 +324,7 @@
               "in": "path",
               "name": "repo_id",
               "required": true,
-              "description": "User Request repo_id",
+              "description": "Repositorie Request repo_id",
               "schema": {
               }
             }
@@ -339,7 +339,7 @@
               "description": "Failed. Misunderstood Request."
             },
             "404": {
-              "description": "Failed. User Request not found."
+              "description": "Failed. Repositorie Request not found."
             }
           }
         }
@@ -397,7 +397,7 @@
             "name": "service_id",
             "in": "path",
             "required": true,
-            "description": "service_id of the user that we want to match",
+            "description": "service_id of the service that we want to match",
             "type": "string"
           }
         ],
@@ -429,7 +429,7 @@
               "description": "Failed. Misunderstood Request."
             },
             "404": {
-              "description": "Failed. User Request not found."
+              "description": "Failed. Service Request not found."
             }
           }
         }
@@ -523,7 +523,7 @@
               }
             },
             "400": {
-              "description": "Failed. Bad post data."
+              "description": "Failed. Bad categorie data."
             }
           }
         }
@@ -570,7 +570,139 @@
               }
             },
             "400": {
-              "description": "Failed. Bad post data."
+              "description": "Failed. Bad host data."
+            }
+          }
+        }
+      },
+      "/ports/{repo_id}": {
+        "parameters": [
+          {
+            "name": "repo_id",
+            "in": "path",
+            "required": true,
+            "description": "repo_id of the ports that we want to match",
+            "type": "string"
+          }
+        ],
+        "get": {
+          "tags": [
+            "Ports Request"
+          ],
+          "summary": "Get ports request with given repo_id",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "repo_id",
+              "required": true,
+              "description": "Port Request repo_id",
+              "schema": {
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Misunderstood Request."
+            },
+            "404": {
+              "description": "Failed. Port request not found."
+            }
+          }
+        }
+      },
+      "/service_repositorie_rel": {
+        "post": {
+          "security":{
+            "basicAuth": []
+          },
+          "tags": [
+            "Service Repositorie Request"
+          ],
+          "summary": "Create a new service repositorie request system",
+          "requestBody": {
+            "description": "Repositorie Service Post Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "201": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Bad service repositorie data."
+            }
+          }
+        }
+      },
+      "/service_repositorie_rel/{service_id}/{repo_id}": {
+        "parameters": [
+          {
+            "name": "service_id",
+            "in": "path",
+            "required": true,
+            "description": "Service Repositorie Request service_id",
+            "type": "string"
+          },
+          {
+            "name": "repo_id",
+            "in": "path",
+            "required": true,
+            "description": "Service Repositorie Request repo_id",
+            "type": "string"
+          }
+        ],
+        "delete": {
+          "security":{
+            "basicAuth": []
+          },
+          "summary": "Delete Service Request by service_id",
+          "tags": [
+            "Service Repositorie Request"
+          ],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "service_id",
+              "required": true,
+              "description": "Service Repositorie Request service_id",
+              "schema": {
+              }
+            },
+            {
+              "in": "path",
+              "name": "repo_id",
+              "required": true,
+              "description": "Service Repositorie Request repo_id",
+              "schema": {
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Misunderstood Request."
+            },
+            "404": {
+              "description": "Failed. Service Request Request not found."
             }
           }
         }
