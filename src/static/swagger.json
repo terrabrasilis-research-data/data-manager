@@ -625,7 +625,7 @@
           ],
           "summary": "Create a new service repositorie request system",
           "requestBody": {
-            "description": "Repositorie Service Post Object",
+            "description": "Service Repositorie Post Object",
             "required": true,
             "content": {
               "application/json": {
@@ -670,7 +670,7 @@
           "security":{
             "basicAuth": []
           },
-          "summary": "Delete Service Request by service_id",
+          "summary": "Delete Service Repositorie by service_id and repo_id",
           "tags": [
             "Service Repositorie Request"
           ],
@@ -702,7 +702,283 @@
               "description": "Failed. Misunderstood Request."
             },
             "404": {
-              "description": "Failed. Service Request Request not found."
+              "description": "Failed. Service Repositorie Request not found."
+            }
+          }
+        }
+      },
+      "/user_repositorie_rel": {
+        "post": {
+          "security":{
+            "basicAuth": []
+          },
+          "tags": [
+            "User Repositorie Request"
+          ],
+          "summary": "Create a new user repositorie request system",
+          "requestBody": {
+            "description": "Repositorie User Post Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "201": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Bad repositorie user data."
+            }
+          }
+        }
+      },
+      "/user_repositorie_rel/{user_id}/{repo_id}": {
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "description": "Repositorie User Request user_id",
+            "type": "string"
+          },
+          {
+            "name": "repo_id",
+            "in": "path",
+            "required": true,
+            "description": "Repositorie User Request repo_id",
+            "type": "string"
+          }
+        ],
+        "delete": {
+          "security":{
+            "basicAuth": []
+          },
+          "summary": "Delete Repositorie User Request by user_id and repo_id ",
+          "tags": [
+            "User Repositorie Request"
+          ],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "user_id",
+              "required": true,
+              "description": "Repositorie User Request user_id",
+              "schema": {
+              }
+            },
+            {
+              "in": "path",
+              "name": "repo_id",
+              "required": true,
+              "description": "Repositorie User Request repo_id",
+              "schema": {
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Misunderstood Request."
+            },
+            "404": {
+              "description": "Failed. Repositorie User Request not found."
+            }
+          }
+        }
+      },
+      "/categories_repositorie_rel": {
+        "post": {
+          "security":{
+            "basicAuth": []
+          },
+          "tags": [
+            "Categorie Repositorie Request"
+          ],
+          "summary": "Create a new categories repositorie request system",
+          "requestBody": {
+            "description": "Repositorie Categorie Post Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "201": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Bad repositorie categorie data."
+            }
+          }
+        }
+      },
+      "/categories_repositorie_rel/{categorie_id}/{repo_id}": {
+        "parameters": [
+          {
+            "name": "categorie_id",
+            "in": "path",
+            "required": true,
+            "description": "Repositorie Categorie Request categorie_id",
+            "type": "string"
+          },
+          {
+            "name": "repo_id",
+            "in": "path",
+            "required": true,
+            "description": "Repositorie Categorie Request repo_id",
+            "type": "string"
+          }
+        ],
+        "delete": {
+          "security":{
+            "basicAuth": []
+          },
+          "summary": "Delete Repositorie Categorie Request by categorie_id and repo_id ",
+          "tags": [
+            "Categorie Repositorie Request"
+          ],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "categorie_id",
+              "required": true,
+              "description": "Repositorie Categorie Request categorie_id",
+              "schema": {
+              }
+            },
+            {
+              "in": "path",
+              "name": "repo_id",
+              "required": true,
+              "description": "Repositorie Categorie Request repo_id",
+              "schema": {
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Misunderstood Request."
+            },
+            "404": {
+              "description": "Failed. Repositorie Categorie Request not found."
+            }
+          }
+        }
+      },
+      "/keywords_repositorie_rel": {
+        "post": {
+          "security":{
+            "basicAuth": []
+          },
+          "tags": [
+            "Keyword Repositorie Request"
+          ],
+          "summary": "Create a new keyword repositorie request system",
+          "requestBody": {
+            "description": "Repositorie Keyword Post Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "201": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Bad repositorie keyword data."
+            }
+          }
+        }
+      },
+      "/keywords_repositorie_rel/{keyword_id}/{repo_id}": {
+        "parameters": [
+          {
+            "name": "keyword_id",
+            "in": "path",
+            "required": true,
+            "description": "Repositorie Keyword Request keyword_id",
+            "type": "string"
+          },
+          {
+            "name": "repo_id",
+            "in": "path",
+            "required": true,
+            "description": "Repositorie Keyword Request repo_id",
+            "type": "string"
+          }
+        ],
+        "delete": {
+          "security":{
+            "basicAuth": []
+          },
+          "summary": "Delete Repositorie Keyword Request by keyword_id and repo_id ",
+          "tags": [
+            "Keyword Repositorie Request"
+          ],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "keyword_id",
+              "required": true,
+              "description": "Repositorie Keyword Request keyword_id",
+              "schema": {
+              }
+            },
+            {
+              "in": "path",
+              "name": "repo_id",
+              "required": true,
+              "description": "Repositorie Keyword Request repo_id",
+              "schema": {
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Misunderstood Request."
+            },
+            "404": {
+              "description": "Failed. Repositorie Keyword Request not found."
             }
           }
         }

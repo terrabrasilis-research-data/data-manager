@@ -179,10 +179,8 @@ def update_user(user_id):
     created_on=request.json['created_on']
     last_login=request.json['last_login']
     try:
-        q = User.query.filter_by(user_id=user_id)
-        user = q.first()
-        q.update(dict(
-            user_id = user_id,
+
+        q = db.session.query(User).update(dict(
             username = username,
             full_name = full_name,
             password = password,
@@ -191,8 +189,10 @@ def update_user(user_id):
             created_on = created_on,
             last_login = last_login
         ))
-        db.session.execute(q)
-        return jsonify({'result': True})
+        
+        #db.session.execute(q)
+        #db.session.commit()
+        return jsonify({'query': str(q)})
     except Exception as e:
 	    return(str(e))
 
