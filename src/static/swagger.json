@@ -353,6 +353,48 @@
             }
           }
         },
+        "put": {
+          "security":{
+            "basicAuth": []
+          },
+          "tags": [
+            "Repositorie Request"
+          ],
+          "summary": "Update a repositorie request with given repo_id",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "repo_id",
+              "required": true,
+              "description": "Repositorie Request repo_id",
+              "schema": {
+              }
+            }
+          ],
+          "requestBody": {
+            "description": "Repositorie Request Update Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "201": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Bad put data."
+            }
+          }
+        },
         "delete": {
           "security":{
             "basicAuth": []
