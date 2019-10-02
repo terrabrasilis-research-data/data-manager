@@ -180,19 +180,22 @@ def update_user(user_id):
     last_login=request.json['last_login']
     try:
 
-        q = db.session.query(User).update(dict(
-            username = username,
-            full_name = full_name,
-            password = password,
-            email = email,
-            image = image,
-            created_on = created_on,
-            last_login = last_login
-        ))
-        
-        #db.session.execute(q)
-        #db.session.commit()
-        return jsonify({'query': str(q)})
+        q = (db.session.query(User)
+            .filter(User.user_id == user_id)
+        )
+
+        new_user = q.one()
+        new_user.username = username
+        new_user.full_name = full_name
+        new_user.password = password
+        new_user.email = email
+        new_user.image = image
+        new_user.created_on = created_on
+        new_user.last_login = last_login
+
+        db.session.commit()
+
+        return jsonify({'result': True})
     except Exception as e:
 	    return(str(e))
 
@@ -775,7 +778,6 @@ def read_repositorie(repo_id):
 def update_repositorie(repo_id):
     if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'bbox' in request.json:
         abort(400)
-
     name = request.json['name']
     abstract = request.json['abstract']
     maintainer = request.json['maintainer']
@@ -784,22 +786,25 @@ def update_repositorie(repo_id):
     bbox = request.json['bbox']
     custom_fields = request.json['custom_fields']
     try:
-        q = Repositorie.query.filter_by(repo_id=repo_id)
-        repositorie = q.first()
-        q.update(dict(
-            name = name,
-            abstract = abstract,
-            maintainer = maintainer,
-            created_on = created_on,
-            language = language,
-            bbox = bbox,
-            custom_fields = custom_fields
-        ))
-        #db.session.add(repositorie)
+
+        q = (db.session.query(Repositorie)
+            .filter(Repositorie.repo_id == repo_id)
+        )
+
+        new_repo = q.one()
+        new_repo.name = name
+        new_repo.abstract = abstract
+        new_repo.maintainer = maintainer
+        new_repo.created_on = created_on
+        new_repo.language = language
+        new_repo.bbox = bbox
+        new_repo.custom_fields = custom_fields
+
         db.session.commit()
+
         return jsonify({'result': True})
     except Exception as e:
-        return(str(e))
+	    return(str(e))
 
 #delete_user(service_id)
 @app.route("/api/v1.0/repositories/<int:repo_id>", methods=['DELETE'])

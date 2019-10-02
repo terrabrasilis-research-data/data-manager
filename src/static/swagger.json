@@ -192,6 +192,48 @@
             }
           }
         },
+        "put": {
+          "security":{
+            "basicAuth": []
+          },
+          "tags": [
+            "User Request"
+          ],
+          "summary": "Update a user request with given user_id",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "user_id",
+              "required": true,
+              "description": "User Request user_id",
+              "schema": {
+              }
+            }
+          ],
+          "requestBody": {
+            "description": "User Request Update Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "201": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Bad put data."
+            }
+          }
+        },
         "delete": {
           "security":{
             "basicAuth": []

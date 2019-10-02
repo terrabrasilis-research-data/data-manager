@@ -29,7 +29,7 @@ class User(db.Model):
         self.last_login = last_login
 
     def __repr__(self):
-        return '<id {}>'.format(self.id)
+        return '<user_id {}>'.format(self.user_id)
     
     def serialize(self):
         return {
@@ -171,9 +171,6 @@ class Repositorie(db.Model):
         self.bbox = bbox
         self.custom_fields = custom_fields
    
-    def __repr__(self):
-        return '<id {}>'.format(self.id)
-
     def serialize(self):
 
         return {            
