@@ -97,6 +97,16 @@ def make_public_repositorie(repositorie):
             new_repositorie[field] = repositorie[field]
     return new_repositorie
 
+#uri groups
+def make_public_group(group):
+    new_groups = {}
+    for field in group:
+        if field == 'group_id':
+            new_groups['uri'] = url_for('read_group', group_id=group['group_id'], _external=True)
+        else:
+            new_groups[field] = group[field]
+    return new_groups
+
 #uri users
 def make_public_user(user):
     new_user = {}
@@ -237,6 +247,37 @@ def delete_user_repositorie_rel(user_id,repo_id):
     try:
         repo_users = db.session.query(Repositorie_User).filter_by(user_id=user_id, repo_id=repo_id).first()
         db.session.delete(repo_users)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+	    return(str(e))
+
+#create_user_group_rel()
+@app.route('/api/v1.0/user_group_rel', methods=['POST'])
+@auth.login_required
+def create_user_group_rel():
+    if not request.json or not 'user_id' and 'group_id' in request.json:
+        abort(400)
+    user_id=request.json['user_id']
+    group_id=request.json['group_id']
+    try:
+        user_group=Groups_User(
+            group_id = group_id,
+            user_id = user_id
+        )
+        db.session.add(user_group)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+        return(str(e))
+
+#delete_user_group_rel(user_id,group_id)
+@app.route("/api/v1.0/user_group_rel/<int:user_id>/<int:group_id>", methods=['DELETE'])
+@auth.login_required
+def delete_user_group_rel(user_id,group_id):
+    try:
+        group_user = db.session.query(Groups_User).filter_by(user_id=user_id, group_id=group_id).first()
+        db.session.delete(group_user)
         db.session.commit()
         return jsonify({'result': True})
     except Exception as e:
@@ -509,25 +550,19 @@ def read_ports(repo_id):
 @app.route('/api/v1.0/repositories', methods=['POST'])
 @auth.login_required
 def create_repositorie():
-    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'bbox' in request.json:
+    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' in request.json:
         abort(400)
 
     name = request.json['name']
     abstract = request.json['abstract']
     maintainer = request.json['maintainer']
     created_on = request.json['created_on']
-    language = request.json['language']
-    bbox = request.json['bbox']
-    custom_fields = request.json['custom_fields']
     try:
         repositorie=Repositorie(
             name = name,
             abstract = abstract,
             maintainer = maintainer,
-            created_on = created_on,
-            language = language,
-            bbox = bbox,
-            custom_fields = custom_fields
+            created_on = created_on
         )
         db.session.add(repositorie)
         db.session.commit()
@@ -806,13 +841,188 @@ def update_repositorie(repo_id):
     except Exception as e:
 	    return(str(e))
 
-#delete_user(service_id)
+#delete_repositorie(repo_id)
 @app.route("/api/v1.0/repositories/<int:repo_id>", methods=['DELETE'])
 @auth.login_required
 def delete_repositorie(repo_id):
     try:
         repositorie = db.session.query(Repositorie).filter_by(repo_id=repo_id).first()
         db.session.delete(repositorie)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+	    return(str(e))
+
+#create_group()
+@app.route("/api/v1.0/groups", methods=['POST'])
+@auth.login_required
+def create_group():
+    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'bbox' in request.json:
+        abort(400)
+
+    name = request.json['name']
+    abstract = request.json['abstract']
+    maintainer = request.json['maintainer']
+    created_on = request.json['created_on']
+    language = request.json['language']
+    bbox = request.json['bbox']
+    custom_fields = request.json['custom_fields']
+
+    try:
+        group=Group(
+            name = name,
+            abstract = abstract,
+            maintainer = maintainer,
+            created_on = created_on,
+            language = language,
+            bbox = bbox,
+            custom_fields = custom_fields
+
+        )
+        db.session.add(group)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+        return(str(e))
+
+#read_groups()
+@app.route("/api/v1.0/groups", methods=['GET'])
+def read_groups():
+    try:
+        #query all
+        groups=Group.query.all()
+       
+        #get lists
+        data = ([remove_bbox(make_public_group(e.serialize())) for e in groups])
+        id_data = ([e.serialize() for e in groups])
+        bbox = ([new_bbox(e.serialize()) for e in groups])
+        
+        #create data dict
+        json_data = {}
+        for val in data: 
+            json_data.setdefault('groups', []).append(val)
+        
+        #create bboxs dict
+        json_bbox = {}
+        for val in bbox: 
+            json_bbox.setdefault('bbox', []).append(val)
+        
+        lista = []
+
+        #create response dict
+        json_response = {}
+        for i in range(len(data)):
+
+            #create lists
+            list_user = []
+          
+            #create lists
+            grup_usr = Groups_User.query.filter(Groups_User.group_id.in_([id_data[i]['group_id']]))
+            r_user = ([e.serialize() for e in grup_usr])
+
+            for k in range(len(r_user)):
+                list_user.append(r_user[k]['user_id'])
+
+            #create users dict
+            users=User.query.filter(User.user_id.in_(list_user))
+            members = ([make_public_user(e.serialize()) for e in users])
+            json_users = {}
+            for val in members: 
+                json_users.setdefault('users', []).append(val)
+
+            #compose
+            json_data['groups'][i].update(json_bbox['bbox'][i])
+            json_data['groups'][i].update({"users": json_users['users']})
+            json_response.setdefault("groups", []).append(json_data['groups'][i])
+
+        return jsonify(json_response)
+
+    except Exception as e:
+	    return(str(e))
+
+#read_groups(group_id)
+@app.route("/api/v1.0/groups/<int:group_id>", methods=['GET'])
+def read_group(group_id):
+    try:
+        
+        #query single id
+        groups=Group.query.filter_by(group_id=group_id).first()
+
+        #create data dict
+        json_data = remove_bbox(groups.serialize())
+        
+        #create bbox dict
+        json_bbox = new_bbox(groups.serialize())
+
+        #create lists
+        list_user = []
+
+        #create lists 
+        grup_usr = Groups_User.query.filter(Groups_User.group_id.in_([group_id]))
+        r_user = ([e.serialize() for e in grup_usr])
+
+        for k in range(len(r_user)):
+            list_user.append(r_user[k]['user_id'])
+
+        #create users dict
+        users=User.query.filter(User.user_id.in_(list_user))
+        members = ([make_public_user(e.serialize()) for e in users])
+        json_users = {}
+        for val in members: 
+            json_users.setdefault('users', []).append(val)
+
+        #create response dict
+        json_response = {}
+        json_data.update(json_bbox)
+        json_data.update(json_users)
+        json_response.setdefault("groups", []).append(json_data)
+
+        return jsonify(json_response)
+
+    except Exception as e:
+	    return(str(e))
+
+#update_group(group_id)
+@app.route('/api/v1.0/groups/<int:group_id>', methods=['PUT'])
+@auth.login_required
+def update_group(group_id):
+    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'bbox' in request.json:
+        abort(400)
+    name = request.json['name']
+    abstract = request.json['abstract']
+    maintainer = request.json['maintainer']
+    created_on = request.json['created_on']
+    language = request.json['language']
+    bbox = request.json['bbox']
+    custom_fields = request.json['custom_fields']
+    try:
+
+        q = (db.session.query(Group)
+            .filter(Groups.group_id == group_id)
+        )
+
+        new_group = q.one()
+        new_group.name = name
+        new_group.abstract = abstract
+        new_group.maintainer = maintainer
+        new_group.created_on = created_on
+        new_group.language = language
+        new_group.bbox = bbox
+        new_group.custom_fields = custom_fields
+
+        db.session.commit()
+
+        return jsonify({'result': True})
+    except Exception as e:
+	    return(str(e))
+
+#delete_group(group_id)
+@app.route("/api/v1.0/groups/<int:group_id>", methods=['DELETE'])
+@auth.login_required
+def delete_group(group_id):
+    try:
+        group = db.session.query(Group).filter_by(group_id=group_id).first()
+        db.session.delete(group)
         db.session.commit()
         return jsonify({'result': True})
     except Exception as e:

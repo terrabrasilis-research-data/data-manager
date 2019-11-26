@@ -149,11 +149,11 @@ class Keywords(db.Model):
             'name': self.name
         }
 
-class Repositorie(db.Model):
+class Group(db.Model):
 
-    __tablename__ = 'research_data_repositories'
+    __tablename__ = 'research_group'
 
-    repo_id = db.Column(db.Integer, primary_key=True)
+    group_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=False, nullable=False)
     abstract = db.Column(db.String(500), unique=False, nullable=False)
     maintainer = db.Column(db.String(355), unique=False, nullable=False)
@@ -174,7 +174,7 @@ class Repositorie(db.Model):
     def serialize(self):
 
         return {            
-            'repo_id': self.repo_id, 
+            'group_id': self.group_id, 
             'name': self.name,
             'abstract':self.abstract,
             'maintainer':self.maintainer,
@@ -182,6 +182,33 @@ class Repositorie(db.Model):
             'language':self.language,
             'bbox': db.session.scalar(functions.ST_AsGeoJSON(self.bbox)),
             'custom_fields':self.custom_fields
+        }
+
+class Repositorie(db.Model):
+
+    __tablename__ = 'research_data_repositories'
+
+    repo_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=False, nullable=False)
+    abstract = db.Column(db.String(500), unique=False, nullable=False)
+    maintainer = db.Column(db.String(355), unique=False, nullable=False)
+    created_on = db.Column(db.DateTime, unique=False, nullable=False)
+    
+    
+    def __init__(self, name, abstract, maintainer, created_on):
+        self.name = name
+        self.abstract = abstract
+        self.maintainer = maintainer
+        self.created_on = created_on
+   
+    def serialize(self):
+
+        return {            
+            'repo_id': self.repo_id, 
+            'name': self.name,
+            'abstract':self.abstract,
+            'maintainer':self.maintainer,
+            'created_on':self.created_on
         }
 
 class Repositorie_Service(db.Model):
@@ -203,6 +230,27 @@ class Repositorie_Service(db.Model):
         return {            
             'repo_id': self.repo_id, 
             'service_id': self.service_id
+        }
+
+class Groups_User(db.Model):
+
+    __tablename__ = 'research_group_users'
+    __table_args__ = (
+        PrimaryKeyConstraint('group_id', 'user_id'),
+    )
+
+    group_id = db.Column(db.Integer, db.ForeignKey('research_group.group_id'),nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),nullable=False)
+
+    def __init__(self, user_id, group_id):
+        self.group_id = group_id
+        self.user_id = user_id
+
+    def serialize(self):
+
+        return {            
+            'group_id': self.group_id, 
+            'user_id': self.user_id
         }
 
 class Repositorie_User(db.Model):

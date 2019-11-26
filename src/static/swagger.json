@@ -267,6 +267,167 @@
           }
         }
       },
+      "/groups": {
+        "get": {
+          "tags": [
+            "Groups Request"
+          ],
+          "summary": "Returns groupsRequests",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+              }
+            }
+          }
+        },
+        "post": {
+          "security":{
+            "basicAuth": []
+          },
+          "tags": [
+            "Groups Request"
+          ],
+          "summary": "Create a new Groups request system",
+          "requestBody": {
+            "description": "Groups Request Post Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "201": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Bad post data."
+            }
+          }
+        }
+      },
+      "/groups/{group_id}": {
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "description": "group_id of the user that we want to match",
+            "type": "string"
+          }
+        ],
+        "get": {
+          "tags": [
+            "Groups Request"
+          ],
+          "summary": "Get Groups request with given group_id",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "group_id",
+              "required": true,
+              "description": "Groups Request group_id",
+              "schema": {
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Misunderstood Request."
+            },
+            "404": {
+              "description": "Failed. Groups request not found."
+            }
+          }
+        },
+        "put": {
+          "security":{
+            "basicAuth": []
+          },
+          "tags": [
+            "Groups Request"
+          ],
+          "summary": "Update a Groups request with given group_id",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "group_id",
+              "required": true,
+              "description": "Groups Request group_id",
+              "schema": {
+              }
+            }
+          ],
+          "requestBody": {
+            "description": "Groups Request Update Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "201": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Bad put data."
+            }
+          }
+        },
+        "delete": {
+          "security":{
+            "basicAuth": []
+          },
+          "summary": "Delete Groups Request by group_id",
+          "tags": [
+            "Groups Request"
+          ],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "group_id",
+              "required": true,
+              "description": "Groups Request group_id",
+              "schema": {
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Misunderstood Request."
+            },
+            "404": {
+              "description": "Failed. Groups Request not found."
+            }
+          }
+        }
+      },
       "/repositories": {
         "get": {
           "tags": [
@@ -879,6 +1040,98 @@
             },
             "404": {
               "description": "Failed. Repositorie User Request not found."
+            }
+          }
+        }
+      },
+      "/user_group_rel": {
+        "post": {
+          "security":{
+            "basicAuth": []
+          },
+          "tags": [
+            "User Group Request"
+          ],
+          "summary": "Create a new user Group request system",
+          "requestBody": {
+            "description": "Group User Post Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                }
+              }
+            }
+          },
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "201": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Bad Group user data."
+            }
+          }
+        }
+      },
+      "/user_group_rel/{user_id}/{group_id}": {
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "description": "Group User Request user_id",
+            "type": "string"
+          },
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "description": "Group User Request group_id",
+            "type": "string"
+          }
+        ],
+        "delete": {
+          "security":{
+            "basicAuth": []
+          },
+          "summary": "Delete Group User Request by user_id and group_id ",
+          "tags": [
+            "User Group Request"
+          ],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "user_id",
+              "required": true,
+              "description": "Group User Request user_id",
+              "schema": {
+              }
+            },
+            {
+              "in": "path",
+              "name": "group_id",
+              "required": true,
+              "description": "Group User Request group_id",
+              "schema": {
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "OK",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "Failed. Misunderstood Request."
+            },
+            "404": {
+              "description": "Failed. Group User Request not found."
             }
           }
         }
