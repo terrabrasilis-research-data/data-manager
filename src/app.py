@@ -70,22 +70,6 @@ def unauthorized():
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
-       
-#new_bbox
-def new_bbox(repositories):
-    new_repositorie = {}
-    for field in repositories:
-        if field == 'bbox':
-            new_repositorie[field] = repositories[field]
-    return new_repositorie
-
-#remove_bbox
-def remove_bbox(repositories):
-    new_repositorie = {}
-    for field in repositories:
-        if field != 'bbox':
-            new_repositorie[field] = repositories[field]
-    return new_repositorie
 
 #uri repositories
 def make_public_repositorie(repositorie):
@@ -221,32 +205,32 @@ def delete_user(user_id):
     except Exception as e:
 	    return(str(e))
 
-#create_user_repositorie_rel()
-@app.route('/api/v1.0/user_repositorie_rel', methods=['POST'])
+#create_group_repositorie_rel()
+@app.route('/api/v1.0/group_repositorie_rel', methods=['POST'])
 @auth.login_required
-def create_user_repositorie_rel():
-    if not request.json or not 'user_id' and 'repo_id' in request.json:
+def create_group_repositorie_rel():
+    if not request.json or not 'group_id' and 'repo_id' in request.json:
         abort(400)
-    user_id=request.json['user_id']
+    group_id=request.json['group_id']
     repo_id=request.json['repo_id']
     try:
-        user_repositorie=Repositorie_User(
+        group_repositorie=Repositorie_Group(
             repo_id = repo_id,
-            user_id = user_id
+            group_id = group_id
         )
-        db.session.add(user_repositorie)
+        db.session.add(group_repositorie)
         db.session.commit()
         return jsonify({'result': True})
     except Exception as e:
         return(str(e))
 
-#delete_user_repositorie_rel(user_id,repo_id)
-@app.route("/api/v1.0/user_repositorie_rel/<int:user_id>/<int:repo_id>", methods=['DELETE'])
+#delete_group_repositorie_rel(group_id,repo_id)
+@app.route("/api/v1.0/group_repositorie_rel/<int:group_id>/<int:repo_id>", methods=['DELETE'])
 @auth.login_required
-def delete_user_repositorie_rel(user_id,repo_id):
+def delete_group_repositorie_rel(group_id,repo_id):
     try:
-        repo_users = db.session.query(Repositorie_User).filter_by(user_id=user_id, repo_id=repo_id).first()
-        db.session.delete(repo_users)
+        group_repositorie = db.session.query(Repositorie_Group).filter_by(group_id=group_id, repo_id=repo_id).first()
+        db.session.delete(group_repositorie)
         db.session.commit()
         return jsonify({'result': True})
     except Exception as e:
@@ -578,19 +562,13 @@ def read_repositories():
         repositories=Repositorie.query.all()
        
         #get lists
-        data = ([remove_bbox(make_public_repositorie(e.serialize())) for e in repositories])
+        data = ([(make_public_repositorie(e.serialize())) for e in repositories])
         id_data = ([e.serialize() for e in repositories])
-        bbox = ([new_bbox(e.serialize()) for e in repositories])
         
         #create data dict
         json_data = {}
         for val in data: 
             json_data.setdefault('repositorie', []).append(val)
-        
-        #create bboxs dict
-        json_bbox = {}
-        for val in bbox: 
-            json_bbox.setdefault('bbox', []).append(val)
         
         lista = []
 
@@ -600,7 +578,6 @@ def read_repositories():
 
             #create lists
             list_ser = []
-            list_user = []
             list_cat = []
             list_key = []
 
@@ -608,9 +585,6 @@ def read_repositories():
             repo_ser = Repositorie_Service.query.filter(Repositorie_Service.repo_id.in_([id_data[i]['repo_id']]))
             r_ser = ([e.serialize() for e in repo_ser])
           
-            repo_usr = Repositorie_User.query.filter(Repositorie_User.repo_id.in_([id_data[i]['repo_id']]))
-            r_user = ([e.serialize() for e in repo_usr])
-
             repo_cat = Repositorie_Categorie.query.filter(Repositorie_Categorie.repo_id.in_([id_data[i]['repo_id']]))
             r_cat = ([e.serialize() for e in repo_cat])
 
@@ -619,9 +593,6 @@ def read_repositories():
 
             for j in range(len(r_ser)):
                 list_ser.append(r_ser[j]['service_id'])
-
-            for k in range(len(r_user)):
-                list_user.append(r_user[k]['user_id'])
 
             for l in range(len(r_cat)):
                 list_cat.append(r_cat[l]['categorie_id'])
@@ -642,13 +613,6 @@ def read_repositories():
             json_cate = {}
             for val in cate: 
                 json_cate.setdefault('categories', []).append(val['name'])
-
-            #create users dict
-            users=User.query.filter(User.user_id.in_(list_user))
-            members = ([make_public_user(e.serialize()) for e in users])
-            json_users = {}
-            for val in members: 
-                json_users.setdefault('users', []).append(val)
             
             #create services dict
             services = Service.query.filter(Service.service_id.in_(list_ser))
@@ -683,9 +647,7 @@ def read_repositories():
                 del json_ser['services'][n]['service_id']
 
             #compose
-            json_data['repositorie'][i].update(json_bbox['bbox'][i])
             json_data['repositorie'][i].update({"services": json_ser['services']})
-            json_data['repositorie'][i].update({"users": json_users['users']})
             json_data['repositorie'][i].update({"categories": json_cate['categories']})
             json_data['repositorie'][i].update({"keywords": json_keyword['keywords']})
             json_response.setdefault("repositorie", []).append(json_data['repositorie'][i])
@@ -704,23 +666,17 @@ def read_repositorie(repo_id):
         repositories=Repositorie.query.filter_by(repo_id=repo_id).first()
 
         #create data dict
-        json_data = remove_bbox(repositories.serialize())
+        json_data = (repositories.serialize())
         
-        #create bbox dict
-        json_bbox = new_bbox(repositories.serialize())
 
         #create lists
         list_ser = []
-        list_user = []
         list_cat = []
         list_key = []
 
         #create lists 
         repo_ser = Repositorie_Service.query.filter(Repositorie_Service.repo_id.in_([repo_id]))
         r_ser = ([e.serialize() for e in repo_ser])
-        
-        repo_usr = Repositorie_User.query.filter(Repositorie_User.repo_id.in_([repo_id]))
-        r_user = ([e.serialize() for e in repo_usr])
 
         repo_cat = Repositorie_Categorie.query.filter(Repositorie_Categorie.repo_id.in_([repo_id]))
         r_cat = ([e.serialize() for e in repo_cat])
@@ -730,9 +686,6 @@ def read_repositorie(repo_id):
 
         for j in range(len(r_ser)):
             list_ser.append(r_ser[j]['service_id'])
-
-        for k in range(len(r_user)):
-            list_user.append(r_user[k]['user_id'])
 
         for l in range(len(r_cat)):
             list_cat.append(r_cat[l]['categorie_id'])
@@ -753,13 +706,6 @@ def read_repositorie(repo_id):
         json_cate = {}
         for val in cate: 
             json_cate.setdefault('categories', []).append(val['name'])
-
-        #create users dict
-        users=User.query.filter(User.user_id.in_(list_user))
-        members = ([make_public_user(e.serialize()) for e in users])
-        json_users = {}
-        for val in members: 
-            json_users.setdefault('users', []).append(val)
         
         #create services dict
         services = Service.query.filter(Service.service_id.in_(list_ser))
@@ -795,9 +741,7 @@ def read_repositorie(repo_id):
             
         #create response dict
         json_response = {}
-        json_data.update(json_bbox)
         json_data.update(json_ser)
-        json_data.update(json_users)
         json_data.update(json_cate)
         json_data.update(json_keyword)
         json_response.setdefault("repositorie", []).append(json_data)
@@ -811,14 +755,13 @@ def read_repositorie(repo_id):
 @app.route('/api/v1.0/repositories/<int:repo_id>', methods=['PUT'])
 @auth.login_required
 def update_repositorie(repo_id):
-    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'bbox' in request.json:
+    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' in request.json:
         abort(400)
     name = request.json['name']
     abstract = request.json['abstract']
     maintainer = request.json['maintainer']
     created_on = request.json['created_on']
     language = request.json['language']
-    bbox = request.json['bbox']
     custom_fields = request.json['custom_fields']
     try:
 
@@ -832,7 +775,6 @@ def update_repositorie(repo_id):
         new_repo.maintainer = maintainer
         new_repo.created_on = created_on
         new_repo.language = language
-        new_repo.bbox = bbox
         new_repo.custom_fields = custom_fields
 
         db.session.commit()
@@ -857,7 +799,7 @@ def delete_repositorie(repo_id):
 @app.route("/api/v1.0/groups", methods=['POST'])
 @auth.login_required
 def create_group():
-    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'bbox' in request.json:
+    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'image' in request.json:
         abort(400)
 
     name = request.json['name']
@@ -865,7 +807,7 @@ def create_group():
     maintainer = request.json['maintainer']
     created_on = request.json['created_on']
     language = request.json['language']
-    bbox = request.json['bbox']
+    image = request.json['image']
     custom_fields = request.json['custom_fields']
 
     try:
@@ -875,7 +817,7 @@ def create_group():
             maintainer = maintainer,
             created_on = created_on,
             language = language,
-            bbox = bbox,
+            image = image,
             custom_fields = custom_fields
 
         )
@@ -893,19 +835,13 @@ def read_groups():
         groups=Group.query.all()
        
         #get lists
-        data = ([remove_bbox(make_public_group(e.serialize())) for e in groups])
+        data = ([(make_public_group(e.serialize())) for e in groups])
         id_data = ([e.serialize() for e in groups])
-        bbox = ([new_bbox(e.serialize()) for e in groups])
         
         #create data dict
         json_data = {}
         for val in data: 
             json_data.setdefault('groups', []).append(val)
-        
-        #create bboxs dict
-        json_bbox = {}
-        for val in bbox: 
-            json_bbox.setdefault('bbox', []).append(val)
         
         lista = []
 
@@ -918,20 +854,25 @@ def read_groups():
           
             #create lists
             grup_usr = Groups_User.query.filter(Groups_User.group_id.in_([id_data[i]['group_id']]))
+
             r_user = ([e.serialize() for e in grup_usr])
+
+            print(r_user)
 
             for k in range(len(r_user)):
                 list_user.append(r_user[k]['user_id'])
 
             #create users dict
             users=User.query.filter(User.user_id.in_(list_user))
+            
             members = ([make_public_user(e.serialize()) for e in users])
+
             json_users = {}
+
             for val in members: 
                 json_users.setdefault('users', []).append(val)
 
             #compose
-            json_data['groups'][i].update(json_bbox['bbox'][i])
             json_data['groups'][i].update({"users": json_users['users']})
             json_response.setdefault("groups", []).append(json_data['groups'][i])
 
@@ -949,10 +890,7 @@ def read_group(group_id):
         groups=Group.query.filter_by(group_id=group_id).first()
 
         #create data dict
-        json_data = remove_bbox(groups.serialize())
-        
-        #create bbox dict
-        json_bbox = new_bbox(groups.serialize())
+        json_data = (groups.serialize())
 
         #create lists
         list_user = []
@@ -973,7 +911,6 @@ def read_group(group_id):
 
         #create response dict
         json_response = {}
-        json_data.update(json_bbox)
         json_data.update(json_users)
         json_response.setdefault("groups", []).append(json_data)
 
@@ -986,14 +923,14 @@ def read_group(group_id):
 @app.route('/api/v1.0/groups/<int:group_id>', methods=['PUT'])
 @auth.login_required
 def update_group(group_id):
-    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'bbox' in request.json:
+    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'image' in request.json:
         abort(400)
     name = request.json['name']
     abstract = request.json['abstract']
     maintainer = request.json['maintainer']
     created_on = request.json['created_on']
     language = request.json['language']
-    bbox = request.json['bbox']
+    image = request.json['image']
     custom_fields = request.json['custom_fields']
     try:
 
@@ -1007,7 +944,7 @@ def update_group(group_id):
         new_group.maintainer = maintainer
         new_group.created_on = created_on
         new_group.language = language
-        new_group.bbox = bbox
+        new_group.image = image
         new_group.custom_fields = custom_fields
 
         db.session.commit()

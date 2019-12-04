@@ -952,17 +952,17 @@
           }
         }
       },
-      "/user_repositorie_rel": {
+      "/group_repositorie_rel": {
         "post": {
           "security":{
             "basicAuth": []
           },
           "tags": [
-            "User Repositorie Request"
+            "Group Repositorie Request"
           ],
-          "summary": "Create a new user repositorie request system",
+          "summary": "Create a new group repositorie request system",
           "requestBody": {
-            "description": "Repositorie User Post Object",
+            "description": "Repositorie Group Post Object",
             "required": true,
             "content": {
               "application/json": {
@@ -986,20 +986,20 @@
           }
         }
       },
-      "/user_repositorie_rel/{user_id}/{repo_id}": {
+      "/group_repositorie_rel/{group_id}/{repo_id}": {
         "parameters": [
           {
-            "name": "user_id",
+            "name": "group_id",
             "in": "path",
             "required": true,
-            "description": "Repositorie User Request user_id",
+            "description": "Repositorie Group Request group_id",
             "type": "string"
           },
           {
             "name": "repo_id",
             "in": "path",
             "required": true,
-            "description": "Repositorie User Request repo_id",
+            "description": "Repositorie Group Request repo_id",
             "type": "string"
           }
         ],
@@ -1007,16 +1007,16 @@
           "security":{
             "basicAuth": []
           },
-          "summary": "Delete Repositorie User Request by user_id and repo_id ",
+          "summary": "Delete Repositorie Group Request by group_id and repo_id ",
           "tags": [
-            "User Repositorie Request"
+            "Group Repositorie Request"
           ],
           "parameters": [
             {
               "in": "path",
-              "name": "user_id",
+              "name": "group_id",
               "required": true,
-              "description": "Repositorie User Request user_id",
+              "description": "Repositorie Group Request group_id",
               "schema": {
               }
             },
@@ -1024,7 +1024,7 @@
               "in": "path",
               "name": "repo_id",
               "required": true,
-              "description": "Repositorie User Request repo_id",
+              "description": "Repositorie Group Request repo_id",
               "schema": {
               }
             }
@@ -1039,7 +1039,7 @@
               "description": "Failed. Misunderstood Request."
             },
             "404": {
-              "description": "Failed. Repositorie User Request not found."
+              "description": "Failed. Repositorie Group Request not found."
             }
           }
         }
