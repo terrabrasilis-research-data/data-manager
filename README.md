@@ -26,7 +26,7 @@ docker run -d --name terrabrasilis_data_manager_api --restart unless-stopped \
 
 If required, the following environment variables are available.
 
-* POSTGRES_URL Database Address, with port (e.g. 127.0.0.1:5432)
-* POSTGRES_USER  Database user (e.g. postgres)
-* POSTGRES_PW Database password (e.g. postgres)
-* POSTGRES_DB Database name (e.g. terrabrasilisrd)
+* `POSTGRES_URL` Database Address, with port (e.g. 127.0.0.1:5432)
+* `POSTGRES_USER`  Database user (e.g. postgres)
+* `POSTGRES_PW` Database password (e.g. postgres)
+* `POSTGRES_DB` Database name (e.g. terrabrasilisrd)
