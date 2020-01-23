@@ -2,7 +2,6 @@ CREATE TABLE "users"(
   user_id serial PRIMARY KEY, 
   username VARCHAR (50) UNIQUE NOT NULL, 
   full_name VARCHAR (355) NOT NULL, 
-  "password" VARCHAR (50) NOT NULL, 
   email VARCHAR (355) UNIQUE NOT NULL, 
   image VARCHAR (355) NOT NULL, 
   created_on TIMESTAMP NOT NULL, 
@@ -133,8 +132,8 @@ INSERT INTO keywords ("name") VALUES ('Águas Continentais');
 INSERT INTO categories ("name") VALUES ('Sensoriamento Remoto');
 INSERT INTO categories ("name") VALUES ('Uso e Cobertura da Terra');
 
-INSERT INTO users (username, full_name, "password", email, image, created_on, last_login) VALUES ('username_1', 'username_full_name', 'pass', 'email@email.com','assets/images/img_avatar.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00');
-INSERT INTO users (username, full_name, "password", email, image, created_on, last_login) VALUES ('username_2', 'username2_full_name', 'pass', 'email2@email2.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00');
+INSERT INTO users (username, full_name, email, image, created_on, last_login) VALUES ('username_1', 'username_full_name', 'email@email.com','assets/images/img_avatar.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00');
+INSERT INTO users (username, full_name, email, image, created_on, last_login) VALUES ('username_2', 'username2_full_name', 'email2@email2.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00');
 
 INSERT INTO services ("name", host_id, machine, created_on) VALUES ('PostgreSQL', 1, 01, '2019-09-04T14:48:54+00:00');
 INSERT INTO services ("name", host_id, machine, created_on) VALUES ('GeoServer', 1, 02, '2019-09-04T14:48:54+00:00');

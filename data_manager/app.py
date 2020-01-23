@@ -37,7 +37,7 @@ app.config['JSON_SORT_KEYS'] = False
 
 ### swagger specific ###
 SWAGGER_URL = '/swagger'
-API_URL = 'http://127.0.0.1:5000/static/swagger.json'
+API_URL = 'http://127.0.0.1:8090/static/swagger.json'
 SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
@@ -967,4 +967,4 @@ def delete_group(group_id):
 
 #app
 if __name__ == '__main__':
-    app.run('0.0.0.0', debug=True)
+    app.run(get_env_variable("HOST_IP"), debug=True, port=8090)
