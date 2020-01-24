@@ -116,11 +116,10 @@ def make_public_service(service):
 @app.route('/api/v1.0/users', methods=['POST'])
 @auth.login_required
 def create_user():
-    if not request.json or not 'username' and 'password' and 'image' and "full_name" and "email" and "created_on" and "last_login" in request.json:
+    if not request.json or not 'username' and 'image' and "full_name" and "email" and "created_on" and "last_login" in request.json:
         abort(400)
     username=request.json['username']
     full_name=request.json['full_name']
-    password=request.json['password']
     email=request.json['email']
     image=request.json['image']
     created_on=request.json['created_on']
@@ -129,7 +128,6 @@ def create_user():
         user=User(
             username = username,
             full_name = full_name,
-            password = password,
             email = email,
             image = image,
             created_on = created_on,
@@ -163,11 +161,10 @@ def read_user(user_id):
 @app.route("/api/v1.0/users/<int:user_id>", methods=['PUT'])
 @auth.login_required
 def update_user(user_id):
-    if not request.json or not 'username' and 'password' and 'image' and "full_name" and "email" and "created_on" and "last_login" in request.json:
+    if not request.json or not 'username' and 'image' and "full_name" and "email" and "created_on" and "last_login" in request.json:
         abort(400)
     username=request.json['username']
     full_name=request.json['full_name']
-    password=request.json['password']
     email=request.json['email']
     image=request.json['image']
     created_on=request.json['created_on']
@@ -181,7 +178,6 @@ def update_user(user_id):
         new_user = q.one()
         new_user.username = username
         new_user.full_name = full_name
-        new_user.password = password
         new_user.email = email
         new_user.image = image
         new_user.created_on = created_on

@@ -13,16 +13,14 @@ class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=False, nullable=False)
     full_name = db.Column(db.String(355), unique=False, nullable=False)
-    password = db.Column(db.String(50), unique=False, nullable=False)
     email = db.Column(db.String(355), unique=False, nullable=False)
     image = db.Column(db.String(355), unique=False, nullable=False)
     created_on = db.Column(db.DateTime, unique=False, nullable=False)
     last_login = db.Column(db.DateTime, unique=False, nullable=False)
 
-    def __init__(self, username, full_name, password, email, image, created_on, last_login):
+    def __init__(self, username, full_name, email, image, created_on, last_login):
         self.username = username
         self.full_name = full_name
-        self.password = password
         self.email = email
         self.image = image
         self.created_on = created_on
