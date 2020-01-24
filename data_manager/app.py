@@ -6,6 +6,7 @@ from flask_httpauth import HTTPBasicAuth
 from flask import Flask, jsonify
 from flask import make_response
 from sqlalchemy import update
+from flask_cors import CORS
 from flask import request
 from flask import url_for
 from flask import abort
@@ -33,6 +34,8 @@ POSTGRES_DB = get_env_variable("POSTGRES_DB")
 
 #app
 app = Flask(__name__)
+CORS(app)
+
 app.config['JSON_SORT_KEYS'] = False
 
 ### swagger specific ###
@@ -57,8 +60,8 @@ db = SQLAlchemy(app)
 #oath
 @auth.get_password
 def get_password(username):
-    if username == 'gabriel':
-        return 'gabriel'
+    if username == get_env_variable("AUTH_USER"):
+        return get_env_variable("AUTH_PASS")
     return None
 
 #oath
@@ -963,4 +966,4 @@ def delete_group(group_id):
 
 #app
 if __name__ == '__main__':
-    app.run(get_env_variable("HOST_IP"), debug=True, port=8090)
+    app.run('0.0.0.0', debug=True, port=8090)
