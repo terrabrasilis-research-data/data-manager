@@ -4,6 +4,7 @@ from geoalchemy2 import Geometry
 from geoalchemy2 import functions
 from flask.json import jsonify
 from sqlalchemy import PrimaryKeyConstraint
+from passlib.hash import pbkdf2_sha256 as sha256
 from sqlalchemy.dialects.postgresql import JSONB
 
 class User(db.Model):
@@ -12,14 +13,16 @@ class User(db.Model):
 
     user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=False, nullable=False)
+    password = db.Column(db.String(50), unique=False, nullable=False)
     full_name = db.Column(db.String(355), unique=False, nullable=False)
     email = db.Column(db.String(355), unique=False, nullable=False)
     image = db.Column(db.String(355), unique=False, nullable=False)
     created_on = db.Column(db.DateTime, unique=False, nullable=False)
     last_login = db.Column(db.DateTime, unique=False, nullable=False)
 
-    def __init__(self, username, full_name, email, image, created_on, last_login):
+    def __init__(self, username, password, full_name, email, image, created_on, last_login):
         self.username = username
+        self.password = password
         self.full_name = full_name
         self.email = email
         self.image = image
@@ -39,6 +42,18 @@ class User(db.Model):
             'created_on':self.created_on,
             'last_login':self.last_login
         }
+
+    @classmethod
+    def find_by_username(cls, username):
+        return cls.query.filter_by(username = username).first()
+
+    @staticmethod
+    def generate_hash(password):
+        return sha256.hash(password)    
+    
+    @staticmethod
+    def verify_hash(password, hash):
+        return sha256.verify(password, hash)
 
 class Service(db.Model):
 
@@ -67,6 +82,30 @@ class Service(db.Model):
             'host_id':self.host_id,
             'created_on':self.created_on,
         }
+
+class RevokedTokenModel(db.Model):
+
+    __tablename__ = 'revoked_tokens'
+    
+    id = db.Column(db.Integer, primary_key = True)
+    jti = db.Column(db.String(120))
+
+    def __init__(self, jti):
+        self.jti = jti
+
+    def __repr__(self):
+        return '<id {}>'.format(self.id)
+
+    def serialize(self):
+        return {
+            'id': self.id, 
+            'jti': self.jti,
+        }
+
+    @classmethod
+    def is_jti_blacklisted(cls, jti):
+        query = cls.query.filter_by(jti = jti).first()
+        return bool(query)
 
 class Categorie(db.Model):
 
@@ -334,4 +373,3 @@ class Service_Port(db.Model):
             'port_id': self.port_id, 
             'service_id': self.service_id
         }
-       

@@ -1,12 +1,11 @@
-# TerraBrasilis Research Data - Data Management
-The Data Manager component is responsible for the management of Research Data Repositories and for providing mechanisms for searching and accessing all data available in the repositories.
-
+# TerraBrasilis Research Data - Data Manager
+The Data Manager is responsible for the support portion of the platform. In the context of infrastructure, this includes the creation, management and delivery of Research Data Repositories. It uses a flask aplication with a relational database to CRUD metadata.
 
 Documentation
 ------------
 #### create_user()
 ```sh
-curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"username": "gabriel", "full_name": "Gabriel Sansigolo", "email":"gabrielsansigolo@gmail.com", "image":"assets/images/img_avatar2.png", "created_on":"2019-09-04T14:48:54+00:00", "last_login":"2019-09-04T14:48:54+00:00"}' http://localhost:8090/api/v1.0/users
+curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"username": "gabriel", "password": "gabriel", "full_name": "Gabriel Sansigolo", "email":"gabrielsansigolo@gmail.com", "image":"assets/images/img_avatar2.png", "created_on":"2019-09-04T14:48:54+00:00", "last_login":"2019-09-04T14:48:54+00:00"}' http://localhost:8090/api/v1.0/users
 ```
 
 #### read_users()
@@ -152,4 +151,9 @@ curl -u gabriel:gabriel -i -H "Content-Type: application/json" -X POST -d '{"rep
 #### delete_keyword_repositorie_rel(categorie_id,repo_id)
 ```sh
 curl -u gabriel:gabriel -X DELETE http://localhost:8090/api/v1.0/keyword_repositorie_rel/7/1
+```
+
+#### login()
+```sh
+curl -i -H "Content-Type: application/json" -X PUSH -d '{"username": "gabriel", "password":"gabriel"}' http://localhost:8090/api/v1.0/login
 ```

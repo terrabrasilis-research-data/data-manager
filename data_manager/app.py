@@ -1,7 +1,9 @@
 #!flask/bin/python
+from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
 from flask_swagger_ui import get_swaggerui_blueprint
+from flask_jwt_extended import JWTManager
 from flask_httpauth import HTTPBasicAuth
 from flask import Flask, jsonify
 from flask import make_response
@@ -14,9 +16,6 @@ from models import *
 import datetime
 import json
 import os
-
-#auth
-auth = HTTPBasicAuth()
 
 #env
 def get_env_variable(name):
@@ -37,6 +36,17 @@ app = Flask(__name__)
 CORS(app)
 
 app.config['JSON_SORT_KEYS'] = False
+app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
+app.config['JWT_BLACKLIST_ENABLED'] = True
+app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
+
+#check_if_token_in_blacklist
+@jwt.token_in_blacklist_loader
+def check_if_token_in_blacklist(decrypted_token):
+    jti = decrypted_token['jti']
+    return RevokedTokenModel.is_jti_blacklisted(jti)
+
+jwt = JWTManager(app)
 
 ### swagger specific ###
 SWAGGER_URL = '/swagger'
@@ -56,18 +66,6 @@ DB_URL = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=POSTGRES_USE
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # silence the deprecation warning
 db = SQLAlchemy(app)
-
-#oath
-@auth.get_password
-def get_password(username):
-    if username == get_env_variable("AUTH_USER"):
-        return get_env_variable("AUTH_PASS")
-    return None
-
-#oath
-@auth.error_handler
-def unauthorized():
-    return make_response(jsonify({'error': 'Unauthorized access'}), 403)
 
 #errorhandler
 @app.errorhandler(404)
@@ -117,11 +115,11 @@ def make_public_service(service):
 
 #create_user()
 @app.route('/api/v1.0/users', methods=['POST'])
-@auth.login_required
 def create_user():
-    if not request.json or not 'username' and 'image' and "full_name" and "email" and "created_on" and "last_login" in request.json:
+    if not request.json or not 'username' and 'password' and 'image' and "full_name" and "email" and "created_on" and "last_login" in request.json:
         abort(400)
     username=request.json['username']
+    password=request.json['password']
     full_name=request.json['full_name']
     email=request.json['email']
     image=request.json['image']
@@ -130,6 +128,7 @@ def create_user():
     try:
         user=User(
             username = username,
+            password = User.generate_hash(password),
             full_name = full_name,
             email = email,
             image = image,
@@ -138,7 +137,16 @@ def create_user():
         )
         db.session.add(user)
         db.session.commit()
-        return jsonify({'result': True})
+ 
+        access_token = create_access_token(identity = request.json['username'])
+        refresh_token = create_refresh_token(identity = request.json['username'])
+
+        return jsonify({
+            'message': 'User {} was created'.format(request.json['username']),
+            'access_token': access_token,
+            'refresh_token': refresh_token
+            })
+           
     except Exception as e:
         return(str(e))
 
@@ -162,12 +170,13 @@ def read_user(user_id):
 
 #update_user(user_id)
 @app.route("/api/v1.0/users/<int:user_id>", methods=['PUT'])
-@auth.login_required
+@jwt_required
 def update_user(user_id):
-    if not request.json or not 'username' and 'image' and "full_name" and "email" and "created_on" and "last_login" in request.json:
+    if not request.json or not 'username' and "password" and  'image' and "full_name" and "email" and "created_on" and "last_login" in request.json:
         abort(400)
     username=request.json['username']
     full_name=request.json['full_name']
+    password=request.json['password']
     email=request.json['email']
     image=request.json['image']
     created_on=request.json['created_on']
@@ -181,6 +190,7 @@ def update_user(user_id):
         new_user = q.one()
         new_user.username = username
         new_user.full_name = full_name
+        new_password = User.generate_hash(password),
         new_user.email = email
         new_user.image = image
         new_user.created_on = created_on
@@ -194,7 +204,7 @@ def update_user(user_id):
 
 #delete_user(service_id)
 @app.route("/api/v1.0/users/<int:user_id>", methods=['DELETE'])
-@auth.login_required
+@jwt_required
 def delete_user(user_id):
     try:
         user = db.session.query(User).filter_by(user_id=user_id).first()
@@ -206,7 +216,7 @@ def delete_user(user_id):
 
 #create_group_repositorie_rel()
 @app.route('/api/v1.0/group_repositorie_rel', methods=['POST'])
-@auth.login_required
+@jwt_required
 def create_group_repositorie_rel():
     if not request.json or not 'group_id' and 'repo_id' in request.json:
         abort(400)
@@ -225,7 +235,7 @@ def create_group_repositorie_rel():
 
 #delete_group_repositorie_rel(group_id,repo_id)
 @app.route("/api/v1.0/group_repositorie_rel/<int:group_id>/<int:repo_id>", methods=['DELETE'])
-@auth.login_required
+@jwt_required
 def delete_group_repositorie_rel(group_id,repo_id):
     try:
         group_repositorie = db.session.query(Repositorie_Group).filter_by(group_id=group_id, repo_id=repo_id).first()
@@ -237,7 +247,7 @@ def delete_group_repositorie_rel(group_id,repo_id):
 
 #create_user_group_rel()
 @app.route('/api/v1.0/user_group_rel', methods=['POST'])
-@auth.login_required
+@jwt_required
 def create_user_group_rel():
     if not request.json or not 'user_id' and 'group_id' in request.json:
         abort(400)
@@ -256,7 +266,7 @@ def create_user_group_rel():
 
 #delete_user_group_rel(user_id,group_id)
 @app.route("/api/v1.0/user_group_rel/<int:user_id>/<int:group_id>", methods=['DELETE'])
-@auth.login_required
+@jwt_required
 def delete_user_group_rel(user_id,group_id):
     try:
         group_user = db.session.query(Groups_User).filter_by(user_id=user_id, group_id=group_id).first()
@@ -268,7 +278,7 @@ def delete_user_group_rel(user_id,group_id):
 
 #create_service()
 @app.route('/api/v1.0/services', methods=['POST'])
-@auth.login_required
+@jwt_required
 def create_service():
     if not request.json or not 'name' and 'machine' and 'host_id' and 'created_on' in request.json:
         abort(400)
@@ -311,7 +321,7 @@ def read_service(service_id):
 
 #delete_service(service_id)
 @app.route("/api/v1.0/services/<int:service_id>", methods=['DELETE'])
-@auth.login_required
+@jwt_required
 def delete_service(service_id):
     try:
         service = db.session.query(Service).filter_by(service_id=service_id).first()
@@ -323,7 +333,7 @@ def delete_service(service_id):
 
 #create_service_repositorie_rel()
 @app.route('/api/v1.0/service_repositorie_rel', methods=['POST'])
-@auth.login_required
+@jwt_required
 def create_service_repositorie_rel():
     if not request.json or not 'service_id' and 'repo_id' in request.json:
         abort(400)
@@ -342,7 +352,7 @@ def create_service_repositorie_rel():
 
 #delete_service_repositorie_rel(service_id,repo_id)
 @app.route("/api/v1.0/service_repositorie_rel/<int:service_id>/<int:repo_id>", methods=['DELETE'])
-@auth.login_required
+@jwt_required
 def delete_service_repositorie_rel(service_id,repo_id):
     try:
         repo_service = db.session.query(Repositorie_Service).filter_by(service_id=service_id, repo_id=repo_id).first()
@@ -364,7 +374,7 @@ def read_categories():
 
 #create_categorie()
 @app.route('/api/v1.0/categories', methods=['POST'])
-@auth.login_required
+@jwt_required
 def create_categorie():
     if not request.json or not 'name' in request.json:
         abort(400)
@@ -381,7 +391,7 @@ def create_categorie():
 
 #create_categorie_repositorie_rel()
 @app.route('/api/v1.0/categorie_repositorie_rel', methods=['POST'])
-@auth.login_required
+@jwt_required
 def create_categorie_repositorie_rel():
     if not request.json or not 'repo_id' and 'categorie_id' in request.json:
         abort(400)
@@ -400,7 +410,7 @@ def create_categorie_repositorie_rel():
 
 #delete_categorie_repositorie_rel(categorie_id,repo_id)
 @app.route("/api/v1.0/categorie_repositorie_rel/<int:categorie_id>/<int:repo_id>", methods=['DELETE'])
-@auth.login_required
+@jwt_required
 def delete_categorie_repositorie_rel(categorie_id,repo_id):
     try:
         repo_categorie = db.session.query(Repositorie_Categorie).filter_by(categorie_id=categorie_id, repo_id=repo_id).first()
@@ -422,7 +432,7 @@ def read_keywords():
 
 #create_keywords()
 @app.route('/api/v1.0/keywords', methods=['POST'])
-@auth.login_required
+@jwt_required
 def create_keywords():
     if not request.json or not 'name' in request.json:
         abort(400)
@@ -439,7 +449,7 @@ def create_keywords():
 
 #create_keyword_repositorie_rel()
 @app.route('/api/v1.0/keyword_repositorie_rel', methods=['POST'])
-@auth.login_required
+@jwt_required
 def create_keyword_repositorie_rel():
     if not request.json or not 'repo_id' and 'keyword_id' in request.json:
         abort(400)
@@ -458,7 +468,7 @@ def create_keyword_repositorie_rel():
 
 #delete_keyword_repositorie_rel(keyword_id,repo_id)
 @app.route("/api/v1.0/keyword_repositorie_rel/<int:keyword_id>/<int:repo_id>", methods=['DELETE'])
-@auth.login_required
+@jwt_required
 def delete_keyword_repositorie_rel(keyword_id,repo_id):
     try:
         repo_keywords = db.session.query(Repositorie_Keyword).filter_by(keyword_id=keyword_id, repo_id=repo_id).first()
@@ -480,7 +490,7 @@ def read_hosts():
 
 #create_host()
 @app.route('/api/v1.0/hosts', methods=['POST'])
-@auth.login_required
+@jwt_required
 def create_host():
     if not request.json or not 'name' and 'address' and 'created_on' in request.json:
         abort(400)
@@ -531,7 +541,7 @@ def read_ports(repo_id):
 
 #create_repositorie()
 @app.route('/api/v1.0/repositories', methods=['POST'])
-@auth.login_required
+@jwt_required
 def create_repositorie():
     if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' in request.json:
         abort(400)
@@ -752,7 +762,7 @@ def read_repositorie(repo_id):
 
 #update_repositorie(repo_id)
 @app.route('/api/v1.0/repositories/<int:repo_id>', methods=['PUT'])
-@auth.login_required
+@jwt_required
 def update_repositorie(repo_id):
     if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' in request.json:
         abort(400)
@@ -784,7 +794,7 @@ def update_repositorie(repo_id):
 
 #delete_repositorie(repo_id)
 @app.route("/api/v1.0/repositories/<int:repo_id>", methods=['DELETE'])
-@auth.login_required
+@jwt_required
 def delete_repositorie(repo_id):
     try:
         repositorie = db.session.query(Repositorie).filter_by(repo_id=repo_id).first()
@@ -796,7 +806,7 @@ def delete_repositorie(repo_id):
 
 #create_group()
 @app.route("/api/v1.0/groups", methods=['POST'])
-@auth.login_required
+@jwt_required
 def create_group():
     if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'image' in request.json:
         abort(400)
@@ -920,7 +930,7 @@ def read_group(group_id):
 
 #update_group(group_id)
 @app.route('/api/v1.0/groups/<int:group_id>', methods=['PUT'])
-@auth.login_required
+@jwt_required
 def update_group(group_id):
     if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'image' in request.json:
         abort(400)
@@ -954,7 +964,7 @@ def update_group(group_id):
 
 #delete_group(group_id)
 @app.route("/api/v1.0/groups/<int:group_id>", methods=['DELETE'])
-@auth.login_required
+@jwt_required
 def delete_group(group_id):
     try:
         group = db.session.query(Group).filter_by(group_id=group_id).first()
@@ -963,6 +973,74 @@ def delete_group(group_id):
         return jsonify({'result': True})
     except Exception as e:
 	    return(str(e))
+
+#UserLogin()
+@app.route("/api/v1.0/login", methods=['POST'])
+def UserLogin():
+    if not request.json or not 'username' and 'password' in request.json:
+        abort(400)
+
+    username = request.json['username']
+    password = request.json['password']
+
+    current_user = User.find_by_username(request.json['username'])
+    
+    if not current_user:
+        return jsonify({'message': 'User {} doesn\'t exist'.format(request.json['username'])})
+    
+    if User.verify_hash(request.json['password'], current_user.password):
+
+        access_token = create_access_token(identity = request.json['username'])
+        refresh_token = create_refresh_token(identity = request.json['username'])
+
+        return jsonify({'message': 'Logged in as {}'.format(current_user.username),
+                        'access_token': access_token,
+                        'refresh_token': refresh_token})
+    else:
+        return jsonify({'message': 'Wrong credentials'})
+
+#TokenRefresh()
+@app.route("/api/v1.0/token/refresh", methods=['POST'])
+@jwt_refresh_token_required
+def TokenRefresh():
+    current_user = get_jwt_identity()
+    access_token = create_access_token(identity = current_user)
+
+    return jsonify({'access_token': access_token})
+
+#UserLogoutAccess()
+@app.route("/api/v1.0/logout/access", methods=['POST'])
+@jwt_required
+def UserLogoutAccess():
+    jti = get_raw_jwt()['jti']
+    try:
+        
+        revoked_token=RevokedTokenModel(
+            jti = jti
+        )
+        db.session.add(revoked_token)
+        db.session.commit()
+
+        return jsonify({'message': 'Access token has been revoked'})
+    except:
+        return jsonify({'message': 'Something went wrong'}, 500)
+
+#UserLogoutRefresh()
+@app.route("/api/v1.0/logout/refresh", methods=['POST'])
+@jwt_refresh_token_required
+def UserLogoutRefresh():
+    jti = get_raw_jwt()['jti']
+    try:
+        
+        revoked_token=Host(
+            jti = jti
+        )
+        db.session.add(revoked_token)
+        db.session.commit()
+
+        return jsonify({'message': 'Refresh token has been revoked'})
+    except:
+        return jsonify({'message': 'Something went wrong'}, 500)
 
 #app
 if __name__ == '__main__':
