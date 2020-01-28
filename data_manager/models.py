@@ -19,8 +19,9 @@ class User(db.Model):
     image = db.Column(db.String(355), unique=False, nullable=False)
     created_on = db.Column(db.DateTime, unique=False, nullable=False)
     last_login = db.Column(db.DateTime, unique=False, nullable=False)
+    ckan_api_key = db.Column(db.String(355), unique=False, nullable=False)
 
-    def __init__(self, username, password, full_name, email, image, created_on, last_login):
+    def __init__(self, username, password, full_name, email, image, created_on, last_login, ckan_api_key):
         self.username = username
         self.password = password
         self.full_name = full_name
@@ -28,6 +29,7 @@ class User(db.Model):
         self.image = image
         self.created_on = created_on
         self.last_login = last_login
+        self.ckan_api_key = ckan_api_key
 
     def __repr__(self):
         return '<user_id {}>'.format(self.user_id)

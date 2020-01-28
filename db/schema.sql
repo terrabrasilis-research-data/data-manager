@@ -6,6 +6,7 @@ CREATE TABLE "users"(
   email VARCHAR (355) UNIQUE NOT NULL, 
   image VARCHAR (355) NOT NULL, 
   created_on TIMESTAMP NOT NULL, 
+  ckan_api_key VARCHAR (255) NOT NULL, 
   last_login TIMESTAMP
 );
 
@@ -17,7 +18,7 @@ CREATE TABLE keywords(
 CREATE TABLE revoked_tokens(
   id serial PRIMARY KEY, 
   jti VARCHAR (355) NOT NULL
-)
+);
 
 CREATE TABLE categories(
   categorie_id serial PRIMARY KEY, 
@@ -138,8 +139,8 @@ INSERT INTO keywords ("name") VALUES ('Águas Continentais');
 INSERT INTO categories ("name") VALUES ('Sensoriamento Remoto');
 INSERT INTO categories ("name") VALUES ('Uso e Cobertura da Terra');
 
-INSERT INTO users (username, full_name, "password", email, image, created_on, last_login) VALUES ('username_1', 'username_full_name', 'userpass', 'email@email.com','assets/images/img_avatar.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00');
-INSERT INTO users (username, full_name, "password", email, image, created_on, last_login) VALUES ('username_2', 'username2_full_name', 'userpass', 'email2@email2.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00');
+INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_1', 'username_full_name', 'userpass', 'email@email.com','assets/images/img_avatar.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
+INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_2', 'username2_full_name', 'userpass', 'email2@email2.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
 
 INSERT INTO services ("name", host_id, machine, created_on) VALUES ('PostgreSQL', 1, 01, '2019-09-04T14:48:54+00:00');
 INSERT INTO services ("name", host_id, machine, created_on) VALUES ('GeoServer', 1, 02, '2019-09-04T14:48:54+00:00');

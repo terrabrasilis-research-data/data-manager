@@ -40,13 +40,13 @@ app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 
+jwt = JWTManager(app)
+
 #check_if_token_in_blacklist
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
     return RevokedTokenModel.is_jti_blacklisted(jti)
-
-jwt = JWTManager(app)
 
 ### swagger specific ###
 SWAGGER_URL = '/swagger'
@@ -116,7 +116,7 @@ def make_public_service(service):
 #create_user()
 @app.route('/api/v1.0/users', methods=['POST'])
 def create_user():
-    if not request.json or not 'username' and 'password' and 'image' and "full_name" and "email" and "created_on" and "last_login" in request.json:
+    if not request.json or not 'username' and 'password' and 'image' and "full_name" and "email" and "created_on" and "last_login" and 'ckan_api_key' in request.json:
         abort(400)
     username=request.json['username']
     password=request.json['password']
@@ -125,6 +125,7 @@ def create_user():
     image=request.json['image']
     created_on=request.json['created_on']
     last_login=request.json['last_login']
+    ckan_api_key = request.json['ckan_api_key']
     try:
         user=User(
             username = username,
@@ -133,7 +134,8 @@ def create_user():
             email = email,
             image = image,
             created_on = created_on,
-            last_login = last_login
+            last_login = last_login,
+            ckan_api_key = ckan_api_key
         )
         db.session.add(user)
         db.session.commit()
@@ -144,8 +146,8 @@ def create_user():
         return jsonify({
             'message': 'User {} was created'.format(request.json['username']),
             'access_token': access_token,
-            'refresh_token': refresh_token
-            })
+            'refresh_token': refresh_token,
+            'ckan_api_key': request.json['ckan_api_key']})
            
     except Exception as e:
         return(str(e))
@@ -172,7 +174,7 @@ def read_user(user_id):
 @app.route("/api/v1.0/users/<int:user_id>", methods=['PUT'])
 @jwt_required
 def update_user(user_id):
-    if not request.json or not 'username' and "password" and  'image' and "full_name" and "email" and "created_on" and "last_login" in request.json:
+    if not request.json or not 'username' and "password" and  'image' and "full_name" and "email" and "created_on" and "last_login" and "ckan_api_key" in request.json:
         abort(400)
     username=request.json['username']
     full_name=request.json['full_name']
@@ -181,6 +183,7 @@ def update_user(user_id):
     image=request.json['image']
     created_on=request.json['created_on']
     last_login=request.json['last_login']
+    ckan_api_key= request.json['ckan_api_key']
     try:
 
         q = (db.session.query(User)
@@ -195,6 +198,7 @@ def update_user(user_id):
         new_user.image = image
         new_user.created_on = created_on
         new_user.last_login = last_login
+        new_user.ckan_api_key = ckan_api_key
 
         db.session.commit()
 
@@ -995,7 +999,8 @@ def UserLogin():
 
         return jsonify({'message': 'Logged in as {}'.format(current_user.username),
                         'access_token': access_token,
-                        'refresh_token': refresh_token})
+                        'refresh_token': refresh_token,
+                        'ckan_api_key': current_user.ckan_api_key})
     else:
         return jsonify({'message': 'Wrong credentials'})
 
