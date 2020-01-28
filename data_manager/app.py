@@ -997,7 +997,8 @@ def UserLogin():
         access_token = create_access_token(identity = request.json['username'])
         refresh_token = create_refresh_token(identity = request.json['username'])
 
-        return jsonify({'message': 'Logged in as {}'.format(current_user.username),
+        return jsonify({'user_id': current_user.user_id, 
+                        'full_name': current_user.full_name,
                         'access_token': access_token,
                         'refresh_token': refresh_token,
                         'ckan_api_key': current_user.ckan_api_key})

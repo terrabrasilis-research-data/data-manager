@@ -2,6 +2,7 @@
 # Edit at https://www.gitignore.io/?templates=venv,flask,python
 
 ### Flask ###
+/flask
 instance/*
 !instance/.gitignore
 .webassets-cache
