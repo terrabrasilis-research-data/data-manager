@@ -1000,6 +1000,7 @@ def UserLogin():
         return jsonify({'user_id': current_user.user_id, 
                         'full_name': current_user.full_name,
                         'access_token': access_token,
+                        'message': 'User {} log in successfully.'.format(current_user.full_name),
                         'refresh_token': refresh_token,
                         'ckan_api_key': current_user.ckan_api_key})
     else:
