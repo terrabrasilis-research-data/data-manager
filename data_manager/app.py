@@ -1039,7 +1039,7 @@ def UserLogoutRefresh():
     jti = get_raw_jwt()['jti']
     try:
         
-        revoked_token=Host(
+        revoked_token=RevokedTokenModel(
             jti = jti
         )
         db.session.add(revoked_token)
