@@ -1,10 +1,10 @@
 #!flask/bin/python
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate, MigrateCommand
 from flask_swagger_ui import get_swaggerui_blueprint
+from flask_migrate import Migrate, MigrateCommand
 from flask_jwt_extended import JWTManager
 from flask_httpauth import HTTPBasicAuth
+from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, jsonify
 from flask import make_response
 from sqlalchemy import update
@@ -140,8 +140,8 @@ def create_user():
         db.session.add(user)
         db.session.commit()
  
-        access_token = create_access_token(identity = request.json['username'])
-        refresh_token = create_refresh_token(identity = request.json['username'])
+        access_token = create_access_token(identity = request.json['username'], expires_delta = None)
+        refresh_token = create_refresh_token(identity = request.json['username'], expires_delta = None)
 
         return jsonify({
             'message': 'User {} was created'.format(request.json['username']),
@@ -994,8 +994,8 @@ def UserLogin():
     
     if User.verify_hash(request.json['password'], current_user.password):
 
-        access_token = create_access_token(identity = request.json['username'])
-        refresh_token = create_refresh_token(identity = request.json['username'])
+        access_token = create_access_token(identity = request.json['username'], expires_delta = None)
+        refresh_token = create_refresh_token(identity = request.json['username'], expires_delta = None)
 
         return jsonify({'user_id': current_user.user_id, 
                         'full_name': current_user.full_name,
@@ -1011,7 +1011,7 @@ def UserLogin():
 @jwt_refresh_token_required
 def TokenRefresh():
     current_user = get_jwt_identity()
-    access_token = create_access_token(identity = current_user)
+    access_token = create_access_token(identity = current_user, expires_delta = None)
 
     return jsonify({'access_token': access_token})
 
