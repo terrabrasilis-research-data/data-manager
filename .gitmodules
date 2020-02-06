@@ -1,4 +1,0 @@
-[submodule "research-data-repository"]
-	path = research-data-repository
-	url = https://github.com/terrabrasilis-research-data/research-data-repository
-	branch = master
