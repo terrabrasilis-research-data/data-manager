@@ -111,6 +111,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+.vscode
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
