@@ -1,0 +1,4 @@
+[submodule "kubernetes/research-data-repository"]
+	path = kubernetes/research-data-repository
+	url = https://github.com/terrabrasilis-research-data/research-data-repository
+	branch = master
