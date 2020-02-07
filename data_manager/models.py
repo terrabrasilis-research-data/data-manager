@@ -124,6 +124,7 @@ class Categorie(db.Model):
 
     def serialize(self):
         return {
+            'categorie_id': self.categorie_id,
             'name': self.name
         }
 
