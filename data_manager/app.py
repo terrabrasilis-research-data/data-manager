@@ -86,10 +86,7 @@ def make_public_repositorie(repositorie):
 def make_public_group(group):
     new_groups = {}
     for field in group:
-        if field == 'group_id':
-            new_groups['uri'] = url_for('read_group', group_id=group['group_id'], _external=True)
-        else:
-            new_groups[field] = group[field]
+        new_groups[field] = group[field]
     return new_groups
 
 #uri users
