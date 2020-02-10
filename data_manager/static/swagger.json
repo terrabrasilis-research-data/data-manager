@@ -900,6 +900,74 @@
         }
       }
     },
+    "/service_port_rel": {
+      "post": {
+        "security":{
+          "bearerAuth": []
+        },
+        "tags": [
+          "Service Port Request"
+        ],
+        "summary": "Create a new service port request system",
+        "requestBody": {
+          "description": "Service Port Post Object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+              }
+            }
+          }
+        },
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "201": {
+            "description": "OK",
+            "schema": {
+            }
+          },
+          "400": {
+            "description": "Failed. Bad service repositorie data."
+          }
+        }
+      }
+    },
+    "/service_host_rel": {
+      "post": {
+        "security":{
+          "bearerAuth": []
+        },
+        "tags": [
+          "Service Host Request"
+        ],
+        "summary": "Create a new service host request system",
+        "requestBody": {
+          "description": "Service Repositorie Host Object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+              }
+            }
+          }
+        },
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "201": {
+            "description": "OK",
+            "schema": {
+            }
+          },
+          "400": {
+            "description": "Failed. Bad service repositorie data."
+          }
+        }
+      }
+    },
     "/service_repositorie_rel/{service_id}/{repo_id}": {
       "parameters": [
         {

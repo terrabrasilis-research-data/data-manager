@@ -376,3 +376,24 @@ class Service_Port(db.Model):
             'port_id': self.port_id, 
             'service_id': self.service_id
         }
+
+class Service_Host(db.Model):
+
+    __tablename__ = 'services_hosts'
+    __table_args__ = (
+        PrimaryKeyConstraint('host_id', 'service_id'),
+    )
+
+    host_id = db.Column(db.Integer, db.ForeignKey('hosts.host_id'),nullable=False)
+    service_id = db.Column(db.Integer, db.ForeignKey('services.service_id'),nullable=False)
+
+    def __init__(self, host_id, service_id):
+        self.host_id = host_id
+        self.service_id = service_id
+
+    def serialize(self):
+
+        return {            
+            'host_id': self.host_id, 
+            'service_id': self.service_id
+        }

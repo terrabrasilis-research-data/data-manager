@@ -79,6 +79,13 @@ CREATE TABLE services_ports(
  FOREIGN KEY (service_id) REFERENCES services (service_id)
 );
 
+CREATE TABLE services_hosts(
+ host_id INT NOT NULL, 
+ service_id INT NOT NULL, 
+ FOREIGN KEY (host_id) REFERENCES hosts (host_id), 
+ FOREIGN KEY (service_id) REFERENCES services (service_id)
+);
+
 CREATE TABLE research_data_repositories_group(
   repo_id INT NOT NULL, 
   group_id INT NOT NULL, 
@@ -121,13 +128,8 @@ INSERT INTO research_data_repositories ("name", abstract, maintainer, created_on
 
 INSERT INTO research_data_repositories ("name", abstract, maintainer, created_on) VALUES ('LabISA Repository', 'O Laboratório de Instrumentação de Sistemas Aquáticos (LabISA) é um dos laboratórios que compõe a Coordenação-Geral de Observação da Terra OBT-INPE. O laboratório foi motivado pelo aumento no número de estudos voltados à aplicações de sensoriamento remoto para estimativa de propriedades físicas, biológicas e químicas de águas continentais. A principal atividade do laboratório é coleta de dados sobre propriedades óticas e limnológicas de águas interiores e costeiras.', 'username', '2019-09-04T14:48:54+00:00');
 
-INSERT INTO ports (port) VALUES ('5432');
-INSERT INTO ports (port) VALUES ('5555');
-INSERT INTO ports (port) VALUES ('5050');
-INSERT INTO ports (port) VALUES ('5000');
-
-INSERT INTO hosts ("name", address, created_on) VALUES ('Servidor_1','172.17.0','2019-09-04T14:48:54+00:00');
-INSERT INTO hosts ("name", address, created_on) VALUES ('Servidor_2','172.18.0','2019-09-04T14:48:54+00:00');
+INSERT INTO ports (port) VALUES ('30040');
+INSERT INTO ports (port) VALUES ('30045');
 
 INSERT INTO keywords ("name") VALUES ('Sistemas Socioambientais');
 INSERT INTO keywords ("name") VALUES ('Atividade Antrópicas');
@@ -142,32 +144,6 @@ INSERT INTO categories ("name") VALUES ('Uso e Cobertura da Terra');
 INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_1', 'username_full_name', 'userpass', 'email@email.com','assets/images/img_avatar.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
 INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_2', 'username2_full_name', 'userpass', 'email2@email2.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
 
-INSERT INTO services ("name", host_id, machine, created_on) VALUES ('PostgreSQL', 1, 01, '2019-09-04T14:48:54+00:00');
-INSERT INTO services ("name", host_id, machine, created_on) VALUES ('GeoServer', 1, 02, '2019-09-04T14:48:54+00:00');
-INSERT INTO services ("name", host_id, machine, created_on) VALUES ('GeoNetwork', 1, 03, '2019-09-04T14:48:54+00:00');
-INSERT INTO services ("name", host_id, machine, created_on) VALUES ('PostgreSQL', 2, 01, '2019-09-04T14:48:54+00:00');
-INSERT INTO services ("name", host_id, machine, created_on) VALUES ('GeoServer', 2, 02, '2019-09-04T14:48:54+00:00');
-INSERT INTO services ("name", host_id, machine, created_on) VALUES ('GeoNetwork', 2, 03, '2019-09-04T14:48:54+00:00');
-
-INSERT INTO research_data_repositories_services (repo_id, service_id) VALUES (1,1);
-INSERT INTO research_data_repositories_services (repo_id, service_id) VALUES (1,2);
-INSERT INTO research_data_repositories_services (repo_id, service_id) VALUES (1,3);
-INSERT INTO research_data_repositories_services (repo_id, service_id) VALUES (2,4);
-INSERT INTO research_data_repositories_services (repo_id, service_id) VALUES (2,5);
-INSERT INTO research_data_repositories_services (repo_id, service_id) VALUES (2,6);
-
-INSERT INTO services_ports (service_id, port_id) VALUES (1,1);
-INSERT INTO services_ports (service_id, port_id) VALUES (2,2);
-INSERT INTO services_ports (service_id, port_id) VALUES (2,3);
-INSERT INTO services_ports (service_id, port_id) VALUES (3,4);
-INSERT INTO services_ports (service_id, port_id) VALUES (4,1);
-INSERT INTO services_ports (service_id, port_id) VALUES (5,2);
-INSERT INTO services_ports (service_id, port_id) VALUES (5,3);
-INSERT INTO services_ports (service_id, port_id) VALUES (6,4);
-
-INSERT INTO research_data_repositories_group (repo_id, group_id) VALUES (1,1);
-INSERT INTO research_data_repositories_group (repo_id, group_id) VALUES (2,2);
-
 INSERT INTO research_group_users (group_id, user_id) VALUES (1,1);
 INSERT INTO research_group_users (group_id, user_id) VALUES (1,2);
 INSERT INTO research_group_users (group_id, user_id) VALUES (2,1);
@@ -178,15 +154,5 @@ INSERT INTO research_group_users (group_id, user_id) VALUES (4,1);
 INSERT INTO research_group_users (group_id, user_id) VALUES (4,2);
 INSERT INTO research_group_users (group_id, user_id) VALUES (5,1);
 INSERT INTO research_group_users (group_id, user_id) VALUES (5,2);
-
-INSERT INTO research_data_repositories_keywords (repo_id, keyword_id) VALUES (1,1);
-INSERT INTO research_data_repositories_keywords (repo_id, keyword_id) VALUES (1,2);
-INSERT INTO research_data_repositories_keywords (repo_id, keyword_id) VALUES (1,3);
-INSERT INTO research_data_repositories_keywords (repo_id, keyword_id) VALUES (2,4);
-INSERT INTO research_data_repositories_keywords (repo_id, keyword_id) VALUES (2,5);
-INSERT INTO research_data_repositories_keywords (repo_id, keyword_id) VALUES (2,6);
-
-INSERT INTO research_data_repositories_categories (repo_id, categorie_id) VALUES (1,1);
-INSERT INTO research_data_repositories_categories (repo_id, categorie_id) VALUES (2,2);
 
 

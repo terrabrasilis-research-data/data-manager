@@ -137,8 +137,8 @@ def create_user():
         db.session.add(user)
         db.session.commit()
  
-        access_token = create_access_token(identity = request.json['username'], expires_delta = None)
-        refresh_token = create_refresh_token(identity = request.json['username'], expires_delta = None)
+        access_token = create_access_token(identity = request.json['username'], expires_delta = datetime.timedelta(days=365))
+        refresh_token = create_refresh_token(identity = request.json['username'], expires_delta = datetime.timedelta(days=365))
 
         return jsonify({
             'message': 'User {} was created'.format(request.json['username']),
@@ -297,7 +297,8 @@ def create_service():
         )
         db.session.add(service)
         db.session.commit()
-        return jsonify({'result': True})
+        services=Service.query.filter_by(name = request.json['name'], host_id = request.json['host_id'])
+        return jsonify([make_public_service(e.serialize()) for e in services])
     except Exception as e:
         return(str(e))
 
@@ -467,6 +468,44 @@ def create_keyword_repositorie_rel():
     except Exception as e:
         return(str(e))
 
+#create_service_port_rel()
+@app.route('/api/v1.0/service_port_rel', methods=['POST'])
+@jwt_required
+def create_service_port_rel():
+    if not request.json or not 'port_id' and 'service_id' in request.json:
+        abort(400)
+    port_id=request.json['port_id']
+    service_id=request.json['service_id']
+    try:
+        service_port=Service_Port(
+            port_id = port_id,
+            service_id = service_id,
+        )
+        db.session.add(service_port)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+        return(str(e))
+
+#create_service_host_rel()
+@app.route('/api/v1.0/service_host_rel', methods=['POST'])
+@jwt_required
+def create_service_host_rel():
+    if not request.json or not 'host_id' and 'service_id' in request.json:
+        abort(400)
+    host_id=request.json['host_id']
+    service_id=request.json['service_id']
+    try:
+        service_host=Service_Host(
+            host_id = host_id,
+            service_id = service_id,
+        )
+        db.session.add(service_host)
+        db.session.commit()
+        return jsonify({'result': True})
+    except Exception as e:
+        return(str(e))
+
 #delete_keyword_repositorie_rel(keyword_id,repo_id)
 @app.route("/api/v1.0/keyword_repositorie_rel/<int:keyword_id>/<int:repo_id>", methods=['DELETE'])
 @jwt_required
@@ -507,7 +546,8 @@ def create_host():
         )
         db.session.add(host)
         db.session.commit()
-        return jsonify({'result': True})
+        hosts=Host.query.filter_by(address = request.json['address'])
+        return jsonify([e.serialize() for e in hosts])
     except Exception as e:
         return(str(e))
 
@@ -867,8 +907,6 @@ def read_groups():
 
             r_user = ([e.serialize() for e in grup_usr])
 
-            print(r_user)
-
             for k in range(len(r_user)):
                 list_user.append(r_user[k]['user_id'])
 
@@ -991,8 +1029,8 @@ def UserLogin():
     
     if User.verify_hash(request.json['password'], current_user.password):
 
-        access_token = create_access_token(identity = request.json['username'], expires_delta = None)
-        refresh_token = create_refresh_token(identity = request.json['username'], expires_delta = None)
+        access_token = create_access_token(identity = request.json['username'], expires_delta = datetime.timedelta(days=365))
+        refresh_token = create_refresh_token(identity = request.json['username'], expires_delta = datetime.timedelta(days=365))
 
         return jsonify({'user_id': current_user.user_id, 
                         'full_name': current_user.full_name,
@@ -1008,7 +1046,7 @@ def UserLogin():
 @jwt_refresh_token_required
 def TokenRefresh():
     current_user = get_jwt_identity()
-    access_token = create_access_token(identity = current_user, expires_delta = None)
+    access_token = create_access_token(identity = current_user, expires_delta = datetime.timedelta(days=365))
 
     return jsonify({'access_token': access_token})
 
