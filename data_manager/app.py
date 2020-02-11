@@ -600,7 +600,8 @@ def create_repositorie():
         )
         db.session.add(repositorie)
         db.session.commit()
-        return jsonify({'result': True})
+        repositorie=Repositorie.query.filter_by(name = request.json['name'])
+        return jsonify([e.serialize() for e in repositorie])
     except Exception as e:
         return(str(e))
 
