@@ -10,11 +10,6 @@ CREATE TABLE "users"(
   last_login TIMESTAMP
 );
 
-CREATE TABLE keywords(
-  keyword_id serial PRIMARY KEY, 
-  name VARCHAR (50) UNIQUE NOT NULL
-);
-
 CREATE TABLE revoked_tokens(
   id serial PRIMARY KEY, 
   jti VARCHAR (355) NOT NULL
@@ -100,13 +95,6 @@ CREATE TABLE research_group_users(
   FOREIGN KEY (user_id) REFERENCES "users" (user_id)
 );
 
-CREATE TABLE research_data_repositories_keywords(
-  repo_id INT NOT NULL, 
-  keyword_id INT NOT NULL, 
-  FOREIGN KEY (repo_id) REFERENCES research_data_repositories (repo_id), 
-  FOREIGN KEY (keyword_id) REFERENCES keywords (keyword_id)
-);
-
 CREATE TABLE research_data_repositories_categories(
   repo_id INT NOT NULL, 
   categorie_id INT NOT NULL, 
@@ -126,13 +114,6 @@ INSERT INTO research_group ("name", abstract, maintainer, created_on, "language"
 
 INSERT INTO ports (port) VALUES ('30040');
 INSERT INTO ports (port) VALUES ('30045');
-
-INSERT INTO keywords ("name") VALUES ('Sistemas Socioambientais');
-INSERT INTO keywords ("name") VALUES ('Atividade Antrópicas');
-INSERT INTO keywords ("name") VALUES ('Uso e Cobertura da Terra');
-INSERT INTO keywords ("name") VALUES ('Sensoriamento Remoto');
-INSERT INTO keywords ("name") VALUES ('Sistemas Aquáticos');
-INSERT INTO keywords ("name") VALUES ('Águas Continentais');
 
 INSERT INTO categories ("name") VALUES ('Sensoriamento Remoto');
 INSERT INTO categories ("name") VALUES ('Uso e Cobertura da Terra');

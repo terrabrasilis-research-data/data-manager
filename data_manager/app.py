@@ -422,52 +422,6 @@ def delete_categorie_repositorie_rel(categorie_id,repo_id):
     except Exception as e:
 	    return(str(e))
 
-#read_keywords()
-@app.route("/api/v1.0/keywords", methods=['GET'])
-def read_keywords():
-    try:
-        keywords=Keywords.query.all()
-        return jsonify([e.serialize() for e in keywords])
-
-    except Exception as e:
-	    return(str(e))
-
-#create_keywords()
-@app.route('/api/v1.0/keywords', methods=['POST'])
-@jwt_required
-def create_keywords():
-    if not request.json or not 'name' in request.json:
-        abort(400)
-    name=request.json['name']
-    try:
-        keyword=Keywords(
-            name = name
-        )
-        db.session.add(keyword)
-        db.session.commit()
-        return jsonify({'result': True})
-    except Exception as e:
-        return(str(e))
-
-#create_keyword_repositorie_rel()
-@app.route('/api/v1.0/keyword_repositorie_rel', methods=['POST'])
-@jwt_required
-def create_keyword_repositorie_rel():
-    if not request.json or not 'repo_id' and 'keyword_id' in request.json:
-        abort(400)
-    repo_id=request.json['repo_id']
-    keyword_id=request.json['keyword_id']
-    try:
-        keyword_repositorie=Repositorie_Keyword(
-            repo_id = repo_id,
-            keyword_id = keyword_id,
-        )
-        db.session.add(keyword_repositorie)
-        db.session.commit()
-        return jsonify({'result': True})
-    except Exception as e:
-        return(str(e))
-
 #create_service_port_rel()
 @app.route('/api/v1.0/service_port_rel', methods=['POST'])
 @jwt_required
@@ -505,18 +459,6 @@ def create_service_host_rel():
         return jsonify({'result': True})
     except Exception as e:
         return(str(e))
-
-#delete_keyword_repositorie_rel(keyword_id,repo_id)
-@app.route("/api/v1.0/keyword_repositorie_rel/<int:keyword_id>/<int:repo_id>", methods=['DELETE'])
-@jwt_required
-def delete_keyword_repositorie_rel(keyword_id,repo_id):
-    try:
-        repo_keywords = db.session.query(Repositorie_Keyword).filter_by(keyword_id=keyword_id, repo_id=repo_id).first()
-        db.session.delete(repo_keywords)
-        db.session.commit()
-        return jsonify({'result': True})
-    except Exception as e:
-	    return(str(e))
 
 #read_hosts()
 @app.route("/api/v1.0/hosts", methods=['GET'])
@@ -639,24 +581,11 @@ def read_repositories():
             repo_cat = Repositorie_Categorie.query.filter(Repositorie_Categorie.repo_id.in_([id_data[i]['repo_id']]))
             r_cat = ([e.serialize() for e in repo_cat])
 
-            repo_key = Repositorie_Keyword.query.filter(Repositorie_Keyword.repo_id.in_([id_data[i]['repo_id']]))
-            r_key = ([e.serialize() for e in repo_key])
-
             for j in range(len(r_ser)):
                 list_ser.append(r_ser[j]['service_id'])
 
             for l in range(len(r_cat)):
                 list_cat.append(r_cat[l]['categorie_id'])
-
-            for m in range(len(r_key)):
-                list_key.append(r_key[m]['keyword_id'])
-  
-            #create keywords dict
-            keywords=Keywords.query.filter(Keywords.keyword_id.in_(list_key))
-            keyw = ([e.serialize() for e in keywords])
-            json_keyword = {}
-            for val in keyw: 
-                json_keyword.setdefault('keywords', []).append(val['name'])
   
             #create categories dict
             categories=Categorie.query.filter(Categorie.categorie_id.in_(list_cat))
@@ -700,7 +629,6 @@ def read_repositories():
             #compose
             json_data['repositorie'][i].update({"services": json_ser['services']})
             json_data['repositorie'][i].update({"categories": json_cate['categories']})
-            json_data['repositorie'][i].update({"keywords": json_keyword['keywords']})
             json_response.setdefault("repositorie", []).append(json_data['repositorie'][i])
 
         return jsonify(json_response)
@@ -732,24 +660,11 @@ def read_repositorie(repo_id):
         repo_cat = Repositorie_Categorie.query.filter(Repositorie_Categorie.repo_id.in_([repo_id]))
         r_cat = ([e.serialize() for e in repo_cat])
 
-        repo_key = Repositorie_Keyword.query.filter(Repositorie_Keyword.repo_id.in_([repo_id]))
-        r_key = ([e.serialize() for e in repo_key])
-
         for j in range(len(r_ser)):
             list_ser.append(r_ser[j]['service_id'])
 
         for l in range(len(r_cat)):
             list_cat.append(r_cat[l]['categorie_id'])
-
-        for m in range(len(r_key)):
-            list_key.append(r_key[m]['keyword_id'])
-
-        #create keywords dict
-        keywords=Keywords.query.filter(Keywords.keyword_id.in_(list_key))
-        keyw = ([e.serialize() for e in keywords])
-        json_keyword = {}
-        for val in keyw: 
-            json_keyword.setdefault('keywords', []).append(val['name'])
 
         #create categories dict
         categories=Categorie.query.filter(Categorie.categorie_id.in_(list_cat))
@@ -794,7 +709,6 @@ def read_repositorie(repo_id):
         json_response = {}
         json_data.update(json_ser)
         json_data.update(json_cate)
-        json_data.update(json_keyword)
         json_response.setdefault("repositorie", []).append(json_data)
 
         return jsonify(json_response)

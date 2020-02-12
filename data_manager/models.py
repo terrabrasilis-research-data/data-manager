@@ -171,24 +171,6 @@ class Port(db.Model):
             'port': self.port
         }
 
-class Keywords(db.Model):
-
-    __tablename__ = 'keywords'
-
-    keyword_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=False, nullable=False)
-
-    def __init__(self, name):
-        self.name = name
-
-    def __repr__(self):
-        return '<id {}>'.format(self.id)
-
-    def serialize(self):
-        return {
-            'name': self.name
-        }
-
 class Group(db.Model):
 
     __tablename__ = 'research_group'
@@ -333,27 +315,6 @@ class Repositorie_Categorie(db.Model):
         return {            
             'repo_id': self.repo_id, 
             'categorie_id': self.categorie_id
-        }
-     
-class Repositorie_Keyword(db.Model):
-
-    __tablename__ = 'research_data_repositories_keywords'
-    __table_args__ = (
-        PrimaryKeyConstraint('repo_id', 'keyword_id'),
-    )
-
-    repo_id = db.Column(db.Integer, db.ForeignKey('research_data_repositories.repo_id'),nullable=False)
-    keyword_id = db.Column(db.Integer, db.ForeignKey('keywords.keyword_id'),nullable=False)
-
-    def __init__(self, repo_id, keyword_id):
-        self.repo_id = repo_id
-        self.keyword_id = keyword_id
-
-    def serialize(self):
-
-        return {            
-            'repo_id': self.repo_id, 
-            'keyword_id': self.keyword_id
         }
 
 class Service_Port(db.Model):
