@@ -76,9 +76,6 @@ def not_found(error):
 def make_public_repositorie(repositorie):
     new_repositorie = {}
     for field in repositorie:
-        if field == 'repo_id':
-            new_repositorie['uri'] = url_for('read_repositorie', repo_id=repositorie['repo_id'], _external=True)
-        else:
             new_repositorie[field] = repositorie[field]
     return new_repositorie
 

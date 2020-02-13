@@ -134,7 +134,7 @@ class Host(db.Model):
 
     host_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=False, nullable=False)
-    address = db.Column(db.String(50), unique=False, nullable=False)
+    address = db.Column(db.String(60), unique=False, nullable=False)
     created_on = db.Column(db.DateTime, unique=False, nullable=False)
 
     def __init__(self, name, address, created_on):

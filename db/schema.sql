@@ -23,7 +23,7 @@ CREATE TABLE categories(
 CREATE TABLE hosts(
   host_id serial PRIMARY KEY, 
   name VARCHAR (50) NOT NULL,
-  address VARCHAR (50) UNIQUE NOT NULL, 
+  address VARCHAR (60) UNIQUE NOT NULL, 
   created_on TIMESTAMP NOT NULL
 );
 
