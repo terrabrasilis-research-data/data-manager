@@ -118,18 +118,31 @@ INSERT INTO ports (port) VALUES ('30045');
 INSERT INTO categories ("name") VALUES ('Sensoriamento Remoto');
 INSERT INTO categories ("name") VALUES ('Uso e Cobertura da Terra');
 
-INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_1', 'username_full_name', 'userpass', 'email@email.com','assets/images/img_avatar.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
-INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_2', 'username2_full_name', 'userpass', 'email2@email2.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
+INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_1', 'De Vleeschouwer Donald', 'userpass', 'email@email.com','assets/images/img_avatar.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
+
+INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_2', 'Martínez‐García Alec', 'userpass', 'email2@email2.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
+
+INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_3', 'Miller Cloud', 'userpass', 'email3@email3.com','assets/images/img_avatar.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
+
+INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_4', 'Wetterich S Chris', 'userpass', 'email4@email4.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
+
+INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_5', 'Close H Golds', 'userpass', 'email5@email5.com','assets/images/img_avatar.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
+
+INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_6', 'Elling J Seth', 'userpass', 'email6@email6.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
+
+INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_7', 'Hurley Sith-James', 'userpass', 'email7@email7.com','assets/images/img_avatar.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
+
+INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_8', 'Finch JM Tras', 'userpass', 'email8@email8.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
 
 INSERT INTO research_group_users (group_id, user_id) VALUES (1,1);
 INSERT INTO research_group_users (group_id, user_id) VALUES (1,2);
-INSERT INTO research_group_users (group_id, user_id) VALUES (2,1);
-INSERT INTO research_group_users (group_id, user_id) VALUES (2,2);
-INSERT INTO research_group_users (group_id, user_id) VALUES (3,1);
-INSERT INTO research_group_users (group_id, user_id) VALUES (3,2);
-INSERT INTO research_group_users (group_id, user_id) VALUES (4,1);
-INSERT INTO research_group_users (group_id, user_id) VALUES (4,2);
-INSERT INTO research_group_users (group_id, user_id) VALUES (5,1);
-INSERT INTO research_group_users (group_id, user_id) VALUES (5,2);
+INSERT INTO research_group_users (group_id, user_id) VALUES (2,3);
+INSERT INTO research_group_users (group_id, user_id) VALUES (2,4);
+INSERT INTO research_group_users (group_id, user_id) VALUES (3,5);
+INSERT INTO research_group_users (group_id, user_id) VALUES (3,6);
+INSERT INTO research_group_users (group_id, user_id) VALUES (4,7);
+INSERT INTO research_group_users (group_id, user_id) VALUES (4,8);
+INSERT INTO research_group_users (group_id, user_id) VALUES (5,3);
+INSERT INTO research_group_users (group_id, user_id) VALUES (5,6);
 
 
