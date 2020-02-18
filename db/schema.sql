@@ -134,6 +134,10 @@ INSERT INTO users (username, full_name, "password", email, image, created_on, la
 
 INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_8', 'Finch JM Tras', 'userpass', 'email8@email8.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
 
+INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_9', 'John Silver', 'userpass', 'email9@email9.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
+
+INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_10', 'Karl Wetwhitch', 'userpass', 'email10@email10.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
+
 INSERT INTO research_group_users (group_id, user_id) VALUES (1,1);
 INSERT INTO research_group_users (group_id, user_id) VALUES (1,2);
 INSERT INTO research_group_users (group_id, user_id) VALUES (2,3);
@@ -142,7 +146,7 @@ INSERT INTO research_group_users (group_id, user_id) VALUES (3,5);
 INSERT INTO research_group_users (group_id, user_id) VALUES (3,6);
 INSERT INTO research_group_users (group_id, user_id) VALUES (4,7);
 INSERT INTO research_group_users (group_id, user_id) VALUES (4,8);
-INSERT INTO research_group_users (group_id, user_id) VALUES (5,3);
-INSERT INTO research_group_users (group_id, user_id) VALUES (5,6);
+INSERT INTO research_group_users (group_id, user_id) VALUES (5,9);
+INSERT INTO research_group_users (group_id, user_id) VALUES (5,10);
 
 

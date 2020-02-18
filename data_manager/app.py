@@ -91,7 +91,8 @@ def make_public_user(user):
     new_user = {}
     for field in user:
         if field == 'user_id':
-            new_user['uri'] = url_for('read_user', user_id=user['user_id'], _external=True)
+            new_user[field] = user[field]
+            #new_user['uri'] = url_for('read_user', user_id=user['user_id'], _external=True)
         else:
             new_user[field] = user[field]
     return new_user
