@@ -725,7 +725,6 @@ def update_repositorie(repo_id):
     maintainer = request.json['maintainer']
     created_on = request.json['created_on']
     language = request.json['language']
-    custom_fields = request.json['custom_fields']
     try:
 
         q = (db.session.query(Repositorie)
@@ -738,7 +737,6 @@ def update_repositorie(repo_id):
         new_repo.maintainer = maintainer
         new_repo.created_on = created_on
         new_repo.language = language
-        new_repo.custom_fields = custom_fields
 
         db.session.commit()
 
@@ -771,7 +769,6 @@ def create_group():
     created_on = request.json['created_on']
     language = request.json['language']
     image = request.json['image']
-    custom_fields = request.json['custom_fields']
 
     try:
         group=Group(
@@ -780,13 +777,13 @@ def create_group():
             maintainer = maintainer,
             created_on = created_on,
             language = language,
-            image = image,
-            custom_fields = custom_fields
+            image = image
 
         )
         db.session.add(group)
-        db.session.commit()
-        return jsonify({'result': True})
+        db.session.commit()        
+        group=Group.query.filter_by(name = request.json['name'], abstract = request.json['abstract'])
+        return jsonify([e.serialize() for e in group])
     except Exception as e:
         return(str(e))
 

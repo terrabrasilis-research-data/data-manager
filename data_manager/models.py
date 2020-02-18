@@ -182,16 +182,14 @@ class Group(db.Model):
     image = db.Column(db.String(355), unique=False, nullable=False)
     created_on = db.Column(db.DateTime, unique=False, nullable=False)
     language = db.Column(db.String(50), unique=False, nullable=False)
-    custom_fields = db.Column(JSONB, unique=False, nullable=False)
     
-    def __init__(self, name, abstract, maintainer, created_on, language, bbox, custom_fields):
+    def __init__(self, name, abstract, maintainer, created_on, language, image):
         self.name = name
         self.abstract = abstract
         self.maintainer = maintainer
         self.created_on = created_on
         self.image = image
         self.language = language
-        self.custom_fields = custom_fields
    
     def serialize(self):
 
@@ -202,8 +200,7 @@ class Group(db.Model):
             'maintainer':self.maintainer,
             'image':self.image,
             'created_on':self.created_on,
-            'language':self.language,
-            'custom_fields':self.custom_fields
+            'language':self.language
         }
 
 class Repositorie(db.Model):
