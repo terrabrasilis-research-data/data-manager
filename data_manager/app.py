@@ -232,6 +232,15 @@ def create_group_repositorie_rel():
     except Exception as e:
         return(str(e))
 
+#read_group_repositorie_rel()
+@app.route('/api/v1.0/group_repositorie_rel/<int:repo_id>', methods=['GET'])
+def read_group_repositorie_rel(repo_id):
+    try:
+        group_repositorie=Repositorie_Group.query.filter_by(repo_id=repo_id).first()
+        return jsonify(group_repositorie.serialize())
+    except Exception as e:
+	    return(str(e))
+
 #delete_group_repositorie_rel(group_id,repo_id)
 @app.route("/api/v1.0/group_repositorie_rel/<int:group_id>/<int:repo_id>", methods=['DELETE'])
 @jwt_required

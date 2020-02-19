@@ -124,15 +124,15 @@ INSERT INTO users (username, full_name, "password", email, image, created_on, la
 
 INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_3', 'Miller Cloud', 'userpass', 'email3@email3.com','assets/images/img_avatar.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
 
-INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_4', 'Wetterich S Chris', 'userpass', 'email4@email4.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
+INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_4', 'Wetterich Chris', 'userpass', 'email4@email4.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
 
-INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_5', 'Close H Golds', 'userpass', 'email5@email5.com','assets/images/img_avatar.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
+INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_5', 'Close Golds', 'userpass', 'email5@email5.com','assets/images/img_avatar.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
 
-INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_6', 'Elling J Seth', 'userpass', 'email6@email6.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
+INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_6', 'Elling Seth', 'userpass', 'email6@email6.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
 
 INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_7', 'Hurley Sith-James', 'userpass', 'email7@email7.com','assets/images/img_avatar.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
 
-INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_8', 'Finch JM Tras', 'userpass', 'email8@email8.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
+INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_8', 'Finch Tras', 'userpass', 'email8@email8.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
 
 INSERT INTO users (username, full_name, "password", email, image, created_on, last_login, ckan_api_key) VALUES ('username_9', 'John Silver', 'userpass', 'email9@email9.com','assets/images/img_avatar2.png','2019-09-04T14:48:54+00:00','2019-09-04T14:48:54+00:00','');
 
