@@ -1003,6 +1003,15 @@ def UserLogoutRefresh():
     except:
         return jsonify({'message': 'Something went wrong'}, 500)
 
+#imageUpload
+@app.route("/api/v1.0/image_upload", methods=['POST'])
+def imageUpload():
+
+    try:
+        return jsonify({'message': 'Upload done!'})
+    except:
+        return jsonify({'message': 'Something went wrong'}, 500)
+
 #app
 if __name__ == '__main__':
     app.run('0.0.0.0', debug=True, port=8090)
