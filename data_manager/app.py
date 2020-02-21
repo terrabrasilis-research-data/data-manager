@@ -1021,7 +1021,6 @@ def imageUpload():
     try:
         # Retrieves file upload
         image = request.files.get('image')
-        
         image.save(os.path.join(UPLOAD_FOLDER, image.filename))
 
         return jsonify({'message': 'Success'})
