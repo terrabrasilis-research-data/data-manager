@@ -1,6 +1,6 @@
 #!flask/bin/python
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
-from flask import Flask, flash, request, redirect, url_for
+from flask import Flask, flash, request, redirect, url_for, send_from_directory
 from flask_swagger_ui import get_swaggerui_blueprint
 from flask import Flask, request, redirect, url_for
 from flask_migrate import Migrate, MigrateCommand
@@ -36,7 +36,6 @@ POSTGRES_DB = get_env_variable("POSTGRES_DB")
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
-
 
 #app
 app = Flask(__name__)
@@ -1028,6 +1027,15 @@ def imageUpload():
         return jsonify({'message': 'Success'})
     except:
         return jsonify({'message': 'Something went wrong'}, 500)
-   
+
+#download_file
+@app.route("/api/v1.0/uploads/<path:filename>", methods=['GET'])
+def download_file(filename):
+    #try:
+        return send_from_directory(app.config['UPLOAD_FOLDER'],
+                               filename, as_attachment=True)
+    #except:
+    #    return jsonify({'message': 'Something went wrong'}, 500)
+
 if __name__ == '__main__':
     app.run(get_env_variable("HOST_IP"), debug=True, port=8090)
