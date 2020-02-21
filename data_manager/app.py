@@ -1,7 +1,10 @@
 #!flask/bin/python
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
+from flask import Flask, flash, request, redirect, url_for
 from flask_swagger_ui import get_swaggerui_blueprint
+from flask import Flask, request, redirect, url_for
 from flask_migrate import Migrate, MigrateCommand
+from werkzeug.utils import secure_filename
 from flask_jwt_extended import JWTManager
 from flask_httpauth import HTTPBasicAuth
 from flask_sqlalchemy import SQLAlchemy
@@ -30,15 +33,20 @@ POSTGRES_URL = get_env_variable("POSTGRES_URL")
 POSTGRES_USER = get_env_variable("POSTGRES_USER")
 POSTGRES_PW = get_env_variable("POSTGRES_PW")
 POSTGRES_DB = get_env_variable("POSTGRES_DB")
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
 
 #app
 app = Flask(__name__)
-CORS(app)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 app.config['JSON_SORT_KEYS'] = False
 app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 jwt = JWTManager(app)
 
@@ -65,6 +73,8 @@ app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
 DB_URL = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=POSTGRES_USER,pw=POSTGRES_PW,url=POSTGRES_URL,db=POSTGRES_DB)
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # silence the deprecation warning
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 db = SQLAlchemy(app)
 
 #errorhandler
@@ -1003,15 +1013,21 @@ def UserLogoutRefresh():
     except:
         return jsonify({'message': 'Something went wrong'}, 500)
 
+def allowed_file(filename):
+	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+	
 #imageUpload
 @app.route("/api/v1.0/image_upload", methods=['POST'])
 def imageUpload():
-
     try:
-        return jsonify({'message': 'Upload done!'})
+        # Retrieves file upload
+        image = request.files.get('image')
+        
+        image.save(os.path.join(UPLOAD_FOLDER, image.filename))
+
+        return jsonify({'message': 'Success'})
     except:
         return jsonify({'message': 'Something went wrong'}, 500)
-
-#app
+   
 if __name__ == '__main__':
-    app.run('0.0.0.0', debug=True, port=8090)
+    app.run(get_env_variable("HOST_IP"), debug=True, port=8090)
