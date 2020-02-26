@@ -620,7 +620,7 @@ def read_repositories():
             for n in range(len(ser)):
                 hosts = Host.query.filter(Host.host_id.in_([json_ser['services'][n]['host_id']]))
                 hos = ([e.serialize() for e in hosts])
-                
+
                 ser_port = Service_Port.query.filter(Service_Port.service_id.in_( [json_ser['services'][n]['service_id']] ))
                 s_port = ([e.serialize() for e in ser_port])
 
@@ -637,11 +637,11 @@ def read_repositories():
 
                 json_ser['services'][n].update({ "ports" : json_ports['ports'] })
 
-                json_ser['services'][n].update({ "address" : str(hos[0]['address']) + str(json_ser['services'][n]['machine']) })
+                json_ser['services'][n].update({ "address" : str(hos[0]['address']) })
                 del json_ser['services'][n]['host_id']
                 del json_ser['services'][n]['machine']
                 del json_ser['services'][n]['service_id']
-
+               
             #compose
             json_data['repositorie'][i].update({"services": json_ser['services']})
             json_data['repositorie'][i].update({"categories": json_cate['categories']})
@@ -663,7 +663,6 @@ def read_repositorie(repo_id):
         #create data dict
         json_data = (repositories.serialize())
         
-
         #create lists
         list_ser = []
         list_cat = []
@@ -715,7 +714,7 @@ def read_repositorie(repo_id):
                 json_ports.setdefault('ports', []).append(val['port'])
 
             json_ser['services'][n].update({ "ports" : json_ports['ports'] })
-            json_ser['services'][n].update({ "address" : str(hos[0]['address']) + str(json_ser['services'][n]['machine']) })
+            json_ser['services'][n].update({ "address" : str(hos[0]['address']) })
 
             del json_ser['services'][n]['host_id']
             del json_ser['services'][n]['machine']
