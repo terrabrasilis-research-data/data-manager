@@ -542,16 +542,18 @@ def read_ports(repo_id):
 @app.route('/api/v1.0/repositories', methods=['POST'])
 @jwt_required
 def create_repositorie():
-    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' in request.json:
+    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'path' in request.json:
         abort(400)
 
     name = request.json['name']
+    path = request.json['path']
     abstract = request.json['abstract']
     maintainer = request.json['maintainer']
     created_on = request.json['created_on']
     try:
         repositorie=Repositorie(
             name = name,
+            path = path,
             abstract = abstract,
             maintainer = maintainer,
             created_on = created_on

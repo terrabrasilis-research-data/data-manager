@@ -209,13 +209,15 @@ class Repositorie(db.Model):
 
     repo_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=False, nullable=False)
+    path = db.Column(db.String(50), unique=False, nullable=False)
     abstract = db.Column(db.String(500), unique=False, nullable=False)
     maintainer = db.Column(db.String(355), unique=False, nullable=False)
     created_on = db.Column(db.DateTime, unique=False, nullable=False)
     
     
-    def __init__(self, name, abstract, maintainer, created_on):
+    def __init__(self, name, path, abstract, maintainer, created_on):
         self.name = name
+        self.path = path
         self.abstract = abstract
         self.maintainer = maintainer
         self.created_on = created_on
@@ -225,6 +227,7 @@ class Repositorie(db.Model):
         return {            
             'repo_id': self.repo_id, 
             'name': self.name,
+            'path': self.path,
             'abstract':self.abstract,
             'maintainer':self.maintainer,
             'created_on':self.created_on

@@ -48,6 +48,7 @@ CREATE TABLE ports(
 CREATE TABLE research_data_repositories (
   repo_id serial PRIMARY KEY, 
   name VARCHAR (50) UNIQUE NOT NULL, 
+  path VARCHAR (50) UNIQUE NOT NULL, 
   abstract VARCHAR (500) NOT NULL, 
   maintainer VARCHAR (355) NULL, 
   created_on TIMESTAMP NOT NULL
