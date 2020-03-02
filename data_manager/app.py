@@ -779,22 +779,24 @@ def delete_repositorie(repo_id):
 @app.route("/api/v1.0/groups", methods=['POST'])
 @jwt_required
 def create_group():
-    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'image' in request.json:
+    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'image' and 'ckan_group_id' in request.json:
         abort(400)
-
+    
     name = request.json['name']
     abstract = request.json['abstract']
     maintainer = request.json['maintainer']
     created_on = request.json['created_on']
+    ckan_group_id = request.json['ckan_group_id']
     language = request.json['language']
     image = request.json['image']
-
+    
     try:
         group=Group(
             name = name,
             abstract = abstract,
             maintainer = maintainer,
             created_on = created_on,
+            ckan_group_id = ckan_group_id,
             language = language,
             image = image
 
@@ -900,12 +902,13 @@ def read_group(group_id):
 @app.route('/api/v1.0/groups/<int:group_id>', methods=['PUT'])
 @jwt_required
 def update_group(group_id):
-    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'image' in request.json:
+    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'image' and 'ckan_group_id' in request.json:
         abort(400)
     name = request.json['name']
     abstract = request.json['abstract']
     maintainer = request.json['maintainer']
     created_on = request.json['created_on']
+    ckan_group_id = request.json['ckan_group_id']
     language = request.json['language']
     image = request.json['image']
     custom_fields = request.json['custom_fields']
@@ -921,6 +924,7 @@ def update_group(group_id):
         new_group.maintainer = maintainer
         new_group.created_on = created_on
         new_group.language = language
+        new_group.ckan_group_id = ckan_group_id
         new_group.image = image
         new_group.custom_fields = custom_fields
 

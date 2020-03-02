@@ -179,16 +179,18 @@ class Group(db.Model):
     name = db.Column(db.String(50), unique=False, nullable=False)
     abstract = db.Column(db.String(500), unique=False, nullable=False)
     maintainer = db.Column(db.String(355), unique=False, nullable=False)
+    ckan_group_id = db.Column(db.String(355), unique=False, nullable=False)
     image = db.Column(db.String(355), unique=False, nullable=False)
     created_on = db.Column(db.DateTime, unique=False, nullable=False)
     language = db.Column(db.String(50), unique=False, nullable=False)
     
-    def __init__(self, name, abstract, maintainer, created_on, language, image):
+    def __init__(self, name, abstract, maintainer, created_on, language, image, ckan_group_id):
         self.name = name
         self.abstract = abstract
         self.maintainer = maintainer
         self.created_on = created_on
         self.image = image
+        self.ckan_group_id = ckan_group_id
         self.language = language
    
     def serialize(self):
@@ -198,6 +200,7 @@ class Group(db.Model):
             'name': self.name,
             'abstract':self.abstract,
             'maintainer':self.maintainer,
+            'ckan_group_id':self.ckan_group_id,
             'image':self.image,
             'created_on':self.created_on,
             'language':self.language
