@@ -1021,14 +1021,16 @@ def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 	
 #imageUpload
-@app.route("/api/v1.0/image_upload", methods=['POST'])
-def imageUpload():
+@app.route("/api/v1.0/file_upload/<int:repo_id>", methods=['POST'])
+def fileUpload(repo_id):
     try:
-        # Retrieves file upload
-        image = request.files.get('image')
-        image.save(os.path.join(UPLOAD_FOLDER, image.filename))
 
-        return jsonify({'message': 'Success'})
+        # Retrieves file upload
+        f = request.files.get('file')
+
+        f.save(os.path.join(UPLOAD_FOLDER, f.filename))
+
+        return jsonify({'message': 'Success', 'repo_id': repo_id})
     except:
         return jsonify({'message': 'Something went wrong'}, 500)
 
