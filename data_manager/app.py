@@ -1159,6 +1159,10 @@ def fileUpload(repo_id):
             #########################################################    
             if (check_filetype_name(os.path.join(UPLOAD_FOLDER, f.filename),'shp') == True):
 
+                #########################################################
+                # Database                                              #
+                #########################################################   
+                 
                 # get repositorie
                 repositorie=Repositorie.query.filter_by(repo_id=repo_id).first()
                 repo_json = (repositorie.serialize())
@@ -1168,7 +1172,7 @@ def fileUpload(repo_id):
                 host = Host.query.filter_by(name=repo_json['name']).first()
                 host_json = (host.serialize())
                 host_address = host_json['address']
-                db_port = "5432" #30040
+                db_port = "5433" #30040
                 geoserver_port = "8082" #30050
                 srid = "4326"
 
@@ -1184,6 +1188,10 @@ def fileUpload(repo_id):
                 # delete zipfile, 
                 subprocess.call("rm -rf " + os.path.join(UPLOAD_FOLDER, f.filename) + " ; rm -rf " + os.path.join(UPLOAD_FOLDER, f.filename.rsplit('.', 1)[0]), shell=True)
 
+                #########################################################
+                # GeoServer                                             #
+                #########################################################   
+                 
                 # geoserver env
                 GEOSERVER_URL = "http://" + url + ":" + geoserver_port + "/geoserver"
                 LAB_NAME = repo_json['path']
@@ -1191,31 +1199,29 @@ def fileUpload(repo_id):
 
                 # connect catalog
                 cat = Catalog(GEOSERVER_URL + '/rest')
-
+                
                 # create workspace
-                ws = cat.create_workspace(LAB_NAME, LAB_URI)
-
+                #   ws = cat.create_workspace(LAB_NAME, LAB_URI)
+               
                 # create datastore
-                ds = cat.create_datastore(LAB_NAME+'_datastore', LAB_NAME)
-
+                #   ds = cat.create_datastore(LAB_NAME+'_datastore', LAB_NAME)
+               
                 #connect database
-                ds.connection_parameters.update(host=url, port=db_port, database="geo_db", user=TBRD_REPO_DB_USER, passwd=TBRD_REPO_DB_PASS, dbtype='postgis', schema='public')
-
-                # connection_parameters.update
-
+                #   ds.connection_parameters.update(host=url, port=db_port, database="geo_db", user=TBRD_REPO_DB_USER, passwd=TBRD_REPO_DB_PASS, dbtype='postgis', schema='public')
+               
                 #save
-                cat.save(ds)
+                #   cat.save(ds)
 
                 # create featuretype
                 feature_name = shapefile_name.rsplit('.', 1)[0].lower()
                 workspace = cat.get_workspace(LAB_NAME)
                 data_store = cat.get_store(LAB_NAME+'_datastore', workspace)
-                #published = cat.publish_featuretype('LayerName',data_store,'3857')
+                ft = cat.publish_featuretype(str(feature_name), data_store, 'EPSG:4326', srs='EPSG:4326')
 
-                #save
-                #cat.save(ft)
+                # build data_url
+                data_url = GEOSERVER_URL + "/ows?service=WFS&version=1.0.0&request=GetFeature&typeName="+LAB_NAME+":"+str(feature_name)+"&outputFormat=SHAPE-ZIP"
 
-                return jsonify({'message':'zip sucess'}, 200)
+                return jsonify({'data_url': data_url}, 200)
 
             #########################################################
             # Normal Zip                                            #
