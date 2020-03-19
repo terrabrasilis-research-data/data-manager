@@ -8,6 +8,7 @@ from werkzeug.utils import secure_filename
 from flask_jwt_extended import JWTManager
 from flask_httpauth import HTTPBasicAuth
 from flask_sqlalchemy import SQLAlchemy
+from geoserver.catalog import Catalog
 from flask import Flask, jsonify
 from flask import make_response
 from sqlalchemy import update
@@ -18,6 +19,7 @@ from flask import url_for
 from flask import abort
 from models import *
 import subprocess
+import argparse
 import datetime
 import os.path 
 import json
@@ -129,6 +131,18 @@ def get_shapefile_name(path):
         for elem in listOfiles:
             if(elem.rsplit('.', 1)[1].lower() == 'shp'):
                 return elem
+		
+#check if filetype 
+def check_filetype_name(path, ftype):
+    with ZipFile(path, 'r') as zipObj:
+        listOfiles = zipObj.namelist()
+        list_ext = []
+        for elem in listOfiles:
+            list_ext.append(elem.rsplit('.', 1)[1].lower())
+        if (ftype in list_ext):
+            return True
+        else:
+            return False
 		
 #########################################################
 # Create users                                          #
@@ -1132,40 +1146,84 @@ def fileUpload(repo_id):
             return jsonify({'message':'image sucess'}, 200)
 
         #########################################################
-        # Shapefiles                                            #
+        # Zip                                                   #
         #########################################################
         if (file_type == 'zip'):
-            
-            # get repositorie
-            repositorie=Repositorie.query.filter_by(repo_id=repo_id).first()
-            repo_json = (repositorie.serialize())
-            repo_path = repo_json['path']
-
-            # get host
-            host = Host.query.filter_by(name=repo_json['name']).first()
-            host_json = (host.serialize())
-            host_address = host_json['address']
-            port = "5432" #30040
-            srid = "4326"
-
-            # build url
-            url = host_address #+ '/' + repo_path     <- Uncomment to use repositorie database
-
+        
             # save file
             f.save(os.path.join(UPLOAD_FOLDER, f.filename))
             subprocess.call("unzip" + " " +  os.path.join(UPLOAD_FOLDER, f.filename) + " -d " + os.path.join(UPLOAD_FOLDER, f.filename.rsplit('.', 1)[0]), shell=True)
-            
-            # open zip
-            shapefile_name = get_shapefile_name(os.path.join(UPLOAD_FOLDER, f.filename))
 
-            # add shapefile to database
-            subprocess.call("export PGPASSWORD="+TBRD_REPO_DB_PASS+" ; shp2pgsql -s " + srid + " " + os.path.join(UPLOAD_FOLDER, f.filename.rsplit('.', 1)[0], shapefile_name) + " public." + shapefile_name.rsplit('.', 1)[0] + " | psql -h " + url + " -d geo_db " + " -p " + port + " -U " + TBRD_REPO_DB_USER, shell=True)
-            
-            # delete zipfile, 
-            subprocess.call("rm -rf " + os.path.join(UPLOAD_FOLDER, f.filename) + " ; rm -rf " + os.path.join(UPLOAD_FOLDER, f.filename.rsplit('.', 1)[0]), shell=True)
-           
-            return jsonify({'message':'zip sucess'}, 200)
+            #########################################################
+            # Shapefiles                                            #
+            #########################################################    
+            if (check_filetype_name(os.path.join(UPLOAD_FOLDER, f.filename),'shp') == True):
 
+                # get repositorie
+                repositorie=Repositorie.query.filter_by(repo_id=repo_id).first()
+                repo_json = (repositorie.serialize())
+                repo_path = repo_json['path']
+
+                # get host
+                host = Host.query.filter_by(name=repo_json['name']).first()
+                host_json = (host.serialize())
+                host_address = host_json['address']
+                db_port = "5432" #30040
+                geoserver_port = "8082" #30050
+                srid = "4326"
+
+                # build url
+                url = host_address #+ '/' + repo_path     <- Uncomment to use repositorie database
+
+                # open zip
+                shapefile_name = get_shapefile_name(os.path.join(UPLOAD_FOLDER, f.filename))
+
+                # add shapefile to database
+                subprocess.call("export PGPASSWORD="+TBRD_REPO_DB_PASS+" ; shp2pgsql -s " + srid + " " + os.path.join(UPLOAD_FOLDER, f.filename.rsplit('.', 1)[0], shapefile_name) + " public." + shapefile_name.rsplit('.', 1)[0] + " | psql -h " + url + " -d geo_db " + " -p " + db_port + " -U " + TBRD_REPO_DB_USER, shell=True)
+                
+                # delete zipfile, 
+                subprocess.call("rm -rf " + os.path.join(UPLOAD_FOLDER, f.filename) + " ; rm -rf " + os.path.join(UPLOAD_FOLDER, f.filename.rsplit('.', 1)[0]), shell=True)
+
+                # geoserver env
+                GEOSERVER_URL = "http://" + url + ":" + geoserver_port + "/geoserver"
+                LAB_NAME = repo_json['path']
+                LAB_URI = "http://"+"tbrd.com"+"/"+LAB_NAME
+
+                # connect catalog
+                cat = Catalog(GEOSERVER_URL + '/rest')
+
+                # create workspace
+                ws = cat.create_workspace(LAB_NAME, LAB_URI)
+
+                # create datastore
+                ds = cat.create_datastore(LAB_NAME+'_datastore', LAB_NAME)
+
+                #connect database
+                ds.connection_parameters.update(host=url, port=db_port, database="geo_db", user=TBRD_REPO_DB_USER, passwd=TBRD_REPO_DB_PASS, dbtype='postgis', schema='public')
+
+                # connection_parameters.update
+
+                #save
+                cat.save(ds)
+
+                # create featuretype
+                feature_name = shapefile_name.rsplit('.', 1)[0].lower()
+                workspace = cat.get_workspace(LAB_NAME)
+                data_store = cat.get_store(LAB_NAME+'_datastore', workspace)
+                #published = cat.publish_featuretype('LayerName',data_store,'3857')
+
+                #save
+                #cat.save(ft)
+
+                return jsonify({'message':'zip sucess'}, 200)
+
+            #########################################################
+            # Normal Zip                                            #
+            #########################################################
+            else:
+
+                print("zip")
+                
     #except:
     #    return jsonify({'message': 'Something went wrong'}, 500)
 
