@@ -1143,7 +1143,7 @@ def fileUpload(repo_id):
         
             f.save(os.path.join(UPLOAD_FOLDER, f.filename))
 
-            return jsonify({'message':'image sucess'}, 200)
+            return jsonify({'data_url': f.filename}, 200)
 
         #########################################################
         # Zip                                                   #
@@ -1169,7 +1169,7 @@ def fileUpload(repo_id):
                 repo_path = repo_json['path']
 
                 # get host
-                host = Host.query.filter_by(name=repo_json['name']).first()
+                host = Host.query.filter_by(name='Host_1').first()
                 host_json = (host.serialize())
                 host_address = host_json['address']
                 db_port = "5433" #30040
@@ -1201,16 +1201,16 @@ def fileUpload(repo_id):
                 cat = Catalog(GEOSERVER_URL + '/rest')
                 
                 # create workspace
-                #   ws = cat.create_workspace(LAB_NAME, LAB_URI)
+                #ws = cat.create_workspace(LAB_NAME, LAB_URI)
                
                 # create datastore
-                #   ds = cat.create_datastore(LAB_NAME+'_datastore', LAB_NAME)
+                #ds = cat.create_datastore(LAB_NAME+'_datastore', LAB_NAME)
                
                 #connect database
-                #   ds.connection_parameters.update(host=url, port=db_port, database="geo_db", user=TBRD_REPO_DB_USER, passwd=TBRD_REPO_DB_PASS, dbtype='postgis', schema='public')
+                #ds.connection_parameters.update(host=url, port=db_port, database="geo_db", user=TBRD_REPO_DB_USER, passwd=TBRD_REPO_DB_PASS, dbtype='postgis', schema='public')
                
                 #save
-                #   cat.save(ds)
+                #cat.save(ds)
 
                 # create featuretype
                 feature_name = shapefile_name.rsplit('.', 1)[0].lower()

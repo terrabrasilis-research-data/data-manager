@@ -155,4 +155,4 @@ INSERT INTO research_group_users (group_id, user_id) VALUES (4,8);
 INSERT INTO research_group_users (group_id, user_id) VALUES (5,9);
 INSERT INTO research_group_users (group_id, user_id) VALUES (5,10);
 
-INSERT INTO hosts (name, address, created_on ) VALUES ('Host_1', 'http://localhost', '2019-09-04T14:48:54+00:00');
+INSERT INTO hosts (name, address, created_on ) VALUES ('Host_1', '192.168.122.1', '2019-09-04T14:48:54+00:00');
