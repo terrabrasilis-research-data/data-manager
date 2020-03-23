@@ -952,6 +952,67 @@ def read_groups():
 	    return(str(e))
 
 #########################################################
+# Read groups from user                                 #
+######################################################### 
+@app.route("/api/v1.0/groups_from_user/<int:user_id>", methods=['GET'])
+def read_groups_from_users(user_id):
+    try:
+        #query all
+        groups=Group.query.all()
+       
+        #get lists
+        data = ([(make_public_group(e.serialize())) for e in groups])
+        id_data = ([e.serialize() for e in groups])
+        
+        #create data dict
+        json_data = {}
+        for val in data: 
+            json_data.setdefault('groups', []).append(val)
+        
+        lista = []
+
+        #create response dict
+        json_response = {}
+        for i in range(len(data)):
+
+            #create lists
+            list_user = []
+          
+            #create lists
+            grup_usr = Groups_User.query.filter(Groups_User.group_id.in_([id_data[i]['group_id']]))
+
+            r_user = ([e.serialize() for e in grup_usr])
+
+            for k in range(len(r_user)):
+                list_user.append(r_user[k]['user_id'])
+
+            #create users dict
+            users=User.query.filter(User.user_id.in_(list_user))
+            
+            members = ([make_public_user(e.serialize()) for e in users])
+
+            json_users = {}
+
+            for val in members: 
+                json_users.setdefault('users', []).append(val)
+
+            #compose
+            json_data['groups'][i].update({"users": json_users['users']})
+            json_response.setdefault("groups", []).append(json_data['groups'][i])
+
+        #create new response dict
+        new_json_response = {}
+        for i in range(len(json_response['groups'])):
+            for j in range(len(json_response['groups'][i]['users'])):
+                if (json_response['groups'][i]['users'][j]['user_id'] == user_id):
+                    new_json_response.setdefault("groups", []).append(json_response['groups'][i])
+
+        return jsonify(new_json_response)
+
+    except Exception as e:
+	    return(str(e))
+
+#########################################################
 # Read group                                            #
 ######################################################### 
 @app.route("/api/v1.0/groups/<int:group_id>", methods=['GET'])
