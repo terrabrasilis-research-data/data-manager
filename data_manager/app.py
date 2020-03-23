@@ -736,6 +736,110 @@ def read_repositories():
 	    return(str(e))
 
 #########################################################
+# Read repositories from user                           #
+######################################################### 
+@app.route("/api/v1.0/repositories_from_user/<int:user_id>", methods=['GET'])
+def read_repositories_from_user(user_id):
+    try:
+        #query all
+        repositories=Repositorie.query.all()
+       
+        #get lists
+        data = ([(make_public_repositorie(e.serialize())) for e in repositories])
+        id_data = ([e.serialize() for e in repositories])
+        
+        #create data dict
+        json_data = {}
+        for val in data: 
+            json_data.setdefault('repositorie', []).append(val)
+        
+        lista = []
+
+        #create response dict
+        json_response = {}
+        for i in range(len(data)):
+
+            #create lists
+            list_ser = []
+            list_cat = []
+            list_key = []
+
+            #create lists
+            repo_ser = Repositorie_Service.query.filter(Repositorie_Service.repo_id.in_([id_data[i]['repo_id']]))
+            r_ser = ([e.serialize() for e in repo_ser])
+          
+            repo_cat = Repositorie_Categorie.query.filter(Repositorie_Categorie.repo_id.in_([id_data[i]['repo_id']]))
+            r_cat = ([e.serialize() for e in repo_cat])
+
+            for j in range(len(r_ser)):
+                list_ser.append(r_ser[j]['service_id'])
+
+            for l in range(len(r_cat)):
+                list_cat.append(r_cat[l]['categorie_id'])
+  
+            #create categories dict
+            categories=Categorie.query.filter(Categorie.categorie_id.in_(list_cat))
+            cate = ([e.serialize() for e in categories])
+            json_cate = {}
+            for val in cate: 
+                json_cate.setdefault('categories', []).append(val['name'])
+            
+            #create services dict
+            services = Service.query.filter(Service.service_id.in_(list_ser))
+            ser = ([make_public_service(e.serialize()) for e in services])
+            json_ser = {}
+            for val in ser: 
+                json_ser.setdefault('services', []).append(val)
+            
+            for n in range(len(ser)):
+                hosts = Host.query.filter(Host.host_id.in_([json_ser['services'][n]['host_id']]))
+                hos = ([e.serialize() for e in hosts])
+
+                ser_port = Service_Port.query.filter(Service_Port.service_id.in_( [json_ser['services'][n]['service_id']] ))
+                s_port = ([e.serialize() for e in ser_port])
+
+                list_por = []
+                for k in range(len(s_port)):
+                    list_por.append(s_port[k]['port_id'])
+
+                ports = Port.query.filter(Port.port_id.in_(list_por))
+                por = ([e.serialize() for e in ports])
+
+                json_ports = {}
+                for val in por: 
+                    json_ports.setdefault('ports', []).append(val['port'])
+
+                json_ser['services'][n].update({ "ports" : json_ports['ports'] })
+
+                json_ser['services'][n].update({ "address" : str(hos[0]['address']) })
+                del json_ser['services'][n]['host_id']
+                del json_ser['services'][n]['machine']
+                del json_ser['services'][n]['service_id']
+               
+            #compose
+            json_data['repositorie'][i].update({"services": json_ser['services']})
+            json_data['repositorie'][i].update({"categories": json_cate['categories']})
+            json_response.setdefault("repositorie", []).append(json_data['repositorie'][i])
+       
+            #create new response dict
+            new_json_response = {}
+            for i in range(len(json_response['repositorie'])):
+                
+                group_repositorie=Repositorie_Group.query.filter_by(repo_id = json_response['repositorie'][i]['repo_id']).first()
+                group_repo_json = group_repositorie.serialize()
+        
+                grup_usr = Groups_User.query.filter(Groups_User.group_id.in_([ group_repo_json['group_id'] ]))
+                r_user = ([e.serialize() for e in grup_usr])
+                
+                for j in range(len(r_user)):
+                    if (r_user[j]['user_id'] == user_id):
+                        new_json_response.setdefault("repositorie", []).append(json_response['repositorie'][i])
+
+        return jsonify(new_json_response)
+    except Exception as e:
+	    return(str(e))
+
+#########################################################
 # Read repository                                       #
 ######################################################### 
 @app.route("/api/v1.0/repositories/<int:repo_id>", methods=['GET'])
