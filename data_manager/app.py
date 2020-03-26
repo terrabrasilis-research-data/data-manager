@@ -4,6 +4,7 @@ from flask import Flask, flash, request, redirect, url_for, send_from_directory
 from flask_swagger_ui import get_swaggerui_blueprint
 from flask import Flask, request, redirect, url_for
 from flask_migrate import Migrate, MigrateCommand
+from sqlalchemy import update, create_engine
 from werkzeug.utils import secure_filename
 from flask_jwt_extended import JWTManager
 from flask_httpauth import HTTPBasicAuth
@@ -11,13 +12,13 @@ from flask_sqlalchemy import SQLAlchemy
 from geoserver.catalog import Catalog
 from flask import Flask, jsonify
 from flask import make_response
-from sqlalchemy import update
 from zipfile import ZipFile
 from flask_cors import CORS
 from flask import request
 from flask import url_for
 from flask import abort
 from models import *
+import pandas as pd
 import subprocess
 import argparse
 import datetime
@@ -1300,6 +1301,7 @@ def fileUpload(repo_id):
 
         # List of file_types 
         images = ['png' , 'jpg', 'jpeg', 'gif']
+        tabular = ['csv' , 'tab', 'xls', 'xlsx']
 
         #########################################################
         # Non-Geographic Images                                 #
@@ -1394,7 +1396,49 @@ def fileUpload(repo_id):
             else:
 
                 print("zip")
+        
+        #########################################################
+        # Tabular                                               #
+        #########################################################
+        if (file_type in tabular):
+            
+            # save file
+            f.save(os.path.join(UPLOAD_FOLDER, f.filename))
+
+            # add to panda
+            panda_data = pd.read_csv(os.path.join(UPLOAD_FOLDER, f.filename)) 
+
+            #########################################################
+            # Database                                              #
+            #########################################################   
                 
+            # get repositorie
+            repositorie=Repositorie.query.filter_by(repo_id=repo_id).first()
+            repo_json = (repositorie.serialize())
+            repo_path = repo_json['path']
+
+            # get host
+            host = Host.query.filter_by(name='Host_1').first()
+            host_json = (host.serialize())
+            host_address = host_json['address']
+            db_port = "5433" #30040
+
+            # build url
+            url = host_address #+ '/' + repo_path     <- Uncomment to use repositorie database
+
+            # create db engine
+            engine = create_engine('postgresql://'+TBRD_REPO_DB_USER+':'+TBRD_REPO_DB_PASS+'@'+url+':'+db_port+'/geo_db')
+
+            # panda to sql
+            panda_data.to_sql(f.filename.rsplit('.', 1)[0], engine)
+
+
+            # delete csv, 
+            subprocess.call("rm -rf " + os.path.join(UPLOAD_FOLDER, f.filename), shell=True)
+
+
+            return jsonify({'data_url': f.filename}, 200)
+        
     #except:
     #    return jsonify({'message': 'Something went wrong'}, 500)
 
