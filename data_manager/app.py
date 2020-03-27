@@ -1300,8 +1300,8 @@ def fileUpload(repo_id):
         file_type = f.filename.rsplit('.', 1)[1].lower()
 
         # List of file_types 
-        images = ['png' , 'jpg', 'jpeg', 'gif']
-        tabular = ['csv' , 'tab', 'xls', 'xlsx']
+        images = ['png', 'jpg', 'jpeg', 'gif']
+        tabular = ['csv', 'xls', 'xlsx', 'odf']
 
         #########################################################
         # Non-Geographic Images                                 #
@@ -1401,12 +1401,19 @@ def fileUpload(repo_id):
         # Tabular                                               #
         #########################################################
         if (file_type in tabular):
-            
+                            
             # save file
             f.save(os.path.join(UPLOAD_FOLDER, f.filename))
 
-            # add to panda
-            panda_data = pd.read_csv(os.path.join(UPLOAD_FOLDER, f.filename)) 
+            if (file_type == 'xls' or file_type == 'xlsx' or file_type == 'odf'):
+
+                # add to panda
+                panda_data = pd.read_excel(os.path.join(UPLOAD_FOLDER, f.filename)) 
+
+            if (file_type == 'csv'):        
+            
+                # add to panda
+                panda_data = pd.read_csv(os.path.join(UPLOAD_FOLDER, f.filename)) 
 
             #########################################################
             # Database                                              #
