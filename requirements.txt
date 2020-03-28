@@ -13,4 +13,4 @@ flask-jwt-extended==3.24.1
 passlib==1.7.2
 gsconfig-py3==1.0.7 
 pandas==1.0.3
-xlrd===1.0.0 
+xlrd===1.2.0 

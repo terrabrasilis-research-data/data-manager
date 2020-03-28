@@ -24,6 +24,7 @@ import argparse
 import datetime
 import os.path 
 import json
+import xlrd
 import os 
 
 #env
