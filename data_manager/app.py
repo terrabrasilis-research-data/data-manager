@@ -1440,11 +1440,6 @@ def fileUpload(repo_id):
             # panda to sql
             panda_data.to_sql(f.filename.rsplit('.', 1)[0], engine)
 
-
-            # delete csv, 
-            subprocess.call("rm -rf " + os.path.join(UPLOAD_FOLDER, f.filename), shell=True)
-
-
             return jsonify({'data_url': f.filename}, 200)
         
     #except:
