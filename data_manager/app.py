@@ -21,6 +21,7 @@ from models import *
 import pandas as pd
 import subprocess
 import argparse
+import requests
 import datetime
 import os.path 
 import json
@@ -42,6 +43,8 @@ POSTGRES_PW = get_env_variable("POSTGRES_PW")
 POSTGRES_DB = get_env_variable("POSTGRES_DB")
 TBRD_REPO_DB_USER = get_env_variable("TBRD_REPO_DB_USER")
 TBRD_REPO_DB_PASS = get_env_variable("TBRD_REPO_DB_PASS")
+KUBERNETES_API_PORT = get_env_variable("KUBERNETES_API_PORT")
+KUBERNETES_API_HOST = get_env_variable("KUBERNETES_API_HOST")
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
@@ -146,9 +149,9 @@ def check_filetype_name(path, ftype):
         else:
             return False
 		
-#########################################################
-# Create users                                          #
-######################################################### 
+#+--------------------------------------------------------+
+#| Create users                                           |
+#+--------------------------------------------------------+ 
 @app.route('/api/v1.0/users', methods=['POST'])
 def create_user():
     if not request.json or not 'username' and 'password' and 'image' and "full_name" and "email" and "created_on" and "last_login" and 'ckan_api_key' in request.json:
@@ -187,9 +190,9 @@ def create_user():
     except Exception as e:
         return(str(e))
 		
-#########################################################
-# Read users                                            #
-######################################################### 
+#+--------------------------------------------------------+
+#| Read users                                             |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/users")
 def read_users():
     try:
@@ -198,9 +201,9 @@ def read_users():
     except Exception as e:
 	    return(str(e))
 		
-#########################################################
-# Read user                                             #
-######################################################### 
+#+--------------------------------------------------------+
+#| Read user                                              |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/users/<int:user_id>", methods=['GET'])
 def read_user(user_id):
     try:
@@ -209,9 +212,9 @@ def read_user(user_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Update user                                           #
-######################################################### 
+#+--------------------------------------------------------+
+#| Update user                                            |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/users/<int:user_id>", methods=['PUT'])
 @jwt_required
 def update_user(user_id):
@@ -247,9 +250,9 @@ def update_user(user_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Delete user                                           #
-######################################################### 
+#+--------------------------------------------------------+
+#| Delete user                                            |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/users/<int:user_id>", methods=['DELETE'])
 @jwt_required
 def delete_user(user_id):
@@ -261,9 +264,9 @@ def delete_user(user_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Create group repository                               #
-######################################################### 
+#+--------------------------------------------------------+
+#| Create group repository                                |
+#+--------------------------------------------------------+ 
 @app.route('/api/v1.0/group_repositorie_rel', methods=['POST'])
 @jwt_required
 def create_group_repositorie_rel():
@@ -282,9 +285,9 @@ def create_group_repositorie_rel():
     except Exception as e:
         return(str(e))
 
-#########################################################
-# Read group repositorie                                #
-######################################################### 
+#+--------------------------------------------------------+
+#| Read group repositorie                                 |
+#+--------------------------------------------------------+ 
 @app.route('/api/v1.0/group_repositorie_rel/<int:repo_id>', methods=['GET'])
 def read_group_repositorie_rel(repo_id):
     try:
@@ -293,9 +296,9 @@ def read_group_repositorie_rel(repo_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Delete group repositorie                              #
-######################################################### 
+#+--------------------------------------------------------+
+#| Delete group repositorie                               |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/group_repositorie_rel/<int:group_id>/<int:repo_id>", methods=['DELETE'])
 @jwt_required
 def delete_group_repositorie_rel(group_id,repo_id):
@@ -307,9 +310,9 @@ def delete_group_repositorie_rel(group_id,repo_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Create user group                                     #
-######################################################### 
+#+--------------------------------------------------------+
+#| Create user group                                      |
+#+--------------------------------------------------------+ 
 @app.route('/api/v1.0/user_group_rel', methods=['POST'])
 @jwt_required
 def create_user_group_rel():
@@ -328,9 +331,9 @@ def create_user_group_rel():
     except Exception as e:
         return(str(e))
 
-#########################################################
-# Delete user group                                     #
-######################################################### 
+#+--------------------------------------------------------+
+#| Delete user group                                      |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/user_group_rel/<int:user_id>/<int:group_id>", methods=['DELETE'])
 @jwt_required
 def delete_user_group_rel(user_id,group_id):
@@ -342,9 +345,9 @@ def delete_user_group_rel(user_id,group_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Create services                                       #
-######################################################### 
+#+--------------------------------------------------------+
+#| Create services                                        |
+#+--------------------------------------------------------+ 
 @app.route('/api/v1.0/services', methods=['POST'])
 @jwt_required
 def create_service():
@@ -369,9 +372,9 @@ def create_service():
     except Exception as e:
         return(str(e))
 
-#########################################################
-# Read services                                         #
-######################################################### 
+#+--------------------------------------------------------+
+#| Read services                                          |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/services", methods=['GET'])
 def read_services():
     try:
@@ -381,9 +384,9 @@ def read_services():
     except Exception as e:
 	    return(str(e))	
         
-#########################################################
-# Read service                                          #
-######################################################### 
+#+--------------------------------------------------------+
+#| Read service                                           |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/services/<int:service_id>", methods=['GET'])
 def read_service(service_id):
     try:
@@ -392,9 +395,9 @@ def read_service(service_id):
     except Exception as e:
 	    return(str(e))
         
-#########################################################
-# Delete service                                        #
-######################################################### 
+#+--------------------------------------------------------+
+#| Delete service                                         |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/services/<int:service_id>", methods=['DELETE'])
 @jwt_required
 def delete_service(service_id):
@@ -406,9 +409,9 @@ def delete_service(service_id):
     except Exception as e:
 	    return(str(e))
         
-#########################################################
-# Create service repository                             #
-######################################################### 
+#+--------------------------------------------------------+
+#| Create service repository                              |
+#+--------------------------------------------------------+ 
 @app.route('/api/v1.0/service_repositorie_rel', methods=['POST'])
 @jwt_required
 def create_service_repositorie_rel():
@@ -427,9 +430,9 @@ def create_service_repositorie_rel():
     except Exception as e:
         return(str(e))
         
-#########################################################
-# Delete service repository                             #
-######################################################### 
+#+--------------------------------------------------------+
+#| Delete service repository                              |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/service_repositorie_rel/<int:service_id>/<int:repo_id>", methods=['DELETE'])
 @jwt_required
 def delete_service_repositorie_rel(service_id,repo_id):
@@ -441,9 +444,9 @@ def delete_service_repositorie_rel(service_id,repo_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Read categorie                                        #
-######################################################### 
+#+--------------------------------------------------------+
+#| Read categorie                                         |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/categories", methods=['GET'])
 def read_categories():
     try:
@@ -453,9 +456,9 @@ def read_categories():
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Create categorie                                      #
-######################################################### 
+#+--------------------------------------------------------+
+#| Create categorie                                       |
+#+--------------------------------------------------------+ 
 @app.route('/api/v1.0/categories', methods=['POST'])
 @jwt_required
 def create_categorie():
@@ -472,9 +475,9 @@ def create_categorie():
     except Exception as e:
         return(str(e))
 
-#########################################################
-# Create categorie repository                           #
-######################################################### 
+#+--------------------------------------------------------+
+#| Create categorie repository                            |
+#+--------------------------------------------------------+ 
 @app.route('/api/v1.0/categorie_repositorie_rel', methods=['POST'])
 @jwt_required
 def create_categorie_repositorie_rel():
@@ -493,9 +496,9 @@ def create_categorie_repositorie_rel():
     except Exception as e:
         return(str(e))
 
-#########################################################
-# Delete categorie repository                           #
-######################################################### 
+#+--------------------------------------------------------+
+#| Delete categorie repository                            |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/categorie_repositorie_rel/<int:categorie_id>/<int:repo_id>", methods=['DELETE'])
 @jwt_required
 def delete_categorie_repositorie_rel(categorie_id,repo_id):
@@ -507,9 +510,9 @@ def delete_categorie_repositorie_rel(categorie_id,repo_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Create services port                                  #
-######################################################### 
+#+--------------------------------------------------------+
+#| Create services port                                   |
+#+--------------------------------------------------------+ 
 @app.route('/api/v1.0/service_port_rel', methods=['POST'])
 @jwt_required
 def create_service_port_rel():
@@ -528,9 +531,9 @@ def create_service_port_rel():
     except Exception as e:
         return(str(e))
 
-#########################################################
-# Create services host                                    #
-######################################################### 
+#+--------------------------------------------------------+
+#| Create services host                                   |
+#+--------------------------------------------------------+ 
 @app.route('/api/v1.0/service_host_rel', methods=['POST'])
 @jwt_required
 def create_service_host_rel():
@@ -549,9 +552,9 @@ def create_service_host_rel():
     except Exception as e:
         return(str(e))
 
-#########################################################
-# Read hosts                                            #
-######################################################### 
+#+--------------------------------------------------------+
+#| Read hosts                                             |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/hosts", methods=['GET'])
 def read_hosts():
     try:
@@ -561,9 +564,9 @@ def read_hosts():
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Create hosts                                          #
-######################################################### 
+#+--------------------------------------------------------+
+#| Create hosts                                           |
+#+--------------------------------------------------------+ 
 @app.route('/api/v1.0/hosts', methods=['POST'])
 @jwt_required
 def create_host():
@@ -586,9 +589,9 @@ def create_host():
     except Exception as e:
         return(str(e))
 
-#########################################################
-# Read ports                                            #
-######################################################### 
+#+--------------------------------------------------------+
+#| Read ports                                             |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/ports/<int:repo_id>", methods=['GET'])
 def read_ports(repo_id):
     try:
@@ -617,13 +620,14 @@ def read_ports(repo_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Create repository                                     #
-######################################################### 
+#+--------------------------------------------------------+
+#| Create repository                                      |
+#+--------------------------------------------------------+ 
 @app.route('/api/v1.0/repositories', methods=['POST'])
 @jwt_required
 def create_repositorie():
-    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'path' in request.json:
+
+    if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'path' and 'services' in request.json:
         abort(400)
 
     name = request.json['name']
@@ -631,6 +635,10 @@ def create_repositorie():
     abstract = request.json['abstract']
     maintainer = request.json['maintainer']
     created_on = request.json['created_on']
+    services = request.json['services']
+    
+    r = requests.put(KUBERNETES_API_HOST+':'+KUBERNETES_API_PORT+'/api/v1.0/create', json ={'namespace': path, 'services': services}, headers={'Content-type': 'application/json', 'Accept': 'text/plain'}) 
+
     try:
         repositorie=Repositorie(
             name = name,
@@ -646,9 +654,9 @@ def create_repositorie():
     except Exception as e:
         return(str(e))
 
-#########################################################
-# Read repositories                                     #
-######################################################### 
+#+--------------------------------------------------------+
+#| Read repositories                                      |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/repositories", methods=['GET'])
 def read_repositories():
     try:
@@ -737,9 +745,9 @@ def read_repositories():
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Read repositories from user                           #
-######################################################### 
+#+--------------------------------------------------------+
+#| Read repositories from user                            |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/repositories_from_user/<int:user_id>", methods=['GET'])
 def read_repositories_from_user(user_id):
     try:
@@ -841,9 +849,9 @@ def read_repositories_from_user(user_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Read repository                                       #
-######################################################### 
+#+--------------------------------------------------------+
+#| Read repository                                        |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/repositories/<int:repo_id>", methods=['GET'])
 def read_repositorie(repo_id):
     try:
@@ -922,9 +930,9 @@ def read_repositorie(repo_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Update repository                                     #
-######################################################### 
+#+--------------------------------------------------------+
+#| Update repository                                      |
+#+--------------------------------------------------------+ 
 @app.route('/api/v1.0/repositories/<int:repo_id>', methods=['PUT'])
 @jwt_required
 def update_repositorie(repo_id):
@@ -954,9 +962,9 @@ def update_repositorie(repo_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Delete repository                                     #
-######################################################### 
+#+--------------------------------------------------------+
+#| Delete repository                                      |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/repositories/<int:repo_id>", methods=['DELETE'])
 @jwt_required
 def delete_repositorie(repo_id):
@@ -968,9 +976,9 @@ def delete_repositorie(repo_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Create group                                          #
-######################################################### 
+#+--------------------------------------------------------+
+#| Create group                                           |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/groups", methods=['POST'])
 @jwt_required
 def create_group():
@@ -1003,9 +1011,9 @@ def create_group():
     except Exception as e:
         return(str(e))
 
-#########################################################
-# Read groups                                           #
-######################################################### 
+#+--------------------------------------------------------+
+#| Read groups                                            |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/groups", methods=['GET'])
 def read_groups():
     try:
@@ -1057,9 +1065,9 @@ def read_groups():
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Read groups from user                                 #
-######################################################### 
+#+--------------------------------------------------------+
+#| Read groups from user                                  |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/groups_from_user/<int:user_id>", methods=['GET'])
 def read_groups_from_users(user_id):
     try:
@@ -1118,9 +1126,9 @@ def read_groups_from_users(user_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Read group                                            #
-######################################################### 
+#+--------------------------------------------------------+
+#| Read group                                             |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/groups/<int:group_id>", methods=['GET'])
 def read_group(group_id):
     try:
@@ -1158,9 +1166,9 @@ def read_group(group_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Update group                                          #
-######################################################### 
+#+--------------------------------------------------------+
+#| Update group                                           |
+#+--------------------------------------------------------+ 
 @app.route('/api/v1.0/groups/<int:group_id>', methods=['PUT'])
 @jwt_required
 def update_group(group_id):
@@ -1196,9 +1204,9 @@ def update_group(group_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Delete group                                          #
-######################################################### 
+#+--------------------------------------------------------+
+#| Delete group                                           |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/groups/<int:group_id>", methods=['DELETE'])
 @jwt_required
 def delete_group(group_id):
@@ -1210,9 +1218,9 @@ def delete_group(group_id):
     except Exception as e:
 	    return(str(e))
 
-#########################################################
-# Login                                                 #
-######################################################### 
+#+--------------------------------------------------------+
+#| Login                                                  |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/login", methods=['POST'])
 def UserLogin():
     if not request.json or not 'username' and 'password' in request.json:
@@ -1240,9 +1248,9 @@ def UserLogin():
     else:
         return jsonify({'message': 'Wrong credentials'})
 
-#########################################################
-# Token refresh                                         #
-######################################################### 
+#+--------------------------------------------------------+
+#| Token refresh                                          |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/token/refresh", methods=['POST'])
 @jwt_refresh_token_required
 def TokenRefresh():
@@ -1251,9 +1259,9 @@ def TokenRefresh():
 
     return jsonify({'access_token': access_token})
 
-#########################################################
-# Logout access                                         #
-######################################################### 
+#+--------------------------------------------------------+
+#| Logout access                                          |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/logout/access", methods=['POST'])
 @jwt_required
 def UserLogoutAccess():
@@ -1270,9 +1278,9 @@ def UserLogoutAccess():
     except:
         return jsonify({'message': 'Something went wrong'}, 500)
 
-#########################################################
-# Logout refresh                                        #
-######################################################### 
+#+--------------------------------------------------------+
+#| Logout refresh                                         |
+#+--------------------------------------------------------+ 
 @app.route("/api/v1.0/logout/refresh", methods=['POST'])
 @jwt_refresh_token_required
 def UserLogoutRefresh():
@@ -1289,9 +1297,9 @@ def UserLogoutRefresh():
     except:
         return jsonify({'message': 'Something went wrong'}, 500)
 
-#########################################################
-# File upload                                           #
-#########################################################    
+#+--------------------------------------------------------+
+#| File upload                                            |
+#+--------------------------------------------------------+    
 @app.route("/api/v1.0/file_upload/<int:repo_id>", methods=['POST'])
 def fileUpload(repo_id):
     #try:
@@ -1304,32 +1312,32 @@ def fileUpload(repo_id):
         images = ['png', 'jpg', 'jpeg', 'gif']
         tabular = ['csv', 'xls', 'xlsx', 'odf']
 
-        #########################################################
-        # Non-Geographic Images                                 #
-        #########################################################
+        #+--------------------------------------------------------+
+        #|Non-Geographic Images                                   |
+        #+--------------------------------------------------------+
         if (file_type in images):
         
             f.save(os.path.join(UPLOAD_FOLDER, f.filename))
 
             return jsonify({'data_url': f.filename}, 200)
 
-        #########################################################
-        # Zip                                                   #
-        #########################################################
+        #+--------------------------------------------------------+
+        #|Zip                                                     |
+        #+--------------------------------------------------------+
         if (file_type == 'zip'):
         
             # save file
             f.save(os.path.join(UPLOAD_FOLDER, f.filename))
             subprocess.call("unzip" + " " +  os.path.join(UPLOAD_FOLDER, f.filename) + " -d " + os.path.join(UPLOAD_FOLDER, f.filename.rsplit('.', 1)[0]), shell=True)
 
-            #########################################################
-            # Shapefiles                                            #
-            #########################################################    
+            #+--------------------------------------------------------+
+            #|Shapefiles                                              |
+            #+--------------------------------------------------------+    
             if (check_filetype_name(os.path.join(UPLOAD_FOLDER, f.filename),'shp') == True):
 
-                #########################################################
-                # Database                                              #
-                #########################################################   
+                #+--------------------------------------------------------+
+                #|Database                                                |
+                #+--------------------------------------------------------+   
                  
                 # get repositorie
                 repositorie=Repositorie.query.filter_by(repo_id=repo_id).first()
@@ -1356,9 +1364,9 @@ def fileUpload(repo_id):
                 # delete zipfile, 
                 subprocess.call("rm -rf " + os.path.join(UPLOAD_FOLDER, f.filename) + " ; rm -rf " + os.path.join(UPLOAD_FOLDER, f.filename.rsplit('.', 1)[0]), shell=True)
 
-                #########################################################
-                # GeoServer                                             #
-                #########################################################   
+                #+--------------------------------------------------------+
+                #|GeoServer                                               |
+                #+--------------------------------------------------------+   
                  
                 # geoserver env
                 GEOSERVER_URL = "http://" + url + ":" + geoserver_port + "/geoserver"
@@ -1391,16 +1399,16 @@ def fileUpload(repo_id):
 
                 return jsonify({'data_url': data_url}, 200)
 
-            #########################################################
-            # Normal Zip                                            #
-            #########################################################
+            #+--------------------------------------------------------+
+            # Normal Zip                                              |
+            #+--------------------------------------------------------+
             else:
 
                 print("zip")
         
-        #########################################################
-        # Tabular                                               #
-        #########################################################
+        #+--------------------------------------------------------+
+        #|Tabular                                                 |
+        #+--------------------------------------------------------+
         if (file_type in tabular):
                             
             # save file
@@ -1416,9 +1424,9 @@ def fileUpload(repo_id):
                 # add to panda
                 panda_data = pd.read_csv(os.path.join(UPLOAD_FOLDER, f.filename)) 
 
-            #########################################################
-            # Database                                              #
-            #########################################################   
+            #+--------------------------------------------------------+
+            #|Database                                                |
+            #+--------------------------------------------------------+   
                 
             # get repositorie
             repositorie=Repositorie.query.filter_by(repo_id=repo_id).first()
@@ -1445,9 +1453,9 @@ def fileUpload(repo_id):
     #except:
     #    return jsonify({'message': 'Something went wrong'}, 500)
 
-#########################################################
-# Download file                                         #
-#########################################################
+#+--------------------------------------------------------+
+#| Download file                                          |
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/uploads/<path:filename>", methods=['GET'])
 def download_file(filename):
 

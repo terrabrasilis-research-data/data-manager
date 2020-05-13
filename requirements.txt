@@ -14,3 +14,4 @@ passlib==1.7.2
 gsconfig-py3==1.0.7 
 pandas==1.0.3
 xlrd===1.2.0 
+requests===2.23.0
