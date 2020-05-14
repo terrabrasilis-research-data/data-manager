@@ -228,6 +228,7 @@ def update_user(user_id):
     created_on=request.json['created_on']
     last_login=request.json['last_login']
     ckan_api_key= request.json['ckan_api_key']
+
     try:
 
         q = (db.session.query(User)
@@ -1244,6 +1245,7 @@ def UserLogin():
                         'access_token': access_token,
                         'message': 'User {} log in successfully.'.format(current_user.full_name),
                         'refresh_token': refresh_token,
+                        'image': current_user.image,
                         'ckan_api_key': current_user.ckan_api_key})
     else:
         return jsonify({'message': 'Wrong credentials'})
