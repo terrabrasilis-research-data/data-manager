@@ -845,8 +845,8 @@ def read_repositories_from_user(user_id):
                 for j in range(len(r_user)):
                     if (r_user[j]['user_id'] == user_id):
                         new_json_response.setdefault("repositorie", []).append(json_response['repositorie'][i])
-
-        return jsonify(new_json_response)
+                        
+            return jsonify(new_json_response)
     except Exception as e:
 	    return(str(e))
 
@@ -1311,8 +1311,8 @@ def fileUpload(repo_id):
         file_type = f.filename.rsplit('.', 1)[1].lower()
 
         # List of file_types 
-        images = ['png', 'jpg', 'jpeg', 'gif']
-        tabular = ['csv', 'xls', 'xlsx', 'odf']
+        images = [] #images = ['png', 'jpg', 'jpeg', 'gif']
+        tabular = [] #['csv', 'xls', 'xlsx', 'odf']
 
         #+--------------------------------------------------------+
         #|Non-Geographic Images                                   |
@@ -1320,7 +1320,6 @@ def fileUpload(repo_id):
         if (file_type in images):
         
             f.save(os.path.join(UPLOAD_FOLDER, f.filename))
-
             return jsonify({'data_url': f.filename}, 200)
 
         #+--------------------------------------------------------+
@@ -1451,7 +1450,15 @@ def fileUpload(repo_id):
             panda_data.to_sql(f.filename.rsplit('.', 1)[0], engine)
 
             return jsonify({'data_url': f.filename}, 200)
-        
+       
+        #+--------------------------------------------------------+
+        #|Else                                                   |
+        #+-------------------------------------------------------+
+        else:
+
+            f.save(os.path.join(UPLOAD_FOLDER, f.filename))
+            return jsonify({'data_url': f.filename}, 200)
+
     #except:
     #    return jsonify({'message': 'Something went wrong'}, 500)
 
@@ -1469,3 +1476,4 @@ def download_file(filename):
 
 if __name__ == '__main__':
     app.run(get_env_variable("HOST_IP"), debug=True, port=8090)
+
