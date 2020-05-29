@@ -20,6 +20,10 @@ services:
         POSTGRES_USER: ${POSTGRES_USER}
         POSTGRES_PW: ${POSTGRES_PW}
         POSTGRES_DB: ${POSTGRES_DB}
+        TBRD_REPO_DB_USER: ${TBRD_REPO_DB_USER}
+        TBRD_REPO_DB_PASS: ${TBRD_REPO_DB_PASS}
+        KUBERNETES_API_PORT: ${KUBERNETES_API_PORT}
+        KUBERNETES_API_HOST: ${KUBERNETES_API_HOST}
     depends_on:
         - apidb
     links:
