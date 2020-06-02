@@ -5,10 +5,10 @@ MAINTAINER TerraBrasilis Research Data
 EXPOSE 8090
 
 # env variables
-ENV POSTGRES_URL 127.0.0.1:5431
+ENV POSTGRES_URL 127.0.0.1:5432
 ENV POSTGRES_USER postgres
 ENV POSTGRES_PW postgres
-ENV POSTGRES_DB TerraBrasilisRD
+ENV POSTGRES_DB terrabrasilisrd
 ENV HOST_IP 0.0.0.0
 
 # Install app

@@ -1,8 +1,8 @@
 # docker-compose build && docker-compose up -d
-version: "3"
+version: "3.3"
 services: 
   apidb:
-    container_name: terrabrasilisrd_db
+    container_name: data_manager_db
     restart: unless-stopped
     build:
         context: ..
@@ -11,13 +11,13 @@ services:
         POSTGRES_USER: ${POSTGRES_USER}
         POSTGRES_PASSWORD: ${POSTGRES_PW}
   api:
-    container_name: terrabrasilisrd_api
+    container_name: data_manager_api
     restart: unless-stopped
     build:
         context: ..
         dockerfile: docker/api/Dockerfile
     environment:
-        POSTGRES_URL: "apidb:5431"
+        POSTGRES_URL: "apidb:5432"
         POSTGRES_USER: ${POSTGRES_USER}
         POSTGRES_PW: ${POSTGRES_PW}
         POSTGRES_DB: ${POSTGRES_DB}
