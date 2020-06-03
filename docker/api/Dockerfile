@@ -5,11 +5,13 @@ MAINTAINER TerraBrasilis Research Data
 EXPOSE 8090
 
 # env variables
-ENV POSTGRES_URL 127.0.0.1:5432
 ENV POSTGRES_USER postgres
 ENV POSTGRES_PW postgres
 ENV POSTGRES_DB terrabrasilisrd
-ENV HOST_IP 0.0.0.0
+ENV TBRD_REPO_DB_USER geonetwork
+ENV TBRD_REPO_DB_PASS geonetwork
+ENV KUBERNETES_API_PORT 8070
+ENV KUBERNETES_API_HOST http://localhost
 
 # Install app
 COPY . /data_manager

@@ -2,14 +2,17 @@
 version: "3.3"
 services: 
   apidb:
-    container_name: data_manager_db
     restart: unless-stopped
+    container_name: data_manager_db    
     build:
         context: ..
         dockerfile: docker/postgres/Dockerfile
-    environment:        
-        POSTGRES_USER: ${POSTGRES_USER}
+    ports:
+      - "5432:5432"
+    environment:
         POSTGRES_PASSWORD: ${POSTGRES_PW}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_HOST_AUTH_METHOD: trust
   api:
     container_name: data_manager_api
     restart: unless-stopped

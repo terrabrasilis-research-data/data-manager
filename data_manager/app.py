@@ -1475,5 +1475,5 @@ def download_file(filename):
     #    return jsonify({'message': 'Something went wrong'}, 500)
 
 if __name__ == '__main__':
-    app.run(get_env_variable("HOST_IP"), debug=True, port=8090)
+    app.run('0.0.0.0', debug=True, port=8090)
 
