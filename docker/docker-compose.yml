@@ -9,10 +9,8 @@ services:
         dockerfile: docker/postgres/Dockerfile
     ports:
       - "5432:5432"
-    environment:
-        POSTGRES_PASSWORD: ${POSTGRES_PW}
-        POSTGRES_USER: ${POSTGRES_USER}
-        POSTGRES_HOST_AUTH_METHOD: trust
+    env_file:
+        - app-variables.env       
   api:
     container_name: data_manager_api
     restart: unless-stopped
@@ -21,16 +19,13 @@ services:
         dockerfile: docker/api/Dockerfile
     environment:
         POSTGRES_URL: "apidb:5432"
-        POSTGRES_USER: ${POSTGRES_USER}
-        POSTGRES_PW: ${POSTGRES_PW}
-        POSTGRES_DB: ${POSTGRES_DB}
-        TBRD_REPO_DB_USER: ${TBRD_REPO_DB_USER}
-        TBRD_REPO_DB_PASS: ${TBRD_REPO_DB_PASS}
-        KUBERNETES_API_PORT: ${KUBERNETES_API_PORT}
-        KUBERNETES_API_HOST: ${KUBERNETES_API_HOST}
     depends_on:
         - apidb
     links:
         - apidb
     ports:
         - "8090:8090"
+    env_file:
+        - app-variables.env    
+
+

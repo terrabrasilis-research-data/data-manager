@@ -39,7 +39,7 @@ def get_env_variable(name):
 #values
 POSTGRES_URL = get_env_variable("POSTGRES_URL")
 POSTGRES_USER = get_env_variable("POSTGRES_USER")
-POSTGRES_PW = get_env_variable("POSTGRES_PW")
+POSTGRES_PW = get_env_variable("POSTGRES_PASSWORD")
 POSTGRES_DB = get_env_variable("POSTGRES_DB")
 TBRD_REPO_DB_USER = get_env_variable("TBRD_REPO_DB_USER")
 TBRD_REPO_DB_PASS = get_env_variable("TBRD_REPO_DB_PASS")
