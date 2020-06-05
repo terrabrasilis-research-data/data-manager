@@ -3,7 +3,7 @@ version: "3.3"
 services: 
   apidb:
     restart: unless-stopped
-    container_name: data_manager_db    
+    container_name: terrabrasilisrd_db    
     build:
         context: ..
         dockerfile: docker/postgres/Dockerfile
@@ -12,7 +12,7 @@ services:
     env_file:
         - app-variables.env       
   api:
-    container_name: data_manager_api
+    container_name: terrabrasilisrd_api
     restart: unless-stopped
     build:
         context: ..

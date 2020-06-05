@@ -51,7 +51,7 @@ UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
 
 #app
 app = Flask(__name__)
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+cors = CORS(app)
 
 app.config['JSON_SORT_KEYS'] = False
 app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
@@ -638,7 +638,7 @@ def create_repositorie():
     created_on = request.json['created_on']
     services = request.json['services']
     
-    r = requests.put(KUBERNETES_API_HOST+':'+KUBERNETES_API_PORT+'/api/v1.0/create', json ={'namespace': path, 'services': services}, headers={'Content-type': 'application/json', 'Accept': 'text/plain'}) 
+    #r = requests.put(KUBERNETES_API_HOST+':'+KUBERNETES_API_PORT+'/api/v1.0/create', json ={'namespace': path, 'services': services}, headers={'Content-type': 'application/json', 'Accept': 'text/plain'}) 
 
     try:
         repositorie=Repositorie(
@@ -751,12 +751,16 @@ def read_repositories():
 #+--------------------------------------------------------+ 
 @app.route("/api/v1.0/repositories_from_user/<int:user_id>", methods=['GET'])
 def read_repositories_from_user(user_id):
-    try:
+    try:    
         #query all
         repositories=Repositorie.query.all()
        
         #get lists
         data = ([(make_public_repositorie(e.serialize())) for e in repositories])
+        
+        if(len(data) == 0):
+            return jsonify([])
+
         id_data = ([e.serialize() for e in repositories])
         
         #create data dict
@@ -765,7 +769,7 @@ def read_repositories_from_user(user_id):
             json_data.setdefault('repositorie', []).append(val)
         
         lista = []
-
+        
         #create response dict
         json_response = {}
         for i in range(len(data)):
@@ -820,7 +824,7 @@ def read_repositories_from_user(user_id):
                 for val in por: 
                     json_ports.setdefault('ports', []).append(val['port'])
 
-                json_ser['services'][n].update({ "ports" : json_ports['ports'] })
+                json_ser['services'][n].update({ "ports" : str(json_ports['ports']) })
 
                 json_ser['services'][n].update({ "address" : str(hos[0]['address']) })
                 del json_ser['services'][n]['host_id']
@@ -845,7 +849,7 @@ def read_repositories_from_user(user_id):
                 for j in range(len(r_user)):
                     if (r_user[j]['user_id'] == user_id):
                         new_json_response.setdefault("repositorie", []).append(json_response['repositorie'][i])
-                        
+
             return jsonify(new_json_response)
     except Exception as e:
 	    return(str(e))
@@ -1077,13 +1081,17 @@ def read_groups_from_users(user_id):
        
         #get lists
         data = ([(make_public_group(e.serialize())) for e in groups])
+
+        if(len(data) == 0):
+            return jsonify([])
+
         id_data = ([e.serialize() for e in groups])
         
         #create data dict
         json_data = {}
         for val in data: 
             json_data.setdefault('groups', []).append(val)
-        
+            
         lista = []
 
         #create response dict
