@@ -11,22 +11,21 @@ To run the API on your machine, use the start.sh script.
 
 ## API run (Docker)
 
-To run the API on a container use the Dockerfile provided in the repository.
+To run the API on a container use the Docker-compose file provided in the repository.
 
-```
-docker build -t "inpe/terrabrasilisapi" .
-```
-
-After that, run the container.
-
-```
-docker run -d --name terrabrasilis_data_manager_api --restart unless-stopped \
-        -p 8090:8090 inpe/terrabrasilisapi
+```sh
+cd docker
 ```
 
-If required, the following environment variables are available.
+The following Dockerfiles are available in this directory:
 
-* `POSTGRES_URL` Database Address, with port (e.g. 127.0.0.1:5432)
-* `POSTGRES_USER`  Database user (e.g. postgres)
-* `POSTGRES_PW` Database password (e.g. password)
-* `POSTGRES_DB` Database name (e.g. terrabrasilisrd)
+- `api`: Dockerfile to load and configure the necessary environment for using the data manager api
+- `postgres`: Customized dockerfile for postgres configuration and API database initialization
+
+To use these Dockerfiles together it is possible to use the docker-compose, for this, use the following command
+
+```shell
+$ docker-compose up -d --build
+```
+
+> If necessary, the .env file helps in editing the api's connection options with the database
