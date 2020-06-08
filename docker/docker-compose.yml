@@ -7,8 +7,6 @@ services:
     build:
         context: ..
         dockerfile: docker/postgres/Dockerfile
-    ports:
-      - "5432:5432"
     env_file:
         - app-variables.env       
   api:
