@@ -43,8 +43,9 @@ POSTGRES_PW = get_env_variable("POSTGRES_PASSWORD")
 POSTGRES_DB = get_env_variable("POSTGRES_DB")
 TBRD_REPO_DB_USER = get_env_variable("TBRD_REPO_DB_USER")
 TBRD_REPO_DB_PASS = get_env_variable("TBRD_REPO_DB_PASS")
+API_HOST = get_env_variable("API_HOST")
 KUBERNETES_API_PORT = get_env_variable("KUBERNETES_API_PORT")
-KUBERNETES_API_HOST = get_env_variable("KUBERNETES_API_HOST")
+CKAN_API_PORT = get_env_variable("CKAN_API_PORT")
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
@@ -1482,6 +1483,27 @@ def download_file(filename):
     #except:
     #    return jsonify({'message': 'Something went wrong'}, 500)
 
+#+--------------------------------------------------------+
+#| BBox Search                                            |
+#+--------------------------------------------------------+ 
+@app.route("/api/v1.0/bbox_search", methods=['GET']) #POST
+def bbox_search():
+    #if not request.json or not 'bbox' in request.json:
+    #    abort(400)
+    #bbox=request.json['bbox']
+    try:
+        
+        bbox = json.loads('{"type": "Polygon","coordinates": [[[100,0],[101,0],[101,1],[100,1],[100,0]]]}')
+
+        r = requests.get(API_HOST+':'+CKAN_API_PORT+'/api/3/action/package_search') 
+        json_request = r.json()
+
+        return jsonify(json_request)
+
+    except Exception as e:
+	    return(str(e))
+
 if __name__ == '__main__':
     app.run('0.0.0.0', debug=True, port=8090)
+
 
