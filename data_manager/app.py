@@ -10,6 +10,7 @@ from flask_jwt_extended import JWTManager
 from flask_httpauth import HTTPBasicAuth
 from flask_sqlalchemy import SQLAlchemy
 from geoserver.catalog import Catalog
+from geojson import Feature, Point
 from flask import Flask, jsonify
 from flask import make_response
 from zipfile import ZipFile
@@ -24,6 +25,7 @@ import argparse
 import requests
 import datetime
 import os.path 
+import geojson
 import json
 import xlrd
 import os 
@@ -88,6 +90,29 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # silence the deprecation w
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 db = SQLAlchemy(app)
+
+#check_bbox
+def check_bbox(spatial, bbox):
+    
+    #geojson
+    spatial = geojson.loads(spatial)
+    bbox = geojson.loads(bbox)
+    
+    # create db engine
+    engine = create_engine(DB_URL)
+    
+    #connect
+    with engine.connect() as con:
+        rs = con.execute('SELECT ST_Contains(ST_GeomFromGeoJSON($$'+str(bbox[0].geometry)+'$$), ST_GeomFromGeoJSON($$'+str(spatial[0].geometry)+'$$))')
+        for row in rs:
+            return(row[0])  
+
+#check_spatial
+def check_spatial(in_json, bbox):
+    for extra_item in in_json['extras']:
+        if extra_item['key'] == 'spatial':
+            return check_bbox(extra_item['value'], bbox)
+    return False
 
 #errorhandler
 @app.errorhandler(404)
@@ -1486,19 +1511,34 @@ def download_file(filename):
 #+--------------------------------------------------------+
 #| BBox Search                                            |
 #+--------------------------------------------------------+ 
-@app.route("/api/v1.0/bbox_search", methods=['GET']) #POST
+@app.route("/api/v1.0/bbox_search", methods=['POST']) 
 def bbox_search():
-    #if not request.json or not 'bbox' in request.json:
-    #    abort(400)
-    #bbox=request.json['bbox']
+    if not request.json or not 'bbox' in request.json:
+        abort(400)
+    bbox=request.json['bbox']
+
     try:
+
+        bbox = bbox.replace("'",'"')
+
+        #request from CKAN
+        #r = requests.get(API_HOST+':'+CKAN_API_PORT+'/api/3/action/package_search') 
+
+        #json_request = r.json()
+
+        with open('../scripts/package_search.json') as f:
+            json_request = json.load(f)
+
+        #variables
+        datasets_spatial = {}
         
-        bbox = json.loads('{"type": "Polygon","coordinates": [[[100,0],[101,0],[101,1],[100,1],[100,0]]]}')
+        for item in json_request['result']['results']:
+            if(check_spatial(item, bbox)):
+                datasets_spatial.update(item)
 
-        r = requests.get(API_HOST+':'+CKAN_API_PORT+'/api/3/action/package_search') 
-        json_request = r.json()
+        return_dict = dict(help="http://localhost:5000/api/3/action/help_show?name=package_search", success="true", result = dict(count= len([datasets_spatial]), sort= "score desc, metadata_modified desc", facets={}, results=[datasets_spatial]))
 
-        return jsonify(json_request)
+        return jsonify(return_dict)
 
     except Exception as e:
 	    return(str(e))
