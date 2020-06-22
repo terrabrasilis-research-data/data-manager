@@ -15,3 +15,4 @@ gsconfig-py3==1.0.7
 xlrd===1.2.0 
 requests===2.23.0
 pandas==1.0.3
+geojson==2.5.0

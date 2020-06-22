@@ -1511,35 +1511,20 @@ def download_file(filename):
 #+--------------------------------------------------------+
 #| BBox Search                                            |
 #+--------------------------------------------------------+ 
-@app.route("/api/v1.0/bbox_search", methods=['POST']) 
-def bbox_search():
-    if not request.json or not 'bbox' in request.json:
+@app.route("/api/v1.0/bbox_search/<string:bbox>", methods=['POST']) 
+def bbox_search(bbox):
+    if not request.json:
         abort(400)
-    bbox=request.json['bbox']
-
+    bbox=bbox.replace("'",'"')
+    datasets=request.json
     try:
-
-        bbox = bbox.replace("'",'"')
-
-        #request from CKAN
-        #r = requests.get(API_HOST+':'+CKAN_API_PORT+'/api/3/action/package_search') 
-
-        #json_request = r.json()
-
-        with open('../scripts/package_search.json') as f:
-            json_request = json.load(f)
-
-        #variables
-        datasets_spatial = {}
-        
-        for item in json_request['result']['results']:
+        datasets_spatial = {}    
+        for item in datasets['result']['results']:
             if(check_spatial(item, bbox)):
                 datasets_spatial.update(item)
-
         return_dict = dict(help="http://localhost:5000/api/3/action/help_show?name=package_search", success="true", result = dict(count= len([datasets_spatial]), sort= "score desc, metadata_modified desc", facets={}, results=[datasets_spatial]))
 
         return jsonify(return_dict)
-
     except Exception as e:
 	    return(str(e))
 
