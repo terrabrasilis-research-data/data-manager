@@ -24,11 +24,11 @@ import subprocess
 import argparse
 import requests
 import datetime
-import os.path 
+import os.path
 import geojson
 import json
 import xlrd
-import os 
+import os
 
 #env
 def get_env_variable(name):
@@ -55,6 +55,8 @@ UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
 #app
 app = Flask(__name__)
 cors = CORS(app)
+
+db.init_app(app)
 
 app.config['JSON_SORT_KEYS'] = False
 app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
@@ -89,30 +91,33 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # silence the deprecation warning
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-db = SQLAlchemy(app)
-
 #check_bbox
 def check_bbox(spatial, bbox):
-    
+
     #geojson
     spatial = geojson.loads(spatial)
     bbox = geojson.loads(bbox)
-    
+
+    if (bbox['type'] == 'FeatureCollection'):
+        bbox = bbox['features'][0]
+
     # create db engine
     engine = create_engine(DB_URL)
-    
+
     #connect
     with engine.connect() as con:
-        rs = con.execute('SELECT ST_Contains(ST_GeomFromGeoJSON($$'+str(bbox[0].geometry)+'$$), ST_GeomFromGeoJSON($$'+str(spatial[0].geometry)+'$$))')
+        rs = con.execute('SELECT ST_Contains(ST_GeomFromGeoJSON($$'+str(bbox.geometry)+'$$), ST_GeomFromGeoJSON($$'+str(spatial.geometry)+'$$))')
         for row in rs:
-            return(row[0])  
+            return(row[0])
 
 #check_spatial
 def check_spatial(in_json, bbox):
-    for extra_item in in_json['extras']:
-        if extra_item['key'] == 'spatial':
-            return check_bbox(extra_item['value'], bbox)
-    return False
+    try:
+        for extra_item in in_json['extras']:
+            if extra_item['key'] == 'spatial':
+                return check_bbox(extra_item['value'], bbox)
+    except:
+        return False
 
 #errorhandler
 @app.errorhandler(404)
@@ -162,8 +167,8 @@ def get_shapefile_name(path):
         for elem in listOfiles:
             if(elem.rsplit('.', 1)[1].lower() == 'shp'):
                 return elem
-		
-#check if filetype 
+
+#check if filetype
 def check_filetype_name(path, ftype):
     with ZipFile(path, 'r') as zipObj:
         listOfiles = zipObj.namelist()
@@ -174,10 +179,10 @@ def check_filetype_name(path, ftype):
             return True
         else:
             return False
-		
+
 #+--------------------------------------------------------+
 #| Create users                                           |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route('/api/v1.0/users', methods=['POST'])
 def create_user():
     if not request.json or not 'username' and 'password' and 'image' and "full_name" and "email" and "created_on" and "last_login" and 'ckan_api_key' in request.json:
@@ -203,7 +208,7 @@ def create_user():
         )
         db.session.add(user)
         db.session.commit()
- 
+
         access_token = create_access_token(identity = request.json['username'], expires_delta = datetime.timedelta(days=365))
         refresh_token = create_refresh_token(identity = request.json['username'], expires_delta = datetime.timedelta(days=365))
 
@@ -212,13 +217,13 @@ def create_user():
             'access_token': access_token,
             'refresh_token': refresh_token,
             'ckan_api_key': request.json['ckan_api_key']})
-           
+
     except Exception as e:
         return(str(e))
-		
+
 #+--------------------------------------------------------+
 #| Read users                                             |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/users")
 def read_users():
     try:
@@ -226,10 +231,10 @@ def read_users():
         return jsonify([make_public_user(e.serialize()) for e in users])
     except Exception as e:
 	    return(str(e))
-		
+
 #+--------------------------------------------------------+
 #| Read user                                              |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/users/<int:user_id>", methods=['GET'])
 def read_user(user_id):
     try:
@@ -240,7 +245,7 @@ def read_user(user_id):
 
 #+--------------------------------------------------------+
 #| Update user                                            |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/users/<int:user_id>", methods=['PUT'])
 @jwt_required
 def update_user(user_id):
@@ -279,7 +284,7 @@ def update_user(user_id):
 
 #+--------------------------------------------------------+
 #| Delete user                                            |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/users/<int:user_id>", methods=['DELETE'])
 @jwt_required
 def delete_user(user_id):
@@ -293,7 +298,7 @@ def delete_user(user_id):
 
 #+--------------------------------------------------------+
 #| Create group repository                                |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route('/api/v1.0/group_repositorie_rel', methods=['POST'])
 @jwt_required
 def create_group_repositorie_rel():
@@ -314,7 +319,7 @@ def create_group_repositorie_rel():
 
 #+--------------------------------------------------------+
 #| Read group repositorie                                 |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route('/api/v1.0/group_repositorie_rel/<int:repo_id>', methods=['GET'])
 def read_group_repositorie_rel(repo_id):
     try:
@@ -325,7 +330,7 @@ def read_group_repositorie_rel(repo_id):
 
 #+--------------------------------------------------------+
 #| Delete group repositorie                               |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/group_repositorie_rel/<int:group_id>/<int:repo_id>", methods=['DELETE'])
 @jwt_required
 def delete_group_repositorie_rel(group_id,repo_id):
@@ -339,7 +344,7 @@ def delete_group_repositorie_rel(group_id,repo_id):
 
 #+--------------------------------------------------------+
 #| Create user group                                      |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route('/api/v1.0/user_group_rel', methods=['POST'])
 @jwt_required
 def create_user_group_rel():
@@ -360,7 +365,7 @@ def create_user_group_rel():
 
 #+--------------------------------------------------------+
 #| Delete user group                                      |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/user_group_rel/<int:user_id>/<int:group_id>", methods=['DELETE'])
 @jwt_required
 def delete_user_group_rel(user_id,group_id):
@@ -374,7 +379,7 @@ def delete_user_group_rel(user_id,group_id):
 
 #+--------------------------------------------------------+
 #| Create services                                        |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route('/api/v1.0/services', methods=['POST'])
 @jwt_required
 def create_service():
@@ -384,7 +389,7 @@ def create_service():
     machine=request.json['machine']
     host_id=request.json['host_id']
     created_on=request.json['created_on']
-    
+
     try:
         service=Service(
             name=name,
@@ -401,7 +406,7 @@ def create_service():
 
 #+--------------------------------------------------------+
 #| Read services                                          |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/services", methods=['GET'])
 def read_services():
     try:
@@ -409,11 +414,11 @@ def read_services():
         return jsonify([make_public_service(e.serialize()) for e in services])
 
     except Exception as e:
-	    return(str(e))	
-        
+	    return(str(e))
+
 #+--------------------------------------------------------+
 #| Read service                                           |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/services/<int:service_id>", methods=['GET'])
 def read_service(service_id):
     try:
@@ -421,10 +426,10 @@ def read_service(service_id):
         return jsonify(service.serialize())
     except Exception as e:
 	    return(str(e))
-        
+
 #+--------------------------------------------------------+
 #| Delete service                                         |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/services/<int:service_id>", methods=['DELETE'])
 @jwt_required
 def delete_service(service_id):
@@ -435,10 +440,10 @@ def delete_service(service_id):
         return jsonify({'result': True})
     except Exception as e:
 	    return(str(e))
-        
+
 #+--------------------------------------------------------+
 #| Create service repository                              |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route('/api/v1.0/service_repositorie_rel', methods=['POST'])
 @jwt_required
 def create_service_repositorie_rel():
@@ -456,10 +461,10 @@ def create_service_repositorie_rel():
         return jsonify({'result': True})
     except Exception as e:
         return(str(e))
-        
+
 #+--------------------------------------------------------+
 #| Delete service repository                              |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/service_repositorie_rel/<int:service_id>/<int:repo_id>", methods=['DELETE'])
 @jwt_required
 def delete_service_repositorie_rel(service_id,repo_id):
@@ -473,7 +478,7 @@ def delete_service_repositorie_rel(service_id,repo_id):
 
 #+--------------------------------------------------------+
 #| Read categorie                                         |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/categories", methods=['GET'])
 def read_categories():
     try:
@@ -485,7 +490,7 @@ def read_categories():
 
 #+--------------------------------------------------------+
 #| Create categorie                                       |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route('/api/v1.0/categories', methods=['POST'])
 @jwt_required
 def create_categorie():
@@ -504,7 +509,7 @@ def create_categorie():
 
 #+--------------------------------------------------------+
 #| Create categorie repository                            |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route('/api/v1.0/categorie_repositorie_rel', methods=['POST'])
 @jwt_required
 def create_categorie_repositorie_rel():
@@ -525,7 +530,7 @@ def create_categorie_repositorie_rel():
 
 #+--------------------------------------------------------+
 #| Delete categorie repository                            |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/categorie_repositorie_rel/<int:categorie_id>/<int:repo_id>", methods=['DELETE'])
 @jwt_required
 def delete_categorie_repositorie_rel(categorie_id,repo_id):
@@ -539,7 +544,7 @@ def delete_categorie_repositorie_rel(categorie_id,repo_id):
 
 #+--------------------------------------------------------+
 #| Create services port                                   |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route('/api/v1.0/service_port_rel', methods=['POST'])
 @jwt_required
 def create_service_port_rel():
@@ -560,7 +565,7 @@ def create_service_port_rel():
 
 #+--------------------------------------------------------+
 #| Create services host                                   |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route('/api/v1.0/service_host_rel', methods=['POST'])
 @jwt_required
 def create_service_host_rel():
@@ -581,7 +586,7 @@ def create_service_host_rel():
 
 #+--------------------------------------------------------+
 #| Read hosts                                             |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/hosts", methods=['GET'])
 def read_hosts():
     try:
@@ -593,7 +598,7 @@ def read_hosts():
 
 #+--------------------------------------------------------+
 #| Create hosts                                           |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route('/api/v1.0/hosts', methods=['POST'])
 @jwt_required
 def create_host():
@@ -618,11 +623,11 @@ def create_host():
 
 #+--------------------------------------------------------+
 #| Read ports                                             |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/ports/<int:repo_id>", methods=['GET'])
 def read_ports(repo_id):
     try:
-        
+
         #create lists
         list_ser = []
         list_por = []
@@ -649,7 +654,7 @@ def read_ports(repo_id):
 
 #+--------------------------------------------------------+
 #| Create repository                                      |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route('/api/v1.0/repositories', methods=['POST'])
 @jwt_required
 def create_repositorie():
@@ -663,8 +668,8 @@ def create_repositorie():
     maintainer = request.json['maintainer']
     created_on = request.json['created_on']
     services = request.json['services']
-    
-    #r = requests.put(KUBERNETES_API_HOST+':'+KUBERNETES_API_PORT+'/api/v1.0/create', json ={'namespace': path, 'services': services}, headers={'Content-type': 'application/json', 'Accept': 'text/plain'}) 
+
+    #r = requests.put(KUBERNETES_API_HOST+':'+KUBERNETES_API_PORT+'/api/v1.0/create', json ={'namespace': path, 'services': services}, headers={'Content-type': 'application/json', 'Accept': 'text/plain'})
 
     try:
         repositorie=Repositorie(
@@ -683,22 +688,22 @@ def create_repositorie():
 
 #+--------------------------------------------------------+
 #| Read repositories                                      |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/repositories", methods=['GET'])
 def read_repositories():
     try:
         #query all
         repositories=Repositorie.query.all()
-       
+
         #get lists
         data = ([(make_public_repositorie(e.serialize())) for e in repositories])
         id_data = ([e.serialize() for e in repositories])
-        
+
         #create data dict
         json_data = {}
-        for val in data: 
+        for val in data:
             json_data.setdefault('repositorie', []).append(val)
-        
+
         lista = []
 
         #create response dict
@@ -713,7 +718,7 @@ def read_repositories():
             #create lists
             repo_ser = Repositorie_Service.query.filter(Repositorie_Service.repo_id.in_([id_data[i]['repo_id']]))
             r_ser = ([e.serialize() for e in repo_ser])
-          
+
             repo_cat = Repositorie_Categorie.query.filter(Repositorie_Categorie.repo_id.in_([id_data[i]['repo_id']]))
             r_cat = ([e.serialize() for e in repo_cat])
 
@@ -722,21 +727,21 @@ def read_repositories():
 
             for l in range(len(r_cat)):
                 list_cat.append(r_cat[l]['categorie_id'])
-  
+
             #create categories dict
             categories=Categorie.query.filter(Categorie.categorie_id.in_(list_cat))
             cate = ([e.serialize() for e in categories])
             json_cate = {}
-            for val in cate: 
+            for val in cate:
                 json_cate.setdefault('categories', []).append(val['name'])
-            
+
             #create services dict
             services = Service.query.filter(Service.service_id.in_(list_ser))
             ser = ([make_public_service(e.serialize()) for e in services])
             json_ser = {}
-            for val in ser: 
+            for val in ser:
                 json_ser.setdefault('services', []).append(val)
-            
+
             for n in range(len(ser)):
                 hosts = Host.query.filter(Host.host_id.in_([json_ser['services'][n]['host_id']]))
                 hos = ([e.serialize() for e in hosts])
@@ -752,7 +757,7 @@ def read_repositories():
                 por = ([e.serialize() for e in ports])
 
                 json_ports = {}
-                for val in por: 
+                for val in por:
                     json_ports.setdefault('ports', []).append(val['port'])
 
                 json_ser['services'][n].update({ "ports" : json_ports['ports'] })
@@ -761,7 +766,7 @@ def read_repositories():
                 del json_ser['services'][n]['host_id']
                 del json_ser['services'][n]['machine']
                 del json_ser['services'][n]['service_id']
-               
+
             #compose
             json_data['repositorie'][i].update({"services": json_ser['services']})
             json_data['repositorie'][i].update({"categories": json_cate['categories']})
@@ -774,28 +779,28 @@ def read_repositories():
 
 #+--------------------------------------------------------+
 #| Read repositories from user                            |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/repositories_from_user/<int:user_id>", methods=['GET'])
 def read_repositories_from_user(user_id):
-    try:    
+    try:
         #query all
         repositories=Repositorie.query.all()
-       
+
         #get lists
         data = ([(make_public_repositorie(e.serialize())) for e in repositories])
-        
+
         if(len(data) == 0):
             return jsonify([])
 
         id_data = ([e.serialize() for e in repositories])
-        
+
         #create data dict
         json_data = {}
-        for val in data: 
+        for val in data:
             json_data.setdefault('repositorie', []).append(val)
-        
+
         lista = []
-        
+
         #create response dict
         json_response = {}
         for i in range(len(data)):
@@ -808,7 +813,7 @@ def read_repositories_from_user(user_id):
             #create lists
             repo_ser = Repositorie_Service.query.filter(Repositorie_Service.repo_id.in_([id_data[i]['repo_id']]))
             r_ser = ([e.serialize() for e in repo_ser])
-          
+
             repo_cat = Repositorie_Categorie.query.filter(Repositorie_Categorie.repo_id.in_([id_data[i]['repo_id']]))
             r_cat = ([e.serialize() for e in repo_cat])
 
@@ -817,21 +822,21 @@ def read_repositories_from_user(user_id):
 
             for l in range(len(r_cat)):
                 list_cat.append(r_cat[l]['categorie_id'])
-  
+
             #create categories dict
             categories=Categorie.query.filter(Categorie.categorie_id.in_(list_cat))
             cate = ([e.serialize() for e in categories])
             json_cate = {}
-            for val in cate: 
+            for val in cate:
                 json_cate.setdefault('categories', []).append(val['name'])
-            
+
             #create services dict
             services = Service.query.filter(Service.service_id.in_(list_ser))
             ser = ([make_public_service(e.serialize()) for e in services])
             json_ser = {}
-            for val in ser: 
+            for val in ser:
                 json_ser.setdefault('services', []).append(val)
-            
+
             for n in range(len(ser)):
                 hosts = Host.query.filter(Host.host_id.in_([json_ser['services'][n]['host_id']]))
                 hos = ([e.serialize() for e in hosts])
@@ -847,7 +852,7 @@ def read_repositories_from_user(user_id):
                 por = ([e.serialize() for e in ports])
 
                 json_ports = {}
-                for val in por: 
+                for val in por:
                     json_ports.setdefault('ports', []).append(val['port'])
 
                 json_ser['services'][n].update({ "ports" : str(json_ports['ports']) })
@@ -856,22 +861,22 @@ def read_repositories_from_user(user_id):
                 del json_ser['services'][n]['host_id']
                 del json_ser['services'][n]['machine']
                 del json_ser['services'][n]['service_id']
-               
+
             #compose
             json_data['repositorie'][i].update({"services": json_ser['services']})
             json_data['repositorie'][i].update({"categories": json_cate['categories']})
             json_response.setdefault("repositorie", []).append(json_data['repositorie'][i])
-       
+
             #create new response dict
             new_json_response = {}
             for i in range(len(json_response['repositorie'])):
-                
+
                 group_repositorie=Repositorie_Group.query.filter_by(repo_id = json_response['repositorie'][i]['repo_id']).first()
                 group_repo_json = group_repositorie.serialize()
-        
+
                 grup_usr = Groups_User.query.filter(Groups_User.group_id.in_([ group_repo_json['group_id'] ]))
                 r_user = ([e.serialize() for e in grup_usr])
-                
+
                 for j in range(len(r_user)):
                     if (r_user[j]['user_id'] == user_id):
                         new_json_response.setdefault("repositorie", []).append(json_response['repositorie'][i])
@@ -882,23 +887,23 @@ def read_repositories_from_user(user_id):
 
 #+--------------------------------------------------------+
 #| Read repository                                        |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/repositories/<int:repo_id>", methods=['GET'])
 def read_repositorie(repo_id):
     try:
-        
+
         #query single id
         repositories=Repositorie.query.filter_by(repo_id=repo_id).first()
 
         #create data dict
         json_data = (repositories.serialize())
-        
+
         #create lists
         list_ser = []
         list_cat = []
         list_key = []
 
-        #create lists 
+        #create lists
         repo_ser = Repositorie_Service.query.filter(Repositorie_Service.repo_id.in_([repo_id]))
         r_ser = ([e.serialize() for e in repo_ser])
 
@@ -915,14 +920,14 @@ def read_repositorie(repo_id):
         categories=Categorie.query.filter(Categorie.categorie_id.in_(list_cat))
         cate = ([e.serialize() for e in categories])
         json_cate = {}
-        for val in cate: 
+        for val in cate:
             json_cate.setdefault('categories', []).append(val['name'])
-        
+
         #create services dict
         services = Service.query.filter(Service.service_id.in_(list_ser))
         ser = ([make_public_service(e.serialize()) for e in services])
         json_ser = {}
-        for val in ser: 
+        for val in ser:
             json_ser.setdefault('services', []).append(val)
 
         for n in range(len(ser)):
@@ -938,9 +943,9 @@ def read_repositorie(repo_id):
 
             ports = Port.query.filter(Port.port_id.in_(list_por))
             por = ([e.serialize() for e in ports])
-            
+
             json_ports = {}
-            for val in por: 
+            for val in por:
                 json_ports.setdefault('ports', []).append(val['port'])
 
             json_ser['services'][n].update({ "ports" : json_ports['ports'] })
@@ -949,7 +954,7 @@ def read_repositorie(repo_id):
             del json_ser['services'][n]['host_id']
             del json_ser['services'][n]['machine']
             del json_ser['services'][n]['service_id']
-            
+
         #create response dict
         json_response = {}
         json_data.update(json_ser)
@@ -963,7 +968,7 @@ def read_repositorie(repo_id):
 
 #+--------------------------------------------------------+
 #| Update repository                                      |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route('/api/v1.0/repositories/<int:repo_id>', methods=['PUT'])
 @jwt_required
 def update_repositorie(repo_id):
@@ -995,7 +1000,7 @@ def update_repositorie(repo_id):
 
 #+--------------------------------------------------------+
 #| Delete repository                                      |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/repositories/<int:repo_id>", methods=['DELETE'])
 @jwt_required
 def delete_repositorie(repo_id):
@@ -1009,13 +1014,13 @@ def delete_repositorie(repo_id):
 
 #+--------------------------------------------------------+
 #| Create group                                           |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/groups", methods=['POST'])
 @jwt_required
 def create_group():
     if not request.json or not 'name' and 'abstract' and 'maintainer' and 'created_on' and 'language' and 'image' and 'ckan_group_id' in request.json:
         abort(400)
-    
+
     name = request.json['name']
     abstract = request.json['abstract']
     maintainer = request.json['maintainer']
@@ -1023,7 +1028,7 @@ def create_group():
     ckan_group_id = request.json['ckan_group_id']
     language = request.json['language']
     image = request.json['image']
-    
+
     try:
         group=Group(
             name = name,
@@ -1036,7 +1041,7 @@ def create_group():
 
         )
         db.session.add(group)
-        db.session.commit()        
+        db.session.commit()
         group=Group.query.filter_by(name = request.json['name'], abstract = request.json['abstract'])
         return jsonify([e.serialize() for e in group])
     except Exception as e:
@@ -1044,22 +1049,22 @@ def create_group():
 
 #+--------------------------------------------------------+
 #| Read groups                                            |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/groups", methods=['GET'])
 def read_groups():
     try:
         #query all
         groups=Group.query.all()
-       
+
         #get lists
         data = ([(make_public_group(e.serialize())) for e in groups])
         id_data = ([e.serialize() for e in groups])
-        
+
         #create data dict
         json_data = {}
-        for val in data: 
+        for val in data:
             json_data.setdefault('groups', []).append(val)
-        
+
         lista = []
 
         #create response dict
@@ -1068,7 +1073,7 @@ def read_groups():
 
             #create lists
             list_user = []
-          
+
             #create lists
             grup_usr = Groups_User.query.filter(Groups_User.group_id.in_([id_data[i]['group_id']]))
 
@@ -1079,12 +1084,12 @@ def read_groups():
 
             #create users dict
             users=User.query.filter(User.user_id.in_(list_user))
-            
+
             members = ([make_public_user(e.serialize()) for e in users])
 
             json_users = {}
 
-            for val in members: 
+            for val in members:
                 json_users.setdefault('users', []).append(val)
 
             #compose
@@ -1098,13 +1103,13 @@ def read_groups():
 
 #+--------------------------------------------------------+
 #| Read groups from user                                  |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/groups_from_user/<int:user_id>", methods=['GET'])
 def read_groups_from_users(user_id):
     try:
         #query all
         groups=Group.query.all()
-       
+
         #get lists
         data = ([(make_public_group(e.serialize())) for e in groups])
 
@@ -1112,12 +1117,12 @@ def read_groups_from_users(user_id):
             return jsonify([])
 
         id_data = ([e.serialize() for e in groups])
-        
+
         #create data dict
         json_data = {}
-        for val in data: 
+        for val in data:
             json_data.setdefault('groups', []).append(val)
-            
+
         lista = []
 
         #create response dict
@@ -1126,7 +1131,7 @@ def read_groups_from_users(user_id):
 
             #create lists
             list_user = []
-          
+
             #create lists
             grup_usr = Groups_User.query.filter(Groups_User.group_id.in_([id_data[i]['group_id']]))
 
@@ -1137,12 +1142,12 @@ def read_groups_from_users(user_id):
 
             #create users dict
             users=User.query.filter(User.user_id.in_(list_user))
-            
+
             members = ([make_public_user(e.serialize()) for e in users])
 
             json_users = {}
 
-            for val in members: 
+            for val in members:
                 json_users.setdefault('users', []).append(val)
 
             #compose
@@ -1163,11 +1168,11 @@ def read_groups_from_users(user_id):
 
 #+--------------------------------------------------------+
 #| Read group                                             |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/groups/<int:group_id>", methods=['GET'])
 def read_group(group_id):
     try:
-        
+
         #query single id
         groups=Group.query.filter_by(group_id=group_id).first()
 
@@ -1177,7 +1182,7 @@ def read_group(group_id):
         #create lists
         list_user = []
 
-        #create lists 
+        #create lists
         grup_usr = Groups_User.query.filter(Groups_User.group_id.in_([group_id]))
         r_user = ([e.serialize() for e in grup_usr])
 
@@ -1188,7 +1193,7 @@ def read_group(group_id):
         users=User.query.filter(User.user_id.in_(list_user))
         members = ([make_public_user(e.serialize()) for e in users])
         json_users = {}
-        for val in members: 
+        for val in members:
             json_users.setdefault('users', []).append(val)
 
         #create response dict
@@ -1203,7 +1208,7 @@ def read_group(group_id):
 
 #+--------------------------------------------------------+
 #| Update group                                           |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route('/api/v1.0/groups/<int:group_id>', methods=['PUT'])
 @jwt_required
 def update_group(group_id):
@@ -1241,7 +1246,7 @@ def update_group(group_id):
 
 #+--------------------------------------------------------+
 #| Delete group                                           |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/groups/<int:group_id>", methods=['DELETE'])
 @jwt_required
 def delete_group(group_id):
@@ -1255,7 +1260,7 @@ def delete_group(group_id):
 
 #+--------------------------------------------------------+
 #| Login                                                  |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/login", methods=['POST'])
 def UserLogin():
     if not request.json or not 'username' and 'password' in request.json:
@@ -1265,16 +1270,16 @@ def UserLogin():
     password = request.json['password']
 
     current_user = User.find_by_username(request.json['username'])
-    
+
     if not current_user:
         return jsonify({'message': 'User {} doesn\'t exist'.format(request.json['username'])})
-    
+
     if User.verify_hash(request.json['password'], current_user.password):
 
         access_token = create_access_token(identity = request.json['username'], expires_delta = datetime.timedelta(days=365))
         refresh_token = create_refresh_token(identity = request.json['username'], expires_delta = datetime.timedelta(days=365))
 
-        return jsonify({'user_id': current_user.user_id, 
+        return jsonify({'user_id': current_user.user_id,
                         'full_name': current_user.full_name,
                         'access_token': access_token,
                         'message': 'User {} log in successfully.'.format(current_user.full_name),
@@ -1286,7 +1291,7 @@ def UserLogin():
 
 #+--------------------------------------------------------+
 #| Token refresh                                          |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/token/refresh", methods=['POST'])
 @jwt_refresh_token_required
 def TokenRefresh():
@@ -1297,13 +1302,13 @@ def TokenRefresh():
 
 #+--------------------------------------------------------+
 #| Logout access                                          |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/logout/access", methods=['POST'])
 @jwt_required
 def UserLogoutAccess():
     jti = get_raw_jwt()['jti']
     try:
-        
+
         revoked_token=RevokedTokenModel(
             jti = jti
         )
@@ -1316,13 +1321,13 @@ def UserLogoutAccess():
 
 #+--------------------------------------------------------+
 #| Logout refresh                                         |
-#+--------------------------------------------------------+ 
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/logout/refresh", methods=['POST'])
 @jwt_refresh_token_required
 def UserLogoutRefresh():
     jti = get_raw_jwt()['jti']
     try:
-        
+
         revoked_token=RevokedTokenModel(
             jti = jti
         )
@@ -1335,7 +1340,7 @@ def UserLogoutRefresh():
 
 #+--------------------------------------------------------+
 #| File upload                                            |
-#+--------------------------------------------------------+    
+#+--------------------------------------------------------+
 @app.route("/api/v1.0/file_upload/<int:repo_id>", methods=['POST'])
 def fileUpload(repo_id):
     #try:
@@ -1344,7 +1349,7 @@ def fileUpload(repo_id):
         f = request.files.get('file')
         file_type = f.filename.rsplit('.', 1)[1].lower()
 
-        # List of file_types 
+        # List of file_types
         images = [] #images = ['png', 'jpg', 'jpeg', 'gif']
         tabular = [] #['csv', 'xls', 'xlsx', 'odf']
 
@@ -1352,7 +1357,7 @@ def fileUpload(repo_id):
         #|Non-Geographic Images                                   |
         #+--------------------------------------------------------+
         if (file_type in images):
-        
+
             f.save(os.path.join(UPLOAD_FOLDER, f.filename))
             return jsonify({'data_url': f.filename}, 200)
 
@@ -1360,20 +1365,20 @@ def fileUpload(repo_id):
         #|Zip                                                     |
         #+--------------------------------------------------------+
         if (file_type == 'zip'):
-        
+
             # save file
             f.save(os.path.join(UPLOAD_FOLDER, f.filename))
             subprocess.call("unzip" + " " +  os.path.join(UPLOAD_FOLDER, f.filename) + " -d " + os.path.join(UPLOAD_FOLDER, f.filename.rsplit('.', 1)[0]), shell=True)
 
             #+--------------------------------------------------------+
             #|Shapefiles                                              |
-            #+--------------------------------------------------------+    
+            #+--------------------------------------------------------+
             if (check_filetype_name(os.path.join(UPLOAD_FOLDER, f.filename),'shp') == True):
 
                 #+--------------------------------------------------------+
                 #|Database                                                |
-                #+--------------------------------------------------------+   
-                 
+                #+--------------------------------------------------------+
+
                 # get repositorie
                 repositorie=Repositorie.query.filter_by(repo_id=repo_id).first()
                 repo_json = (repositorie.serialize())
@@ -1395,14 +1400,14 @@ def fileUpload(repo_id):
 
                 # add shapefile to database
                 subprocess.call("export PGPASSWORD="+TBRD_REPO_DB_PASS+" ; shp2pgsql -s " + srid + " " + os.path.join(UPLOAD_FOLDER, f.filename.rsplit('.', 1)[0], shapefile_name) + " public." + shapefile_name.rsplit('.', 1)[0] + " | psql -h " + url + " -d geo_db " + " -p " + db_port + " -U " + TBRD_REPO_DB_USER, shell=True)
-                
-                # delete zipfile, 
+
+                # delete zipfile,
                 subprocess.call("rm -rf " + os.path.join(UPLOAD_FOLDER, f.filename) + " ; rm -rf " + os.path.join(UPLOAD_FOLDER, f.filename.rsplit('.', 1)[0]), shell=True)
 
                 #+--------------------------------------------------------+
                 #|GeoServer                                               |
-                #+--------------------------------------------------------+   
-                 
+                #+--------------------------------------------------------+
+
                 # geoserver env
                 GEOSERVER_URL = "http://" + url + ":" + geoserver_port + "/geoserver"
                 LAB_NAME = repo_json['path']
@@ -1410,16 +1415,16 @@ def fileUpload(repo_id):
 
                 # connect catalog
                 cat = Catalog(GEOSERVER_URL + '/rest')
-                
+
                 # create workspace
                 #ws = cat.create_workspace(LAB_NAME, LAB_URI)
-               
+
                 # create datastore
                 #ds = cat.create_datastore(LAB_NAME+'_datastore', LAB_NAME)
-               
+
                 #connect database
                 #ds.connection_parameters.update(host=url, port=db_port, database="geo_db", user=TBRD_REPO_DB_USER, passwd=TBRD_REPO_DB_PASS, dbtype='postgis', schema='public')
-               
+
                 #save
                 #cat.save(ds)
 
@@ -1440,29 +1445,29 @@ def fileUpload(repo_id):
             else:
 
                 print("zip")
-        
+
         #+--------------------------------------------------------+
         #|Tabular                                                 |
         #+--------------------------------------------------------+
         if (file_type in tabular):
-                            
+
             # save file
             f.save(os.path.join(UPLOAD_FOLDER, f.filename))
 
             if (file_type == 'xls' or file_type == 'xlsx' or file_type == 'odf'):
 
                 # add to panda
-                panda_data = pd.read_excel(os.path.join(UPLOAD_FOLDER, f.filename)) 
+                panda_data = pd.read_excel(os.path.join(UPLOAD_FOLDER, f.filename))
 
-            if (file_type == 'csv'):        
-            
+            if (file_type == 'csv'):
+
                 # add to panda
-                panda_data = pd.read_csv(os.path.join(UPLOAD_FOLDER, f.filename)) 
+                panda_data = pd.read_csv(os.path.join(UPLOAD_FOLDER, f.filename))
 
             #+--------------------------------------------------------+
             #|Database                                                |
-            #+--------------------------------------------------------+   
-                
+            #+--------------------------------------------------------+
+
             # get repositorie
             repositorie=Repositorie.query.filter_by(repo_id=repo_id).first()
             repo_json = (repositorie.serialize())
@@ -1484,7 +1489,7 @@ def fileUpload(repo_id):
             panda_data.to_sql(f.filename.rsplit('.', 1)[0], engine)
 
             return jsonify({'data_url': f.filename}, 200)
-       
+
         #+--------------------------------------------------------+
         #|Else                                                   |
         #+-------------------------------------------------------+
@@ -1510,23 +1515,22 @@ def download_file(filename):
 
 #+--------------------------------------------------------+
 #| BBox Search                                            |
-#+--------------------------------------------------------+ 
-@app.route("/api/v1.0/bbox_search/<string:bbox>", methods=['POST']) 
+#+--------------------------------------------------------+
+@app.route("/api/v1.0/bbox_search/<string:bbox>", methods=['POST'])
 def bbox_search(bbox):
     if not request.json:
         abort(400)
     bbox=bbox.replace("'",'"')
     datasets=request.json
+    datasets_spatial = []
     try:
-        datasets_spatial = {}    
         for item in datasets['result']['results']:
             if(check_spatial(item, bbox)):
-                datasets_spatial.update(item)
-        return_dict = dict(help="http://localhost:5000/api/3/action/help_show?name=package_search", success="true", result = dict(count= len([datasets_spatial]), sort= "score desc, metadata_modified desc", facets={}, results=[datasets_spatial]))
-
-        return jsonify(return_dict)
+                datasets_spatial.append(item)
+        return_dict = dict(help="http://localhost:5000/api/3/action/help_show?name=package_search", success="true", result = dict(count= len(datasets_spatial), sort= "score desc, metadata_modified desc", facets={}, results=datasets_spatial))
+        return return_dict
     except Exception as e:
-	    return(str(e))
+        return(str(e))
 
 if __name__ == '__main__':
     app.run('0.0.0.0', debug=True, port=8090)

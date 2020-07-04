@@ -1,11 +1,13 @@
 import json
-from app import db
 from geoalchemy2 import Geometry
 from geoalchemy2 import functions
 from flask.json import jsonify
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import PrimaryKeyConstraint
 from passlib.hash import pbkdf2_sha256 as sha256
 from sqlalchemy.dialects.postgresql import JSONB
+
+db = SQLAlchemy()
 
 class User(db.Model):
 
@@ -33,10 +35,10 @@ class User(db.Model):
 
     def __repr__(self):
         return '<user_id {}>'.format(self.user_id)
-    
+
     def serialize(self):
         return {
-            'user_id': self.user_id, 
+            'user_id': self.user_id,
             'username': self.username,
             'full_name': self.full_name,
             'email':self.email,
@@ -51,8 +53,8 @@ class User(db.Model):
 
     @staticmethod
     def generate_hash(password):
-        return sha256.hash(password)    
-    
+        return sha256.hash(password)
+
     @staticmethod
     def verify_hash(password, hash):
         return sha256.verify(password, hash)
@@ -75,10 +77,10 @@ class Service(db.Model):
 
     def __repr__(self):
         return '<id {}>'.format(self.service_id)
-    
+
     def serialize(self):
         return {
-            'service_id': self.service_id, 
+            'service_id': self.service_id,
             'name': self.name,
             'machine':self.machine,
             'host_id':self.host_id,
@@ -88,7 +90,7 @@ class Service(db.Model):
 class RevokedTokenModel(db.Model):
 
     __tablename__ = 'revoked_tokens'
-    
+
     id = db.Column(db.Integer, primary_key = True)
     jti = db.Column(db.String(120))
 
@@ -100,7 +102,7 @@ class RevokedTokenModel(db.Model):
 
     def serialize(self):
         return {
-            'id': self.id, 
+            'id': self.id,
             'jti': self.jti,
         }
 
@@ -141,14 +143,14 @@ class Host(db.Model):
         self.name = name
         self.address = address
         self.created_on = created_on
-        
+
     def __repr__(self):
         return '<id {}>'.format(self.id)
 
     def serialize(self):
         return {
-            'host_id': self.host_id, 
-            'name': self.name, 
+            'host_id': self.host_id,
+            'name': self.name,
             'address': self.address,
             'created_on': self.created_on
         }
@@ -159,7 +161,7 @@ class Port(db.Model):
 
     port_id = db.Column(db.Integer, primary_key=True)
     port = db.Column(db.String(10), unique=False, nullable=False)
-    
+
     def __init__(self, name):
         self.name = name
 
@@ -183,7 +185,7 @@ class Group(db.Model):
     image = db.Column(db.String(355), unique=False, nullable=False)
     created_on = db.Column(db.DateTime, unique=False, nullable=False)
     language = db.Column(db.String(50), unique=False, nullable=False)
-    
+
     def __init__(self, name, abstract, maintainer, created_on, language, image, ckan_group_id):
         self.name = name
         self.abstract = abstract
@@ -192,11 +194,11 @@ class Group(db.Model):
         self.image = image
         self.ckan_group_id = ckan_group_id
         self.language = language
-   
+
     def serialize(self):
 
-        return {            
-            'group_id': self.group_id, 
+        return {
+            'group_id': self.group_id,
             'name': self.name,
             'abstract':self.abstract,
             'maintainer':self.maintainer,
@@ -216,19 +218,19 @@ class Repositorie(db.Model):
     abstract = db.Column(db.String(500), unique=False, nullable=False)
     maintainer = db.Column(db.String(355), unique=False, nullable=False)
     created_on = db.Column(db.DateTime, unique=False, nullable=False)
-    
-    
+
+
     def __init__(self, name, path, abstract, maintainer, created_on):
         self.name = name
         self.path = path
         self.abstract = abstract
         self.maintainer = maintainer
         self.created_on = created_on
-   
+
     def serialize(self):
 
-        return {            
-            'repo_id': self.repo_id, 
+        return {
+            'repo_id': self.repo_id,
             'name': self.name,
             'path': self.path,
             'abstract':self.abstract,
@@ -252,8 +254,8 @@ class Repositorie_Service(db.Model):
 
     def serialize(self):
 
-        return {            
-            'repo_id': self.repo_id, 
+        return {
+            'repo_id': self.repo_id,
             'service_id': self.service_id
         }
 
@@ -273,8 +275,8 @@ class Groups_User(db.Model):
 
     def serialize(self):
 
-        return {            
-            'group_id': self.group_id, 
+        return {
+            'group_id': self.group_id,
             'user_id': self.user_id
         }
 
@@ -294,8 +296,8 @@ class Repositorie_Group(db.Model):
 
     def serialize(self):
 
-        return {            
-            'repo_id': self.repo_id, 
+        return {
+            'repo_id': self.repo_id,
             'group_id': self.group_id
         }
 
@@ -315,8 +317,8 @@ class Repositorie_Categorie(db.Model):
 
     def serialize(self):
 
-        return {            
-            'repo_id': self.repo_id, 
+        return {
+            'repo_id': self.repo_id,
             'categorie_id': self.categorie_id
         }
 
@@ -336,8 +338,8 @@ class Service_Port(db.Model):
 
     def serialize(self):
 
-        return {            
-            'port_id': self.port_id, 
+        return {
+            'port_id': self.port_id,
             'service_id': self.service_id
         }
 
@@ -357,7 +359,7 @@ class Service_Host(db.Model):
 
     def serialize(self):
 
-        return {            
-            'host_id': self.host_id, 
+        return {
+            'host_id': self.host_id,
             'service_id': self.service_id
         }
