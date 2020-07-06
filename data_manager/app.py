@@ -1529,6 +1529,7 @@ def bbox_search(bbox):
                 datasets_spatial.append(item)
         return_dict = dict(help="http://localhost:5000/api/3/action/help_show?name=package_search", success="true", result = dict(count= len(datasets_spatial), sort= "score desc, metadata_modified desc", facets={}, results=datasets_spatial))
         return jsonify(return_dict)
+
     except Exception as e:
         return(str(e))
 
