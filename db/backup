@@ -1,0 +1,12 @@
+backup
+
+	pg_dump --file "/home/sansigolo/Documents/tbrd/terrabrasilisrd.sql" --host "172.18.0.7" --port "5432" --username "postgres" --verbose --format=c --blobs "terrabrasilisrd"
+
+restore
+
+	pg_restore --host "127.0.0.1" --port "5432" --username "postgres" --dbname "terrabrasilisrd" --verbose "terrabrasilisrd.sql"
+
+copy
+
+	sudo docker cp terrabrasilisrd_db:/terrabrasilisrd.sql /home/sansigolo/Documents/
+

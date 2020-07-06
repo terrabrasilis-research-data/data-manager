@@ -855,7 +855,7 @@ def read_repositories_from_user(user_id):
                 for val in por:
                     json_ports.setdefault('ports', []).append(val['port'])
 
-                json_ser['services'][n].update({ "ports" : str(json_ports['ports']) })
+                json_ser['services'][n].update({ "ports" : str(json_ports['ports'][0]) })
 
                 json_ser['services'][n].update({ "address" : str(hos[0]['address']) })
                 del json_ser['services'][n]['host_id']
@@ -1528,7 +1528,7 @@ def bbox_search(bbox):
             if(check_spatial(item, bbox)):
                 datasets_spatial.append(item)
         return_dict = dict(help="http://localhost:5000/api/3/action/help_show?name=package_search", success="true", result = dict(count= len(datasets_spatial), sort= "score desc, metadata_modified desc", facets={}, results=datasets_spatial))
-        return return_dict
+        return jsonify(return_dict)
     except Exception as e:
         return(str(e))
 

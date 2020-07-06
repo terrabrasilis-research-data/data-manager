@@ -1,7 +1,7 @@
 export POSTGRES_URL=127.0.0.1:5432
 export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=teste
-export POSTGRES_DB=TerraBrasilisRD
+export POSTGRES_DB=terrabrasilisrd
 export API_HOST=http://0.0.0.0
 export KUBERNETES_API_PORT=8070
 export CKAN_API_PORT=5000
