@@ -838,6 +838,7 @@ def read_repositories_from_user(user_id):
                 json_ser.setdefault('services', []).append(val)
 
             for n in range(len(ser)):
+
                 hosts = Host.query.filter(Host.host_id.in_([json_ser['services'][n]['host_id']]))
                 hos = ([e.serialize() for e in hosts])
 
@@ -881,7 +882,8 @@ def read_repositories_from_user(user_id):
                     if (r_user[j]['user_id'] == user_id):
                         new_json_response.setdefault("repositorie", []).append(json_response['repositorie'][i])
 
-            return jsonify(new_json_response)
+
+        return jsonify(new_json_response)
     except Exception as e:
 	    return(str(e))
 
