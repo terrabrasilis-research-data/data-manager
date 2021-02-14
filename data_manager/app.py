@@ -1536,6 +1536,4 @@ def bbox_search(bbox):
         return(str(e))
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', debug=True, port=8090)
-
-
+    app.run('0.0.0.0', debug=True, port=5000)
