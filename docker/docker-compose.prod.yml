@@ -1,0 +1,17 @@
+version: "3.3"
+services:
+
+  tbrd_data-manager-api:
+    container_name: tbrd_data-manager-api
+    restart: unless-stopped
+    build:
+        context: ..
+        dockerfile: docker/api/Dockerfile
+    env_file:
+        - app-variables.env
+    networks: 
+        - tbrd_network
+
+networks: 
+    tbrd_network:
+        external: true

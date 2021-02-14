@@ -1,16 +1,19 @@
-# docker-compose build && docker-compose up -d
 version: "3.3"
 services: 
-  apidb:
+
+  tbrd_data-manager-db:
     restart: unless-stopped
-    container_name: terrabrasilisrd_db    
+    container_name: tbrd_data-manager-db    
     build:
         context: ..
         dockerfile: docker/postgres/Dockerfile
     env_file:
-        - app-variables.env       
-  api:
-    container_name: terrabrasilisrd_api
+        - app-variables.env
+    networks: 
+        - tbrd_network
+
+  tbrd_data-manager-api:
+    container_name: tbrd_data-manager-api
     restart: unless-stopped
     build:
         context: ..
@@ -22,8 +25,12 @@ services:
     links:
         - apidb
     ports:
-        - "8090:8090"
+        - "5000:5000"
     env_file:
-        - app-variables.env    
+        - app-variables.env
+    networks: 
+        - tbrd_network
 
-
+networks: 
+    tbrd_network:
+        external: true
